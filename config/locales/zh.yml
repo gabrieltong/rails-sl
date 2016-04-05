@@ -51,6 +51,7 @@
       user: '用户'
     attributes:
       client: 
+        tags_text: 'Tags'
         id: '商户ID'
         hqhj: '红券货架'
         hyzx: '会员中心'
@@ -68,6 +69,7 @@
         website: '网址'
         wechat_account: '公众号账号'
         wechat_title: '公众号名称'
+        wechat_logo: '公众号二维码'
         created_at: '创建日期'
       user:
         collects: '收藏'
