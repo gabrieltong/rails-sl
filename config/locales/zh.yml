@@ -70,6 +70,10 @@
         wechat_account: '公众号账号'
         wechat_title: '公众号名称'
         wechat_logo: '公众号二维码'
+        admin_phone: '管理员'
+        admin_phone_hint: '请填写手机号作为管理员账号'
+        is_sp: '是否是服务商'
+        sp: '服务商'
         created_at: '创建日期'
       user:
         collects: '收藏'

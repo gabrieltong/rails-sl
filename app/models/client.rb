@@ -1,4 +1,5 @@
 class Client < ActiveRecord::Base
+	attr_accessor :tags_text
 	validates :title, presence: true
 	# validates :reg, :presence=>true
 	# validates :address, :presence=>true
@@ -21,10 +22,15 @@ class Client < ActiveRecord::Base
 	has_attached_file :wechat_logo, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
   validates_attachment_content_type :wechat_logo, content_type: /\Aimage\/.*\Z/  
 
+  belongs_to :sp, :class_name=>:Client, :foreign_key=>:sp_id
+  has_many :clients, :class_name=>:Client, :foreign_key=>:sp_id
+  
+  scope :sp, ->{where(:is_sp=>true)}
+
   acts_as_taggable_on :tag
 
 	def self.permit_params
-		[:title,:reg,:address,:position,:location_y,:localtion_x,:phone,:area,:type,:service_started,:service_ended_at,:website,:wechat_account,:wechat_title,:logo,:wechat_logo,:tags]
+		[:title,:reg,:address,:position,:location_y,:localtion_x,:phone,:area,:type,:service_started,:service_ended_at,:website,:wechat_account,:wechat_title,:logo,:wechat_logo,:tags_text, :is_sp, :sp_id]
 	end
 
 	def hqhj
@@ -35,11 +41,11 @@ class Client < ActiveRecord::Base
 		"http://hongq.net/hyzx/#{id}"
 	end
 
-	def tags= (value)
+	def tags_text= (value)
 		self.tag_list = value
 	end
 
-	def tag
-		self.tag_list.joins(',')
+	def tags_text
+		self.tag_list.join(',')
 	end
 end
