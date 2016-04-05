@@ -1,0 +1,33 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  reg: MyString
+  address: MyString
+  position: MyString
+  location_y: 1.5
+  localtion_x: 1.5
+  phone: MyString
+  area: MyString
+  type: 
+  service_started: 2016-04-05
+  service_ended_at: 2016-04-05
+  website: MyString
+  wechat_account: MyString
+  wechat_title: MyString
+
+two:
+  title: MyString
+  reg: MyString
+  address: MyString
+  position: MyString
+  location_y: 1.5
+  localtion_x: 1.5
+  phone: MyString
+  area: MyString
+  type: 
+  service_started: 2016-04-05
+  service_ended_at: 2016-04-05
+  website: MyString
+  wechat_account: MyString
+  wechat_title: MyString

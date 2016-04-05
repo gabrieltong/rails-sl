@@ -1,0 +1,140 @@
+'zh-CN':
+  other: '其他'
+  detail: '详情'
+  will_paginate:
+    previous_label: "&#8592; 上一页"
+    next_label: "下一页 &#8594;"
+    page_gap: "&hellip;"
+  helpers:
+    links:
+      view: '查看'
+      preview: '预览'
+  notice:
+    was_successfully_created: '创建成功型'
+    was_successfully_updated: '更新成功'
+  root_name: '首页'
+  user_list: '用户列表'
+  site_name: 'Hi Tong'
+  sign_up: '注册'
+  sign_in: '登录'
+  sign_out: '退出'
+  forgot_password: '忘记密码'
+  simple_form:
+    options:
+      user:
+        sex:
+          male: '男'
+          female: '女'
+      import:
+        question_kind:
+          scope_zhenti: '真题'
+        state:
+          audios: '音频压缩包'
+          freelaws: '免费法条'
+    labels:
+      password:
+        username: '用户名'
+        password: '密码'
+        email: '邮件'
+      session:
+        email: '邮箱'
+        username: '用户名'
+        password: '密码'
+      user:
+        username: '用户名'
+        email: '邮箱'
+        password: '密码'
+        signature: '个性签名'
+  activerecord:      
+    models:
+      client: '客户'
+      user: '用户'
+    attributes:
+      client: 
+        id: '商户ID'
+        hqhj: '红券货架'
+        hyzx: '会员中心'
+        title: '品牌名称'
+        reg: '工商注册名称'
+        address: '地址'
+        location_y: '经度'
+        localtion_x: '维度'
+        phone: '客服电话'
+        area: '所属地区'
+        type: '行业类型'
+        service_started: '服务期限开始'
+        service_started_at: '服务期限开始'
+        service_ended_at: '服务期限结束'
+        website: '网址'
+        wechat_account: '公众号账号'
+        wechat_title: '公众号名称'
+        created_at: '创建日期'
+      user:
+        collects: '收藏'
+        borned_at: '出生日期'
+        id_card: '身份证'
+        name: '名称'
+        email: '邮箱'
+        username: '用户名'
+        phone: '手机号'
+        description: '简介'
+        password: '密码'
+        created_at: '创建日期'
+        updated_at: '更新日期'
+        avatar: '头像'
+      xinwen:
+        author: '作者'
+        published_at: '发布日期'
+        from: '来源'
+        public: '是否公开'
+        name: '标题'
+        user: '作者'
+        category: '微信分类'
+        summary: '摘要'
+        xinwen_menu: '分类'
+        image: '封面'
+        flash_url: 'Flash链接'
+        content: '内容'
+        created_at: '创建日期'
+        update_at: '更新日期'
+        xinwen_menu_id: '分类'        
+      xinwen_menu:
+        name: '标题'
+        content: '内容'
+        description: '描述'
+        image: '专辑封面'   
+        user_id: '用户' 
+        created_at: '创建日期'
+        update_at: '更新日期' 
+        xinwen_menu_id: '新闻分类'  
+      event:
+        name: '日程名称'
+        content: '日程内容'
+        start_at: '开始时间'
+        end_at: '结束时间'
+        end_at: '结束时间'
+        all_day: '全天'
+        all_user: '所有用户'
+        color: '日程颜色'
+        user: '用户'
+        created_at: '创建时间'
+        updated_at: '更新时间'
+      import:
+        file: '文件'
+        file_file_name: '文件名称'
+        file_content_type: '文件类型'
+        file_file_size: '文件大小'
+        type: '类型'
+        imported: '导入内容'
+      feedback:
+        name: '反馈标题'
+        content: '反馈内容'
+        user: '用户'
+        created_at: '反馈时间'
+  active_admin:
+    scopes:
+      with_points: '已有知识点'
+      no_points: '不含知识点'
+      validated: '验证通过'
+      invalidated: '验证未通过'
+      all: '所有'
