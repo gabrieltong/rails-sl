@@ -13,7 +13,7 @@
     was_successfully_created: '创建成功型'
     was_successfully_updated: '更新成功'
   root_name: '首页'
-  user_list: '用户列表'
+  member_list: '用户列表'
   site_name: 'Hi Tong'
   sign_up: '注册'
   sign_in: '登录'
@@ -21,7 +21,7 @@
   forgot_password: '忘记密码'
   simple_form:
     options:
-      user:
+      member:
         sex:
           male: '男'
           female: '女'
@@ -40,17 +40,18 @@
         email: '邮箱'
         username: '用户名'
         password: '密码'
-      user:
+      member:
         username: '用户名'
         email: '邮箱'
         password: '密码'
         signature: '个性签名'
   activerecord:      
     models:
-      client: '客户'
-      user: '用户'
+      client: '商户'
+      member: '用户'
     attributes:
       client: 
+        service_deadline: '服务期限'
         tags_text: 'Tags'
         id: '商户ID'
         hqhj: '红券货架'
@@ -75,7 +76,20 @@
         is_sp: '是否是服务商'
         sp: '服务商'
         created_at: '创建日期'
-      user:
+      member:
+        collects: '收藏'
+        borned_at: '出生日期'
+        id_card: '身份证'
+        name: '名称'
+        email: '邮箱'
+        username: '用户名'
+        phone: '手机号'
+        description: '简介'
+        password: '密码'
+        created_at: '创建日期'
+        updated_at: '更新日期'
+        avatar: '头像'
+      member:
         collects: '收藏'
         borned_at: '出生日期'
         id_card: '身份证'
@@ -94,7 +108,7 @@
         from: '来源'
         public: '是否公开'
         name: '标题'
-        user: '作者'
+        member: '作者'
         category: '微信分类'
         summary: '摘要'
         xinwen_menu: '分类'
@@ -109,7 +123,7 @@
         content: '内容'
         description: '描述'
         image: '专辑封面'   
-        user_id: '用户' 
+        member_id: '用户' 
         created_at: '创建日期'
         update_at: '更新日期' 
         xinwen_menu_id: '新闻分类'  
@@ -120,9 +134,9 @@
         end_at: '结束时间'
         end_at: '结束时间'
         all_day: '全天'
-        all_user: '所有用户'
+        all_member: '所有用户'
         color: '日程颜色'
-        user: '用户'
+        member: '用户'
         created_at: '创建时间'
         updated_at: '更新时间'
       import:
@@ -135,7 +149,7 @@
       feedback:
         name: '反馈标题'
         content: '反馈内容'
-        user: '用户'
+        member: '用户'
         created_at: '反馈时间'
   active_admin:
     scopes:
