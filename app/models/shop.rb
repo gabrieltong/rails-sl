@@ -1,5 +1,7 @@
 class Shop < ActiveRecord::Base
 	belongs_to :client
+	has_many :client_managers
+	has_many :managers, :through=>:client_managers
 
 	alias_attribute :longitude, :y
 	alias_attribute :latitude, :x	

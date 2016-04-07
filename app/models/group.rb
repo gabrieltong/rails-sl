@@ -4,7 +4,6 @@ class Group < ActiveRecord::Base
 	has_many :members
 	has_many :group_managers
 	has_many :managers
-	
 	validates :title, :position, :desc, :active, :presence=>true
 
 	def self.permit_params

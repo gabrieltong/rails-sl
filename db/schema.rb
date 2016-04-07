@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160407064031) do
+ActiveRecord::Schema.define(version: 20160407073719) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(version: 20160407064031) do
     t.datetime "updated_at",             null: false
     t.string   "phone",      limit: 255
     t.string   "name",       limit: 255
+    t.integer  "shop_id",    limit: 4
   end
 
   add_index "client_managers", ["admin"], name: "index_client_managers_on_admin", using: :btree
@@ -64,6 +65,7 @@ ActiveRecord::Schema.define(version: 20160407064031) do
   add_index "client_managers", ["member_id"], name: "index_client_managers_on_member_id", using: :btree
   add_index "client_managers", ["phone"], name: "index_client_managers_on_phone", using: :btree
   add_index "client_managers", ["sender"], name: "index_client_managers_on_sender", using: :btree
+  add_index "client_managers", ["shop_id"], name: "index_client_managers_on_shop_id", using: :btree
 
   create_table "client_members", force: :cascade do |t|
     t.integer  "client_id",        limit: 4
@@ -121,23 +123,6 @@ ActiveRecord::Schema.define(version: 20160407064031) do
   end
 
   add_index "clients", ["is_sp"], name: "index_clients_on_is_sp", using: :btree
-
-  create_table "group_managers", force: :cascade do |t|
-    t.integer  "group_id",   limit: 4
-    t.integer  "member_id",  limit: 4
-    t.boolean  "send"
-    t.boolean  "admin"
-    t.boolean  "check"
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-  end
-
-  add_index "group_managers", ["admin"], name: "index_group_managers_on_admin", using: :btree
-  add_index "group_managers", ["check"], name: "index_group_managers_on_check", using: :btree
-  add_index "group_managers", ["group_id", "member_id"], name: "index_group_managers_on_group_id_and_member_id", unique: true, using: :btree
-  add_index "group_managers", ["group_id"], name: "index_group_managers_on_group_id", using: :btree
-  add_index "group_managers", ["member_id"], name: "index_group_managers_on_member_id", using: :btree
-  add_index "group_managers", ["send"], name: "index_group_managers_on_send", using: :btree
 
   create_table "group_members", force: :cascade do |t|
     t.integer  "group_id",   limit: 4
