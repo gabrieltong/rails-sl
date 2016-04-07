@@ -62,6 +62,7 @@
         longitude: '经度'
         latitude: '维度'
       client_manager:
+        shop: '门店'
         client_id: '商户'
         phone: '电话'
         name: '姓名'
