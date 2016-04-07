@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160405062661) do
+ActiveRecord::Schema.define(version: 20160407013641) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -46,6 +46,61 @@ ActiveRecord::Schema.define(version: 20160405062661) do
   add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "client_group_members", force: :cascade do |t|
+    t.integer  "client_group_id", limit: 4
+    t.integer  "member_id",       limit: 4
+    t.date     "started_at"
+    t.date     "ended_at"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "client_group_members", ["client_group_id", "member_id"], name: "index_client_group_members_on_client_group_id_and_member_id", unique: true, using: :btree
+
+  create_table "client_groups", force: :cascade do |t|
+    t.integer  "client_id",  limit: 4
+    t.string   "title",      limit: 255,   default: ""
+    t.integer  "position",   limit: 4
+    t.string   "desc",       limit: 10000, default: ""
+    t.boolean  "active"
+    t.boolean  "default"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "client_groups", ["active"], name: "index_client_groups_on_active", using: :btree
+  add_index "client_groups", ["client_id"], name: "index_client_groups_on_client_id", using: :btree
+  add_index "client_groups", ["default"], name: "index_client_groups_on_default", using: :btree
+  add_index "client_groups", ["position"], name: "index_client_groups_on_position", using: :btree
+
+  create_table "client_members", force: :cascade do |t|
+    t.integer  "client_id",        limit: 4
+    t.integer  "member_id",        limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.string   "name",             limit: 255
+    t.string   "sex",              limit: 255
+    t.date     "borned_at"
+    t.string   "address",          limit: 255
+    t.string   "email",            limit: 255
+    t.string   "pic_file_name",    limit: 255
+    t.string   "pic_content_type", limit: 255
+    t.integer  "pic_file_size",    limit: 4
+    t.datetime "pic_updated_at"
+  end
+
+  add_index "client_members", ["client_id", "member_id"], name: "index_client_members_on_client_id_and_member_id", unique: true, using: :btree
+
+  create_table "client_users", force: :cascade do |t|
+    t.integer  "client_id",  limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "client_users", ["client_id"], name: "index_client_users_on_client_id", using: :btree
+  add_index "client_users", ["user_id"], name: "index_client_users_on_user_id", using: :btree
+
   create_table "clients", force: :cascade do |t|
     t.string   "title",                    limit: 255
     t.string   "reg",                      limit: 255
@@ -71,7 +126,41 @@ ActiveRecord::Schema.define(version: 20160405062661) do
     t.string   "wechat_logo_content_type", limit: 255
     t.integer  "wechat_logo_file_size",    limit: 4
     t.datetime "wechat_logo_updated_at"
+    t.string   "admin_phone",              limit: 255
+    t.boolean  "is_sp"
+    t.integer  "sp_id",                    limit: 4
+    t.boolean  "show_name"
+    t.boolean  "show_phone"
+    t.boolean  "show_sex"
+    t.boolean  "show_borded_at"
+    t.boolean  "show_pic"
+    t.boolean  "show_address"
+    t.boolean  "show_email"
   end
+
+  add_index "clients", ["is_sp"], name: "index_clients_on_is_sp", using: :btree
+
+  create_table "members", force: :cascade do |t|
+    t.string   "email",                  limit: 255, default: "", null: false
+    t.string   "encrypted_password",     limit: 255, default: "", null: false
+    t.string   "reset_password_token",   limit: 255
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "username",               limit: 255
+    t.string   "phone",                  limit: 255
+  end
+
+  add_index "members", ["email"], name: "index_members_on_email", unique: true, using: :btree
+  add_index "members", ["phone"], name: "index_members_on_phone", unique: true, using: :btree
+  add_index "members", ["reset_password_token"], name: "index_members_on_reset_password_token", unique: true, using: :btree
+  add_index "members", ["username"], name: "index_members_on_username", unique: true, using: :btree
 
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
@@ -100,6 +189,8 @@ ActiveRecord::Schema.define(version: 20160405062661) do
     t.string   "encrypted_password", limit: 128, null: false
     t.string   "confirmation_token", limit: 128
     t.string   "remember_token",     limit: 128, null: false
+    t.string   "phone",              limit: 255
+    t.boolean  "wechat_binded"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", using: :btree

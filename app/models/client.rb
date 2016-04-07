@@ -26,7 +26,7 @@ class Client < ActiveRecord::Base
   has_many :clients, :class_name=>:Client, :foreign_key=>:sp_id
   has_many :client_members
   has_many :members, :through=>:client_members
-
+  has_many :client_shops
   scope :sp, ->{where(:is_sp=>true)}
 
   acts_as_taggable_on :tag
