@@ -12,6 +12,9 @@ class Member < ActiveRecord::Base
   has_many :client_members
   has_many :clients, :through=>:client_members
 
+  has_many :client_managers
+  has_many :managed_shops, :through=>:client_managers, :source=>:shop
+  
 	def self.permit_params
 		[:phone, :username, :password, :password_confirmation]
 	end        
