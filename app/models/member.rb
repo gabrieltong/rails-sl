@@ -5,6 +5,7 @@ class Member < ActiveRecord::Base
   devise :database_authenticatable, 
          :recoverable, :rememberable, :trackable, :validatable, :authentication_keys => [:phone]
 
+  validates :phone, :presence=>true, :uniqueness=>true
   has_many :managed_clients, :class_name=>Client, :foreign_key=>:admin_phone, :primary_key=>:phone
   has_many :managed_members, :class_name=>Member, :through=>:managed_clients, :source=>:members
 
@@ -16,7 +17,7 @@ class Member < ActiveRecord::Base
 	end        
 
 	def self.client_permit_params
-		[:name, :sex, :borded_at, :pic, :address, :email]
+		[:email, :password, :password_confirmation, :name, :sex, :borded_at, :pic, :address, :email]
 	end
 
 	def email_required?

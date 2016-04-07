@@ -50,6 +50,7 @@
       client: '商户'
       member: '用户'
       shop: '门店'
+      client_manager: '操作员'
     attributes:
       shop:
         client: '商户'
@@ -60,6 +61,13 @@
         x: '维度'
         longitude: '经度'
         latitude: '维度'
+      client_manager:
+        client_id: '商户'
+        phone: '电话'
+        name: '姓名'
+        admin: '管理员'
+        checker: '销券'
+        sender: '发券'
       client: 
         service_deadline: '服务期限'
         tags_text: 'Tags'
@@ -171,3 +179,6 @@
       validated: '验证通过'
       invalidated: '验证未通过'
       all: '所有'
+      admin: '管理员'
+      checker: '销券'
+      sender: '发券'

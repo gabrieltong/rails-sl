@@ -1,7 +1,9 @@
 class Group < ActiveRecord::Base
 	belongs_to :client
-	has_many :group_member
+	has_many :group_members
 	has_many :members
+	has_many :group_managers
+	has_many :managers
 	
 	validates :title, :position, :desc, :active, :presence=>true
 
