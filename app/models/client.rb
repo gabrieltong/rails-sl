@@ -23,15 +23,19 @@ class Client < ActiveRecord::Base
 	has_attached_file :wechat_logo, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
   validates_attachment_content_type :wechat_logo, content_type: /\Aimage\/.*\Z/  
 
+	validates :longitude, :numericality=>{:greater_than_or_equal_to=>-180, :less_than_or_equal_to=>180}, :allow_nil=>true
+	validates :latitude, :numericality=>{:greater_than_or_equal_to=>-90, :less_than_or_equal_to=>90}, :allow_nil=>true
+
   belongs_to :sp, :class_name=>:Client, :foreign_key=>:sp_id
   has_many :clients, :class_name=>:Client, :foreign_key=>:sp_id
   has_many :client_members
   has_many :members, :through=>:client_members
   has_many :shops
   has_many :groups
+  has_many :group_members, :through=>:members
   has_many :client_managers
   has_many :managers, :through=>:client_managers
-  
+
   scope :sp, ->{where(:is_sp=>true)}
 
   acts_as_taggable_on :tag

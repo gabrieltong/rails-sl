@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160407073719) do
+ActiveRecord::Schema.define(version: 20160407083013) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -166,11 +166,13 @@ ActiveRecord::Schema.define(version: 20160407073719) do
     t.datetime "updated_at",                                      null: false
     t.string   "username",               limit: 255
     t.string   "phone",                  limit: 255
+    t.boolean  "wechat_binded"
   end
 
   add_index "members", ["phone"], name: "index_members_on_phone", unique: true, using: :btree
   add_index "members", ["reset_password_token"], name: "index_members_on_reset_password_token", unique: true, using: :btree
   add_index "members", ["username"], name: "index_members_on_username", unique: true, using: :btree
+  add_index "members", ["wechat_binded"], name: "index_members_on_wechat_binded", using: :btree
 
   create_table "shops", force: :cascade do |t|
     t.integer  "client_id",  limit: 4
