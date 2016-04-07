@@ -49,7 +49,17 @@
     models:
       client: '商户'
       member: '用户'
+      shop: '门店'
     attributes:
+      shop:
+        client: '商户'
+        title: '门店名'
+        address: '门店地址'
+        phone: '客服电话'
+        y: '经度'
+        x: '维度'
+        longitude: '经度'
+        latitude: '维度'
       client: 
         service_deadline: '服务期限'
         tags_text: 'Tags'
@@ -61,6 +71,8 @@
         address: '地址'
         location_y: '经度'
         localtion_x: '维度'
+        longitude: '经度'
+        latitude: '维度'
         phone: '客服电话'
         area: '所属地区'
         type: '行业类型'

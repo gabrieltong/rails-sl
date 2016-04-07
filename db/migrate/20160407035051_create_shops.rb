@@ -1,6 +1,6 @@
-class CreateClientShops < ActiveRecord::Migration
+class CreateShops < ActiveRecord::Migration
   def change
-    create_table :client_shops do |t|
+    create_table :shops do |t|
       t.integer :client_id
       t.string :title
       t.string :address
@@ -10,6 +10,6 @@ class CreateClientShops < ActiveRecord::Migration
 
       t.timestamps null: false
     end
-    add_index :client_shops, :client_id
+    add_index :shops, :client_id
   end
 end

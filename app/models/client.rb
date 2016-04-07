@@ -15,7 +15,8 @@ class Client < ActiveRecord::Base
 	# validates :wechat_account, :presence=>true
 	# validates :wechat_title, :presence=>true
 	alias_attribute :service_started_at, :service_started
-
+	alias_attribute :longitude, :location_y
+	alias_attribute :latitude, :localtion_x
 	has_attached_file :logo, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
   validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
 
@@ -26,13 +27,13 @@ class Client < ActiveRecord::Base
   has_many :clients, :class_name=>:Client, :foreign_key=>:sp_id
   has_many :client_members
   has_many :members, :through=>:client_members
-  has_many :client_shops
+  has_many :shops
   scope :sp, ->{where(:is_sp=>true)}
 
   acts_as_taggable_on :tag
 
 	def self.permit_params
-		[:title,:reg,:address,:position,:location_y,:localtion_x,:phone,:area,:type,:service_started,:service_ended_at,:website,:wechat_account,:wechat_title,:logo,:wechat_logo,:tags_text, :is_sp, :sp_id ,:show_name,:show_phone,:show_sex,:show_borded_at,:show_pic,:show_address,:show_email]
+		[:title,:reg,:address,:position,:location_y,:localtion_x,:phone,:area,:type,:service_started,:service_ended_at,:website,:wechat_account,:wechat_title,:logo,:wechat_logo,:tags_text, :is_sp, :sp_id ,:show_name,:show_phone,:show_sex,:show_borded_at,:show_pic,:show_address,:show_email, :longitude, :latitude]
 	end
 
 	def hqhj

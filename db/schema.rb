@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160407013641) do
+ActiveRecord::Schema.define(version: 20160407035051) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -91,6 +91,19 @@ ActiveRecord::Schema.define(version: 20160407013641) do
 
   add_index "client_members", ["client_id", "member_id"], name: "index_client_members_on_client_id_and_member_id", unique: true, using: :btree
 
+  create_table "client_shops", force: :cascade do |t|
+    t.integer  "client_id",  limit: 4
+    t.string   "title",      limit: 255
+    t.string   "address",    limit: 255
+    t.string   "phone",      limit: 255
+    t.float    "x",          limit: 24
+    t.float    "y",          limit: 24
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "client_shops", ["client_id"], name: "index_client_shops_on_client_id", using: :btree
+
   create_table "client_users", force: :cascade do |t|
     t.integer  "client_id",  limit: 4
     t.integer  "user_id",    limit: 4
@@ -161,6 +174,19 @@ ActiveRecord::Schema.define(version: 20160407013641) do
   add_index "members", ["phone"], name: "index_members_on_phone", unique: true, using: :btree
   add_index "members", ["reset_password_token"], name: "index_members_on_reset_password_token", unique: true, using: :btree
   add_index "members", ["username"], name: "index_members_on_username", unique: true, using: :btree
+
+  create_table "shops", force: :cascade do |t|
+    t.integer  "client_id",  limit: 4
+    t.string   "title",      limit: 255
+    t.string   "address",    limit: 255
+    t.string   "phone",      limit: 255
+    t.float    "x",          limit: 24
+    t.float    "y",          limit: 24
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "shops", ["client_id"], name: "index_shops_on_client_id", using: :btree
 
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
