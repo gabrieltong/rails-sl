@@ -3,7 +3,7 @@
 one:
   client_id: 1
   title: MyString
-  position: 1
+  position: MyString
   desc: MyString
   active: false
   default: false
@@ -11,7 +11,7 @@ one:
 two:
   client_id: 1
   title: MyString
-  position: 1
+  position: MyString
   desc: MyString
   active: false
   default: false

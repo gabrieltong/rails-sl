@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  group_id: 1
+  member_id: 1
+  started_at: 2016-04-07
+  ended_at: 2016-04-07
+
+two:
+  group_id: 1
+  member_id: 1
+  started_at: 2016-04-07
+  ended_at: 2016-04-07

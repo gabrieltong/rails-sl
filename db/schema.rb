@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160407035051) do
+ActiveRecord::Schema.define(version: 20160407043442) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -46,33 +46,6 @@ ActiveRecord::Schema.define(version: 20160407035051) do
   add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
-  create_table "client_group_members", force: :cascade do |t|
-    t.integer  "client_group_id", limit: 4
-    t.integer  "member_id",       limit: 4
-    t.date     "started_at"
-    t.date     "ended_at"
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "client_group_members", ["client_group_id", "member_id"], name: "index_client_group_members_on_client_group_id_and_member_id", unique: true, using: :btree
-
-  create_table "client_groups", force: :cascade do |t|
-    t.integer  "client_id",  limit: 4
-    t.string   "title",      limit: 255,   default: ""
-    t.integer  "position",   limit: 4
-    t.string   "desc",       limit: 10000, default: ""
-    t.boolean  "active"
-    t.boolean  "default"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-  end
-
-  add_index "client_groups", ["active"], name: "index_client_groups_on_active", using: :btree
-  add_index "client_groups", ["client_id"], name: "index_client_groups_on_client_id", using: :btree
-  add_index "client_groups", ["default"], name: "index_client_groups_on_default", using: :btree
-  add_index "client_groups", ["position"], name: "index_client_groups_on_position", using: :btree
-
   create_table "client_members", force: :cascade do |t|
     t.integer  "client_id",        limit: 4
     t.integer  "member_id",        limit: 4
@@ -90,29 +63,6 @@ ActiveRecord::Schema.define(version: 20160407035051) do
   end
 
   add_index "client_members", ["client_id", "member_id"], name: "index_client_members_on_client_id_and_member_id", unique: true, using: :btree
-
-  create_table "client_shops", force: :cascade do |t|
-    t.integer  "client_id",  limit: 4
-    t.string   "title",      limit: 255
-    t.string   "address",    limit: 255
-    t.string   "phone",      limit: 255
-    t.float    "x",          limit: 24
-    t.float    "y",          limit: 24
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "client_shops", ["client_id"], name: "index_client_shops_on_client_id", using: :btree
-
-  create_table "client_users", force: :cascade do |t|
-    t.integer  "client_id",  limit: 4
-    t.integer  "user_id",    limit: 4
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-  end
-
-  add_index "client_users", ["client_id"], name: "index_client_users_on_client_id", using: :btree
-  add_index "client_users", ["user_id"], name: "index_client_users_on_user_id", using: :btree
 
   create_table "clients", force: :cascade do |t|
     t.string   "title",                    limit: 255
@@ -152,6 +102,33 @@ ActiveRecord::Schema.define(version: 20160407035051) do
   end
 
   add_index "clients", ["is_sp"], name: "index_clients_on_is_sp", using: :btree
+
+  create_table "group_members", force: :cascade do |t|
+    t.integer  "group_id",   limit: 4
+    t.integer  "member_id",  limit: 4
+    t.date     "started_at"
+    t.date     "ended_at"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "group_members", ["group_id"], name: "index_group_members_on_group_id", using: :btree
+  add_index "group_members", ["member_id"], name: "index_group_members_on_member_id", using: :btree
+
+  create_table "groups", force: :cascade do |t|
+    t.integer  "client_id",  limit: 4
+    t.string   "title",      limit: 255,   default: ""
+    t.integer  "position",   limit: 4,     default: 0
+    t.string   "desc",       limit: 10000, default: ""
+    t.boolean  "active",                   default: true
+    t.boolean  "default",                  default: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  add_index "groups", ["active"], name: "index_groups_on_active", using: :btree
+  add_index "groups", ["client_id"], name: "index_groups_on_client_id", using: :btree
+  add_index "groups", ["default"], name: "index_groups_on_default", using: :btree
 
   create_table "members", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -207,19 +184,5 @@ ActiveRecord::Schema.define(version: 20160407035051) do
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
-
-  create_table "users", force: :cascade do |t|
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
-    t.string   "email",              limit: 255, null: false
-    t.string   "encrypted_password", limit: 128, null: false
-    t.string   "confirmation_token", limit: 128
-    t.string   "remember_token",     limit: 128, null: false
-    t.string   "phone",              limit: 255
-    t.boolean  "wechat_binded"
-  end
-
-  add_index "users", ["email"], name: "index_users_on_email", using: :btree
-  add_index "users", ["remember_token"], name: "index_users_on_remember_token", using: :btree
 
 end
