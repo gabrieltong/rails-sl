@@ -1,7 +1,7 @@
 class Group < ActiveRecord::Base
 	belongs_to :client
 	has_many :group_members
-	has_many :members
+	has_many :members, :primary_key=>:phone, :foreign_key=>:phone
 	
 	validates :title, :position, :desc, :active, :presence=>true
 

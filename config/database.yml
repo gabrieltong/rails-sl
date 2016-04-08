@@ -48,7 +48,12 @@ test:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
 production:
-  <<: *default
-  database: rails-sl_production
-  username: rails-sl
-  password: <%= ENV['RAILS-SL_DATABASE_PASSWORD'] %>
+  host : rdsufinmen2ivjb.mysql.rds.aliyuncs.com
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: hongqnet
+  pool: 5
+  username: hongqnet
+  password: asfsafdc3432dd
+  socket: /var/lib/mysql/mysql.sock

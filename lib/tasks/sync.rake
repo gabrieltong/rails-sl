@@ -16,6 +16,8 @@ namespace :sync do
         # %x{cp #{source_path}/test/fixtures/*.yml #{dest_path}/test/fixtures/}
 
         # Database YML
+        %x{cp #{source_path}/.ruby-version #{dest_path}/}
+        %x{cp #{source_path}/.ruby-gemset #{dest_path}/}
         %x{cp #{source_path}/config/locales/*.yml #{dest_path}/config/locales/}
         %x{cp #{source_path}/db/migrate/*.rb #{dest_path}/db/migrate/}
         %x{cp #{source_path}/config/database.yml #{dest_path}/config/database.yml}
