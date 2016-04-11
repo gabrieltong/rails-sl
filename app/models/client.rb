@@ -63,4 +63,16 @@ class Client < ActiveRecord::Base
 	def service_deadline
 		"#{service_started}-#{service_ended_at}"
 	end
+
+  def dayuConfig
+		title = "佟洋测试"
+		code = "123456"
+		return {
+	    'smsType'=>'normal',
+	    'smsFreeSignName'=>'前站',
+	    'smsParam'=>"{'code':'#{code}','product'=>'','item'=>'#{title}'}",
+	    'recNum'=>13654265306,
+	    'smsTemplateCode'=>'SMS_2145923'
+		}
+	end
 end

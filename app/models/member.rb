@@ -33,5 +33,5 @@ class Member < ActiveRecord::Base
 
   def email_changed?
     false
-  end	
+  end
 end

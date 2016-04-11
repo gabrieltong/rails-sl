@@ -114,6 +114,7 @@
         show_address: '显示邮寄地址'
         show_email: '显示电子邮箱'
       member:
+        password_confirmation: '确认密码'
         collects: '收藏'
         borned_at: '出生日期'
         id_card: '身份证'
