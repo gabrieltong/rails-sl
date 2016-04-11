@@ -23,11 +23,6 @@ class Dayu < ActiveRecord::Base
     :gabe_dayus
   end
 
-  def config(ak, sk)
-  	@ak = ak || '23265315'
-  	@sk = sk || 'a01020d3de3b53fc9cd86ed51d8bb981'
-  end
-
   def send
     `
     php #{LaPath} dayu:send #{self.id}

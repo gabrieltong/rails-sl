@@ -1,8 +1,6 @@
 # encoding: UTF-8
 class MobileFile < ActiveRecord::Base
   acts_as_paranoid
-  attr_accessible :user_id,:state
-  attr_accessible :file
   has_attached_file :file
 
   do_not_validate_attachment_file_type :file
