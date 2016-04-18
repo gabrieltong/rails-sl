@@ -41,6 +41,7 @@ class Client < ActiveRecord::Base
   has_many :managers, :through=>:client_managers
 
   scope :sp, ->{where(:is_sp=>true)}
+  scope :not_sp, ->{where.not(:is_sp=>true)}
 
   acts_as_taggable_on :tag
 

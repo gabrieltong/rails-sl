@@ -226,3 +226,7 @@
       sender: '发券'
       wechat_binded: '微信已绑定'
       wechat_unbinded: '微信已绑定'
+      sp: '服务商'
+      not_sp: '非服务商'
+      sended: '已发送'
+      not_sended: '未发送'

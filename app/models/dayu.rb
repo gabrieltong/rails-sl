@@ -4,7 +4,10 @@ class Dayu < ActiveRecord::Base
   scope :findByDayuable, -> (obj) { where(:dayuable_type => obj.class.name, :dayuable_id => obj.id) }
 
   serialize :smsParam
-  
+
+  scope :sended, ->{where(:sended=>true)}
+  scope :not_sended, ->{where.not(:sended=>true)}
+
   def self.createByDayuable(dayuable, config)
     dayu = self.new
     dayu.smsType = config['smsType']
