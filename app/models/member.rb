@@ -2,7 +2,7 @@ class Member < ActiveRecord::Base
 	attr_accessor :name,:sex,:borded_at,:pic,:address,:email	
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, 
+  devise :database_authenticatable,
          :recoverable, :rememberable, :trackable, :validatable, :authentication_keys => [:phone]
 
   scope :wechat_binded, ->{where(:wechat_binded=>true)}
@@ -21,7 +21,7 @@ class Member < ActiveRecord::Base
 
 	def self.permit_params
 		[:phone, :username, :password, :password_confirmation]
-	end        
+	end
 
 	def self.client_permit_params
 		[:email, :password, :password_confirmation, :name, :sex, :borded_at, :pic, :address, :email]

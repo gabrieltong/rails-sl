@@ -21,7 +21,7 @@ class Client < ActiveRecord::Base
   validates_attachment_content_type :logo, content_type: /\Aimage\/.*\Z/
 
 	has_attached_file :wechat_logo, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
-  validates_attachment_content_type :wechat_logo, content_type: /\Aimage\/.*\Z/  
+  validates_attachment_content_type :wechat_logo, content_type: /\Aimage\/.*\Z/
 
 	validates :longitude, :numericality=>{:greater_than_or_equal_to=>-180, :less_than_or_equal_to=>180}, :allow_nil=>true
 	validates :latitude, :numericality=>{:greater_than_or_equal_to=>-90, :less_than_or_equal_to=>90}, :allow_nil=>true
@@ -74,5 +74,9 @@ class Client < ActiveRecord::Base
 	    'recNum'=>13654265306,
 	    'smsTemplateCode'=>'SMS_2145923'
 		}
+	end
+
+	def send_smg_to_admin
+			
 	end
 end

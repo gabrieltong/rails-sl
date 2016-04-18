@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160407083013) do
+ActiveRecord::Schema.define(version: 20160418013009) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -123,6 +123,41 @@ ActiveRecord::Schema.define(version: 20160407083013) do
   end
 
   add_index "clients", ["is_sp"], name: "index_clients_on_is_sp", using: :btree
+  add_index "clients", ["sp_id"], name: "index_clients_on_sp_id", using: :btree
+
+  create_table "files", force: :cascade do |t|
+    t.integer  "file_owner_id",     limit: 4
+    t.string   "file_owner_type",   limit: 255
+    t.string   "file_file_name",    limit: 255
+    t.string   "file_content_type", limit: 255
+    t.integer  "file_file_size",    limit: 4
+    t.datetime "file_updated_at"
+    t.string   "type",              limit: 255
+  end
+
+  add_index "files", ["file_owner_id", "file_owner_type"], name: "index_files_on_file_owner_id_and_file_owner_type", using: :btree
+
+  create_table "gabe_dayus", force: :cascade do |t|
+    t.string   "smsType",         limit: 255,              null: false
+    t.string   "smsFreeSignName", limit: 255,              null: false
+    t.string   "smsParam",        limit: 255,              null: false
+    t.string   "recNum",          limit: 255,              null: false
+    t.string   "smsTemplateCode", limit: 255,              null: false
+    t.string   "appkey",          limit: 255, default: "", null: false
+    t.integer  "dayuable_id",     limit: 4,                null: false
+    t.string   "dayuable_type",   limit: 255,              null: false
+    t.datetime "sended_at",                                null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "gabe_dayus", ["appkey"], name: "gabe_dayus_appkey_index", using: :btree
+  add_index "gabe_dayus", ["dayuable_type", "dayuable_id"], name: "gabe_dayus_dayuable_type_dayuable_id_index", using: :btree
+  add_index "gabe_dayus", ["recNum"], name: "gabe_dayus_recnum_index", using: :btree
+  add_index "gabe_dayus", ["smsFreeSignName"], name: "gabe_dayus_smsfreesignname_index", using: :btree
+  add_index "gabe_dayus", ["smsParam"], name: "gabe_dayus_smsparam_index", using: :btree
+  add_index "gabe_dayus", ["smsTemplateCode"], name: "gabe_dayus_smstemplatecode_index", using: :btree
+  add_index "gabe_dayus", ["smsType"], name: "gabe_dayus_smstype_index", using: :btree
 
   create_table "group_members", force: :cascade do |t|
     t.integer  "group_id",   limit: 4
@@ -174,6 +209,34 @@ ActiveRecord::Schema.define(version: 20160407083013) do
   add_index "members", ["username"], name: "index_members_on_username", unique: true, using: :btree
   add_index "members", ["wechat_binded"], name: "index_members_on_wechat_binded", using: :btree
 
+  create_table "migrations", id: false, force: :cascade do |t|
+    t.string  "migration", limit: 255, null: false
+    t.integer "batch",     limit: 4,   null: false
+  end
+
+  create_table "mobile_files", force: :cascade do |t|
+    t.integer  "user_id",           limit: 4
+    t.string   "type",              limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "file_file_name",    limit: 255
+    t.string   "file_content_type", limit: 255
+    t.integer  "file_file_size",    limit: 4
+    t.datetime "file_updated_at"
+  end
+
+  add_index "mobile_files", ["type"], name: "index_mobile_files_on_type", using: :btree
+  add_index "mobile_files", ["user_id"], name: "index_mobile_files_on_user_id", using: :btree
+
+  create_table "password_resets", id: false, force: :cascade do |t|
+    t.string   "email",      limit: 255, null: false
+    t.string   "token",      limit: 255, null: false
+    t.datetime "created_at",             null: false
+  end
+
+  add_index "password_resets", ["email"], name: "password_resets_email_index", using: :btree
+  add_index "password_resets", ["token"], name: "password_resets_token_index", using: :btree
+
   create_table "shops", force: :cascade do |t|
     t.integer  "client_id",  limit: 4
     t.string   "title",      limit: 255
@@ -206,5 +269,16 @@ ActiveRecord::Schema.define(version: 20160407083013) do
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
+
+  create_table "users", force: :cascade do |t|
+    t.string   "name",           limit: 255, null: false
+    t.string   "email",          limit: 255, null: false
+    t.string   "password",       limit: 255, null: false
+    t.string   "remember_token", limit: 100
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "users", ["email"], name: "users_email_unique", unique: true, using: :btree
 
 end
