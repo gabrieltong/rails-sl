@@ -3,6 +3,8 @@ class Dayu < ActiveRecord::Base
 
   scope :findByDayuable, -> (obj) { where(:dayuable_type => obj.class.name, :dayuable_id => obj.id) }
 
+  serialize :smsParam
+
   def self.createByDayuable(dayuable, config)
         dayu = self.new
         dayu.smsType = config['smsType']
@@ -30,7 +32,7 @@ class Dayu < ActiveRecord::Base
         sms_type: smsType, 
         sms_free_sign_name: smsFreeSignName, 
         sms_template_code: smsTemplateCode, 
-        sms_param: {code: '123456', item: 'gabe'}
+        sms_param: smsParam
     }
 
     result = bigfish.send_sms params
