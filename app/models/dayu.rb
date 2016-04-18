@@ -3,8 +3,7 @@ class Dayu < ActiveRecord::Base
 
 	scope :findByDayuable, -> (obj) { where(:dayuable_type => obj.class.name, :dayuable_id => obj.id) }
 
-	def self.createByDayuable(dayuable)
-        config = dayuable.dayuConfig
+	def self.createByDayuable(dayuable, config)
         dayu = self.new
         dayu.smsType = config['smsType']
         dayu.smsFreeSignName = config['smsFreeSignName']
@@ -23,7 +22,7 @@ class Dayu < ActiveRecord::Base
     :gabe_dayus
   end
 
-  def send
+  def run
     `
     php #{LaPath} dayu:send #{self.id}
     `
