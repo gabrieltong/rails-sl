@@ -21,6 +21,7 @@ module RailsSl
     # config.i18n.default_locale = :de
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
+    config.time_zone = 'Asia/Shanghai'
     config.active_record.raise_in_transactional_callbacks = true
     config.i18n.available_locales   = ['zh-CN','en']
     config.i18n.default_locale = 'zh-CN'

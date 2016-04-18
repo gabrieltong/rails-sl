@@ -53,7 +53,16 @@
       client_member: '会员'
       client_manager: '操作员'
       group: '会员组'
+      dayu: '短信'
     attributes:
+      dayu:
+        recNum: '电话号码'
+        smsType: '类型'
+        smsFreeSignName: '签名'
+        smsTemplateCode: '模板'
+        smsParam: '参数'
+        sended: '是否发送'
+        sended_at: '发送时间'
       group:
         id: '会员组ID'
         title: '会员组名'
@@ -105,6 +114,7 @@
         admin_phone_hint: '请填写手机号作为管理员账号'
         is_sp: '是否是服务商'
         sp: '服务商'
+        set_sp: '服务商设置'
         created_at: '创建日期'
         show_name: '显示姓名'
         show_phone: '显示电话'
