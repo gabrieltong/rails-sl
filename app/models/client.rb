@@ -36,9 +36,14 @@ class Client < ActiveRecord::Base
   has_many :members, :through=>:client_members
   has_many :shops
   has_many :groups
-  has_many :group_members, :through=>:members
+  has_many :group_members, :through=>:groups
   has_many :client_managers
+  has_many :imports
   has_many :managers, :through=>:client_managers
+  has_many :card_tpls
+  has_many :card_a_tpls
+  has_many :card_b_tpls
+  has_one :client_setting
 
   scope :sp, ->{where(:is_sp=>true)}
   scope :not_sp, ->{where.not(:is_sp=>true)}
@@ -61,7 +66,7 @@ class Client < ActiveRecord::Base
   # end
 
   def self.permit_params
-    [:title,:reg,:address,:position,:location_y,:localtion_x,:phone,:area,:type,:service_started,:service_ended_at,:website,:wechat_account,:wechat_title,:logo,:wechat_logo,:tags_text, :is_sp, :sp_id ,:show_name,:show_phone,:show_sex,:show_borded_at,:show_pic,:show_address,:show_email, :longitude, :latitude, :admin_phone]
+    [:title,:reg,:address,:position,:location_y,:localtion_x,:phone,:area,:type,:service_started,:service_ended_at,:website,:wechat_account,:wechat_title,:logo,:wechat_logo,:tags_text, :is_sp, :sp_id ,:show_name,:show_phone,:show_sex,:show_borned_at,:show_pic,:show_address,:show_email, :longitude, :latitude, :admin_phone]
   end
 
   def hqhj
@@ -135,5 +140,12 @@ class Client < ActiveRecord::Base
         m.save
       end
     end
+  end
+
+  def clients
+    self.class.where(:id=>id)
+  end
+
+  def generate_setting
   end
 end

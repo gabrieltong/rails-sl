@@ -7,7 +7,7 @@ namespace :sync do
 
     dest_paths.each do |dest_path|
         # Copy all models & tests
-        %x{rm #{dest_path}/app/models/*.rb}
+        # %x{rm #{dest_path}/app/models/*.rb}
         %x{cp #{source_path}/app/models/*.rb #{dest_path}/app/models/}
 
         # %x{cp #{source_path}/test/models/*_test.rb #{dest_path}/test/models/}
