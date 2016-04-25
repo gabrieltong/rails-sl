@@ -1,0 +1,2 @@
+class CardA < Card
+end

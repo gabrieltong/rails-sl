@@ -1,5 +1,5 @@
 class Member < ActiveRecord::Base
-	attr_accessor :name,:sex,:borded_at,:pic,:address,:email, :client_id
+  attr_accessor :name,:sex,:borded_at,:pic,:address,:email, :client_id
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
   Sex = { I18n.t(:male)=>:male, I18n.t(:female)=>:female}
@@ -21,13 +21,13 @@ class Member < ActiveRecord::Base
   has_many :client_managers
   has_many :managed_shops, :through=>:client_managers, :source=>:shop
 
-	def self.permit_params
-		[:phone, :username, :password, :password_confirmation]
-	end
+  def self.permit_params
+    [:phone, :username, :password, :password_confirmation]
+  end
 
-	def self.client_permit_params
-		[:email, :password, :password_confirmation, :name, :sex, :borded_at, :pic, :address, :email]
-	end
+  def self.client_permit_params
+    [:email, :password, :password_confirmation, :name, :sex, :borded_at, :pic, :address, :email]
+  end
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
@@ -35,7 +35,7 @@ class Member < ActiveRecord::Base
     where(conditions.to_h).includes(:managed_clients).where(:clients=>{:id=>client_id}).first
   end  
 
-	def email_required?
+  def email_required?
     false
   end
 

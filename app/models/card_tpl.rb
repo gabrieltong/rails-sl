@@ -1,8 +1,11 @@
 class CardTpl < ActiveRecord::Base
-  attr_accessor :change_remain, :_from
+  attr_accessor :change_remain
+
+  State = { I18n.t('card_tpl.state.active')=>'active', I18n.t('card_tpl.state.inactive')=>'inactive', I18n.t('card_tpl.state.paused')=>'paused'}
   UseWeeks = {I18n.t("use_weeks.mon")=>'mon', I18n.t("use_weeks.thu")=>'thu', I18n.t("use_weeks.wed")=>'wed', I18n.t("use_weeks.thr")=>'thr', I18n.t("use_weeks.fri")=>'fri', I18n.t("use_weeks.sta")=>'sta', I18n.t("use_weeks.sun")=>'sun'}
   UseHours = {I18n.t("use_hours.h1")=>"h1", I18n.t("use_hours.h2")=>"h2", I18n.t("use_hours.h3")=>"h3", I18n.t("use_hours.h4")=>"h4", I18n.t("use_hours.h5")=>"h5", I18n.t("use_hours.h6")=>"h6", I18n.t("use_hours.h7")=>"h7", I18n.t("use_hours.h8")=>"h8", I18n.t("use_hours.h9")=>"h9", I18n.t("use_hours.h10")=>"h10", I18n.t("use_hours.h11")=>"h11", I18n.t("use_hours.h12")=>"h12", I18n.t("use_hours.h13")=>"h13", I18n.t("use_hours.h14")=>"h14", I18n.t("use_hours.h15")=>"h15", I18n.t("use_hours.h16")=>"h16", I18n.t("use_hours.h17")=>"h17", I18n.t("use_hours.h18")=>"h18", I18n.t("use_hours.h19")=>"h19", I18n.t("use_hours.h20")=>"h20", I18n.t("use_hours.h21")=>"h21", I18n.t("use_hours.h22")=>"h22", I18n.t("use_hours.h23")=>"h23", I18n.t("use_hours.h24")=>"h24"}
   IndateType = { I18n.t('indate_type.fixed')=>'fixed', I18n.t('indate_type.dynamic')=>'dynamic'}
+  Type = { I18n.t('card_tpl.type.CardATpl')=>'CardATpl', I18n.t('card_tpl.type.CardBTpl')=>'CardBTpl'}
 
   belongs_to :client
   belongs_to :member
@@ -18,6 +21,7 @@ class CardTpl < ActiveRecord::Base
   has_many :quantities
   has_many :images, :as=>:imageable
   has_many :draw_awards
+  has_many :cards
 
   scope :ab, ->{where(:type=>[:CardATpl, :CardBTpl])}
   scope :a, ->{where(:type=>:CardATpl)}
@@ -31,8 +35,6 @@ class CardTpl < ActiveRecord::Base
   accepts_nested_attributes_for :periods, :allow_destroy => true
   accepts_nested_attributes_for :groups, :allow_destroy => true
   accepts_nested_attributes_for :quantities, :allow_destroy => false
-
-
 
   validates :client_id, :title, :presence=>true
   validates :person_limit, :numericality => {:greater_than => 0}
@@ -56,6 +58,32 @@ class CardTpl < ActiveRecord::Base
   #   record.use_weeks_zh.include? k
   #   end.values
   # end
+
+  state_machine :state, :initial => :inactive do
+    event :activate do
+      transition [:inactive, :paused] => :active
+    end
+
+    event :deactivate do
+      transition [:active, :paused] => :inactive
+    end
+
+    event :pause do
+      transition [:active, :inactive] => :paused
+    end
+
+    state :inactive do
+      
+    end
+
+    state :active do
+      
+    end
+
+    state :paused do
+      
+    end
+  end
 
   before_validation do |record|
     if record.change_remain and record.change_remain.to_i != 0
