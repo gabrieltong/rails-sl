@@ -25,5 +25,8 @@ module RailsSl
     config.active_record.raise_in_transactional_callbacks = true
     config.i18n.available_locales   = ['zh-CN','en']
     config.i18n.default_locale = 'zh-CN'
+
+    config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
+    config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
   end
 end
