@@ -28,6 +28,9 @@ class Member < ActiveRecord::Base
   # 用户具有核销权限的卡卷
   has_many :checker_card_tpls, ->{where(:client_managers=>{:checker=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
 
+  has_many :checked_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
+  has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
+  
   def self.permit_params
     [:phone, :username, :password, :password_confirmation]
   end

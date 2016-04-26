@@ -178,11 +178,7 @@ module SL
 	  		get :check do
 					authenticate!
 	  			render
-	  			if Card.can_check_by_member? params[:code], current_member
-	  				present :result, Card.check(params[:code], params[:capcha])
-	  			else
-	  				present :result, :no_card
-	  			end
+  				present :result, Card.check(params[:code], params[:capcha], current_member)
 	  		end
   		end
   	end

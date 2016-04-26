@@ -7,6 +7,8 @@ class Card < ActiveRecord::Base
   belongs_to :added_quantity, :class_name=>Quantity, :foreign_key=>:added_quantity_id
   belongs_to :removed_quantity, :class_name=>Quantity, :foreign_key=>:removed_quantity_id
   belongs_to :client
+  belongs_to :checker, :class_name=>Member, :foreign_key=>:checker_phone, :primary_key=>:phone
+  belongs_to :sender, :class_name=>Member, :foreign_key=>:sender_phone, :primary_key=>:phone
   has_many :dayus, :as=>:dayuable
 
   scope :acquired, ->{where.not(:acquired_at=>nil)}
@@ -130,6 +132,7 @@ class Card < ActiveRecord::Base
       return card.can_check_by_member? member
     end
   end
+
 # 核销需要验证的情况
 # 已获得
 # 未核销
@@ -140,16 +143,24 @@ class Card < ActiveRecord::Base
 # 当前天(周1，2，3，4，5，6，7）在可核销cwday内
 # 使用乐观锁
 # 有可能需要验证码有效期
-  def self.check(code, capcha)
+  def self.check(code, capcha, memeber)
     where_condition = {:code=>code, :capcha=>capcha}
-    card = Card.where(where_condition).first
+    # 验证卡密是否存在
+    card = self.where(where_condition).first
     if card
-      can = card.can_check?
-      if can === true
-        result = checkable.where(where_condition).limit(1).update_all(:checked_at=>DateTime.now)
-        return result > 0  
+      can_check = card.can_check?
+      # 验证卡密权限
+      if can_check === true 
+        can_check_by_member = card.can_check_by_member?(memeber)
+        # 验证用户权限
+        if can_check_by_member === true 
+          result = checkable.where(where_condition).limit(1).update_all(:checked_at=>DateTime.now,:checker_phone=>memeber.phone)
+          return result > 0  
+        else
+          return can_check_by_member
+        end
       else
-        return can
+        return can_check
       end
     else
       return :no_card

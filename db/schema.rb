@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160426035230) do
+ActiveRecord::Schema.define(version: 20160426060356) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -200,14 +200,18 @@ ActiveRecord::Schema.define(version: 20160426035230) do
     t.string   "capcha",              limit: 10, default: ""
     t.datetime "from"
     t.datetime "to"
+    t.string   "checker_phone",       limit: 11
+    t.string   "sender_phone",        limit: 11
   end
 
   add_index "cards", ["added_quantity_id"], name: "index_cards_on_added_quantity_id", using: :btree
   add_index "cards", ["card_tpl_id"], name: "index_cards_on_card_tpl_id", using: :btree
+  add_index "cards", ["checker_phone"], name: "index_cards_on_checker_phone", using: :btree
   add_index "cards", ["client_id"], name: "index_cards_on_client_id", using: :btree
   add_index "cards", ["code"], name: "index_cards_on_code", unique: true, using: :btree
   add_index "cards", ["phone"], name: "index_cards_on_phone", using: :btree
   add_index "cards", ["removed_quantity_id"], name: "index_cards_on_removed_quantity_id", using: :btree
+  add_index "cards", ["sender_phone"], name: "index_cards_on_sender_phone", using: :btree
   add_index "cards", ["state"], name: "index_cards_on_state", using: :btree
   add_index "cards", ["type"], name: "index_cards_on_type", using: :btree
 
