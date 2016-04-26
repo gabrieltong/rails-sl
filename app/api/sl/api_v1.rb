@@ -64,7 +64,6 @@ module SL
 			  requires :client_id, allow_blank: false, :type=>Integer
 			end
   		get :login do
-  			client_id = 123
 	      @member = Member.includes(:managed_clients).where(:clients=>{:id=>params[:client_id]}).find_by_phone(params[:phone])
 	      if @member and @member.valid_password? params[:password]
 	      	@result = @member
