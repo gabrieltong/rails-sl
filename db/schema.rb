@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160425093817) do
+ActiveRecord::Schema.define(version: 20160426035230) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -155,8 +155,8 @@ ActiveRecord::Schema.define(version: 20160425093817) do
     t.integer  "member_id",                limit: 4
     t.boolean  "indate_today"
     t.string   "website",                  limit: 255
-    t.string   "check_use_weeks",          limit: 255
-    t.string   "use_hours",                limit: 255
+    t.string   "check_weeks",              limit: 255
+    t.string   "check_hours",              limit: 255
     t.string   "draw_type",                limit: 255
     t.integer  "prediction",               limit: 4
     t.string   "state",                    limit: 255
@@ -165,7 +165,7 @@ ActiveRecord::Schema.define(version: 20160425093817) do
     t.integer  "person_limit",             limit: 4,   default: 1
     t.datetime "acquire_from"
     t.datetime "acquire_to"
-    t.string   "acquire_use_weeks",        limit: 255
+    t.string   "acquire_weeks",            limit: 255
     t.boolean  "public"
     t.boolean  "allow_share"
   end
@@ -499,8 +499,8 @@ ActiveRecord::Schema.define(version: 20160425093817) do
 
   create_table "periods", force: :cascade do |t|
     t.integer  "card_tpl_id",  limit: 4
-    t.string   "from",         limit: 255
-    t.string   "to",           limit: 255
+    t.time     "from"
+    t.time     "to"
     t.integer  "number",       limit: 4
     t.string   "type",         limit: 255
     t.integer  "person_limit", limit: 4

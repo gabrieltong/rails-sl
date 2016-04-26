@@ -1,4 +1,70 @@
 'zh-CN':
+  card_tpl:
+    type:
+      CardATpl: '优惠券'
+      CardBTpl: '抽奖券'
+    state:
+      active: '已上架'
+      inactive: '已下架'
+      paused: '已暂停'
+  update_success: '更新成功'
+  use_weeks:
+    monday: '周一'
+    tuesday: '周二'
+    wednesday: '周三'
+    thursday: '周四'
+    friday: '周五'
+    saturday: '周六'
+    sunday: '周日'
+  check_weeks:
+    monday: '周一'
+    tuesday: '周二'
+    wednesday: '周三'
+    thursday: '周四'
+    friday: '周五'
+    saturday: '周六'
+    sunday: '周日'
+  acquire_weeks:
+    monday: '周一'
+    tuesday: '周二'
+    wednesday: '周三'
+    thursday: '周四'
+    friday: '周五'
+    saturday: '周六'
+    sunday: '周日'
+  check_hours:
+    h0: "0点~1点"
+    h1: "1点~2点"
+    h2: "2点~3点"
+    h3: "3点~4点"
+    h4: "4点~5点"
+    h5: "5点~6点"
+    h6: "6点~7点"
+    h7: "7点~8点"
+    h8: "8点~9点"
+    h9: "9点~10点"
+    h10: "10点~11点"
+    h11: "11点~12点"
+    h12: "12点~13点"
+    h13: "13点~14点"
+    h14: "14点~15点"
+    h15: "15点~16点"
+    h16: "16点~17点"
+    h17: "17点~18点"
+    h18: "18点~19点"
+    h19: "19点~20点"
+    h20: "20点~21点"
+    h21: "21点~22点"
+    h22: "22点~23点"
+    h23: "23点~24点"
+  indate_type:
+    fixed: '固定期限'
+    dynamic: '动态期限'
+  draw_type:
+    shake: '摇一摇'
+    scratch: '刮刮卡'
+  male: '男性'
+  female: '女性'
   other: '其他'
   detail: '详情'
   will_paginate:
@@ -25,6 +91,10 @@
         sex:
           male: '男'
           female: '女'
+      client_member:
+        sex:
+          male: '男'
+          female: '女'
       import:
         question_kind:
           scope_zhenti: '真题'
@@ -47,6 +117,7 @@
         signature: '个性签名'
   activerecord:      
     models:
+      import: '导入'
       client: '商户'
       member: '会员'
       shop: '门店'
@@ -54,7 +125,23 @@
       client_manager: '操作员'
       group: '会员组'
       dayu: '短信'
+      card_tpl: '卡券'
+      card_a_tpl: '优惠券'
+      card_b_tpl: '抽奖券'
+      image: '图片'
+      draw_award: '奖项'
+      period: '投放时间段'
     attributes:
+      quantity:
+        number: '数量变化'
+        created_at: '时间'
+        member: '人员'
+      draw_award:
+        title: '奖品名称'
+        award: '奖品'
+        number: '数量'
+      image:
+        file: '图片文件'
       dayu:
         recNum: '电话号码'
         smsType: '类型'
@@ -119,11 +206,12 @@
         show_name: '显示姓名'
         show_phone: '显示电话'
         show_sex: '显示性别'
-        show_borded_at: '显示生日'
+        show_borned_at: '显示生日'
         show_pic: '显示会员照片'
         show_address: '显示邮寄地址'
         show_email: '显示电子邮箱'
       member:
+        client_id: '商户ID'
         password_confirmation: '确认密码'
         collects: '收藏'
         borned_at: '出生日期'
@@ -145,6 +233,9 @@
         address: '邮寄地址'
         email: '电子邮箱'
       client_member:
+        id: '会员ID'
+        groups: '会员组'
+        member_phone: '电话'
         wechat_binded: '微信绑定'
         collects: '收藏'
         borned_at: '出生日期'
@@ -203,6 +294,7 @@
         created_at: '创建时间'
         updated_at: '更新时间'
       import:
+        group: '会员组'
         file: '文件'
         file_file_name: '文件名称'
         file_content_type: '文件类型'
@@ -214,6 +306,65 @@
         content: '反馈内容'
         member: '会员'
         created_at: '反馈时间'
+      card_a_tpl:
+        title: '优惠券标题'
+        desc: '优惠说明'
+        intro: '使用须知'
+      card_b_tpl:
+        title: '抽奖券标题'
+        desc: '抽奖说明'
+        intro: '抽奖须知'
+        draw_type: '抽奖类型'
+      period:
+        from: '开始时间'
+        to: '结束时间'
+        number: '每时段投放张数'
+        person_limit: '每时段每人限领'
+      card_tpl:
+        state: '状态'
+        acquire_range: '投放日期'
+        client_id: '商户ID'
+        groups: '参与权限'
+        allow_share: '允许分享领取链接'
+        public: '是否公开'
+        acquire_from: '投放开始时间'
+        acquire_to: '投放结束时间'
+        person_limit: '每人限领总数'
+        prediction: '预计参与人数'
+        shops: '门店'
+        use_weeks_zh: '可用时段'
+        check_hours_zh: ''
+        check_weeks: '可用时段'
+        acquire_weeks: '投放时段'
+        check_hours: ''
+        use_periods: '可用时段'
+        fixed: '固定期限'
+        dynamic: '动态期限'
+        client: '商户ID'
+        member: '创建者'
+        client_id: '商户ID'
+        title: '标题'
+        short_desc: '简介'
+        type: '类型'
+        indate_type: '有效期类型'
+        indate_from: '起始'
+        indate_to: '终止'
+        indate_after: '动态天数'
+        indate_today: '当天不可用'
+        cover: '封面图片'
+        share_cover: '分享图标'
+        guide_cover: '自定义引导图'
+        website: '外链网址'
+        change_remain: '修改库存'
+        total: '投放总数'
+        remain: '库存'
+  helpers:
+    select:
+      prompt: 请选择
+    submit:
+      activate: '上架'
+      deactivate: '下架'
+      pause: '暂停'
   active_admin:
     scopes:
       with_points: '已有知识点'
@@ -230,3 +381,6 @@
       not_sp: '非服务商'
       sended: '已发送'
       not_sended: '未发送'
+      a: '优惠券'
+      b: '抽奖券'
+      ab: '所有'

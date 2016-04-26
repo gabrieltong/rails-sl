@@ -1,6 +1,10 @@
 #rails-sl
 
+
+
 发卷和核销， 结合卡卷的投放时间及有效时间
+
+发卷核销， 要结合乐观锁
 
 发卷结合没人限领次数及没时间段限领次数
 
@@ -20,3 +24,17 @@ client.admin_phone and client_managers.admin 要结合在一起
 gabe_dayus 的表由laravel维护
 validation
 	memeber.phone, 定义为phone validator
+
+在 rails-sl-client 重构 use_weeks use_hours
+
+核销需要验证的情况
+	已获得
+	未核销
+	验证码，密钥， 二者绑定
+	卡卷实例在有效期内
+	卡卷模板未下架
+	当前时间在可核销时间内
+	当前天(周1，2，3，4，5，6，7）在可核销cwday内
+	使用乐观锁
+
+

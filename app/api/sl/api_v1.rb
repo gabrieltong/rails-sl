@@ -17,8 +17,8 @@ module SL
 			expose :share_cover_url
 			expose :guide_cover_url
 			expose :website
-			expose :check_use_weeks
-			expose :acquire_use_weeks
+			expose :check_weeks
+			expose :acquire_weeks
 			expose :acquire_from
 			expose :acquire_to
 			expose :public
@@ -27,7 +27,7 @@ module SL
 			expose :remain
 			expose :prediction
 			expose :draw_type
-			expose :use_hours
+			expose :check_hours
 			expose :indate_type
 			expose :indate_from
 			expose :indate_to
@@ -44,8 +44,7 @@ module SL
     helpers do
     	def render
     		@status ||= 'success'
-    		@result ||= ''
-    		present :status, @status
+    		present :status, @status 
     	end
 
       def current_member
@@ -123,6 +122,7 @@ module SL
   			desc '核销前获取卡卷信息'
 	  		params do
 				  requires :code, allow_blank: false, :type=>Integer
+				  requires :token, allow_blank: false, :type=>String
 				end
 	  		get :card_info do
 	  			authenticate!
@@ -138,6 +138,7 @@ module SL
 	  		desc '核销前获取卡卷信息'
 	  		params do
 				  requires :code, allow_blank: false, :type=>Integer
+				  requires :token, allow_blank: false, :type=>String
 				end
 	  		get :card_info do
 	  			authenticate!
@@ -150,14 +151,38 @@ module SL
   				# present :result, ''
 	  		end
 
+	  		# 卡能否可笑
+	  		# 卡卷能否核销
+	  		# 用户是否有核销权限
+	  		desc '卡卷能否核销'
+	  		params do
+				  requires :code, allow_blank: false, :type=>Integer
+				  requires :token, allow_blank: false, :type=>String
+				end
+				get :can_check do
+					authenticate!
+	  			render
+	  			if Card.can_check_by_member? params[:code], current_member
+	  				present :result, Card.can_check?(params[:code])	
+	  			else
+	  				present :result, :no_card
+	  			end
+	  		end
+
 	  		desc '核销卡卷'
 	  		params do
+	  			requires :token, allow_blank: false, :type=>String
 				  requires :code, allow_blank: false, :type=>Integer
 				  requires :capcha, allow_blank: false, :type=>String
 				end
-	  		post :check do
-	  			card = Card.includes(:card_tpl).find_by_code(params[:code].to_s)
-	  			result = card.check params[:capcha]
+	  		get :check do
+					authenticate!
+	  			render
+	  			if Card.can_check_by_member? params[:code], current_member
+	  				present :result, Card.check(params[:code], params[:capcha])
+	  			else
+	  				present :result, :no_card
+	  			end
 	  		end
   		end
   	end

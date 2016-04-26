@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class Card < ActiveRecord::Base
   acts_as_paranoid
   # uniquify :code, :salt, :length => 12, :chars => 0..9
@@ -14,9 +15,11 @@ class Card < ActiveRecord::Base
   scope :not_acquired, ->{where(:acquired_at=>nil)}
   scope :not_checked, ->{where(:checked_at=>nil)}
 
+  # 是否在可核销区间
   scope :active, ->{where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
   scope :inactive, ->{where(arel_table[:from].gt(DateTime.now).or(arel_table[:to].lt(DateTime.now)))}
 
+  # 相当于 acquired.not_checked.active
   scope :checkable, ->{where(arel_table[:acquired_at].not_eq(nil)).where(arel_table[:checked_at].eq(nil)).where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
 
 
@@ -71,12 +74,18 @@ class Card < ActiveRecord::Base
     end
   end
 
+# 判断能否核销
   def can_check?
-    return :no_acquired unless self.class.acquired.exists?(self)
-    return :checked if self.class.not_checked.exists?(self)
-    return :inactive unless self.class.active.exists?(self)
-    return card_tpl.state unless self.card_tpl.can_check?
+    return :not_acquired unless self.class.acquired.exists?(self.id)
+    return :checked if self.class.checked.exists?(self.id)
+    return :inactive unless self.class.active.exists?(self.id)
+    card_tpl_can_check = self.card_tpl.can_check?
+    return card_tpl_can_check unless card_tpl_can_check === true
     true
+  end
+
+  def can_check_by_member? member
+    member.checker_card_tpls.include? card_tpl
   end
 
   def send_check_capcha
@@ -102,14 +111,48 @@ class Card < ActiveRecord::Base
     }
   end
 
-  def check(capcha)
-    if can_check? === true
-      return :wrong_capcha unless self.capcha == capcha
-      self.checked_at = DateTime.now
-      self.save
-      return true
+# 改卡卷自身是否能核销 ，包含卡卷实例的验证， 包括卡卷模板的验证
+  def self.can_check? code
+    card = self.find_by_code(code)
+    if card.nil?
+      return :no_card
     else
-      return can_check?
+      return card.can_check?
+    end
+  end
+
+# 用户是否有核销某卡密的资格
+  def self.can_check_by_member? code, member
+    card = self.find_by_code(code)
+    if card.nil?
+      return :no_card
+    else
+      return card.can_check_by_member? member
+    end
+  end
+# 核销需要验证的情况
+# 已获得
+# 未核销
+# 验证码，密钥， 二者绑定
+# 卡卷实例在有效期内
+# 卡卷模板未下架
+# 当前时间在可核销时间内
+# 当前天(周1，2，3，4，5，6，7）在可核销cwday内
+# 使用乐观锁
+# 有可能需要验证码有效期
+  def self.check(code, capcha)
+    where_condition = {:code=>code, :capcha=>capcha}
+    card = Card.where(where_condition).first
+    if card
+      can = card.can_check?
+      if can === true
+        result = checkable.where(where_condition).limit(1).update_all(:checked_at=>DateTime.now)
+        return result > 0  
+      else
+        return can
+      end
+    else
+      return :no_card
     end
   end
 end

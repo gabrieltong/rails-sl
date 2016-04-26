@@ -39,7 +39,7 @@ class Member < ActiveRecord::Base
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     client_id = conditions.delete(:client_id)
-    where(conditions.to_h).includes(:managed_clients).where(:clients=>{:id=>client_id}).first
+    where(conditions.to_h).includes(:managed_clients).where(:clients=>{:id=>client_id},:managed_clients=>{:admin=>true}).first
   end  
 
   def email_required?

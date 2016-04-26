@@ -1,0 +1,16 @@
+zh-CN:
+  errors:
+    messages:
+      invalid_date: "不是有效的日期格式"
+      invalid_time: "不是有效的时间格式"
+      invalid_datetime: "不是有效的日期/时间格式"
+      is_at: "必须等于%{restriction}"
+      before: "必须在%{restriction}之前"
+      on_or_before: "必须等于或者在%{restriction}之前"
+      after: "必须在%{restriction}之后"
+      on_or_after: "必须等于或者在%{restriction}之后"
+  validates_timeliness:
+    error_value_formats:
+      date: '%Y-%m-%d'
+      time: '%H:%M:%S'
+      datetime: '%Y-%m-%d %H:%M:%S'
