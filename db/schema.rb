@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160426060356) do
+ActiveRecord::Schema.define(version: 20160426070203) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -202,6 +202,7 @@ ActiveRecord::Schema.define(version: 20160426060356) do
     t.datetime "to"
     t.string   "checker_phone",       limit: 11
     t.string   "sender_phone",        limit: 11
+    t.time     "acquired_time"
   end
 
   add_index "cards", ["added_quantity_id"], name: "index_cards_on_added_quantity_id", using: :btree

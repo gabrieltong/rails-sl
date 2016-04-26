@@ -87,7 +87,7 @@ class Card < ActiveRecord::Base
   end
 
   def can_check_by_member? member
-    member.checker_card_tpls.include? card_tpl
+    CardTpl.can_check_by_member? card_tpl_id, member
   end
 
   def send_check_capcha
@@ -117,7 +117,7 @@ class Card < ActiveRecord::Base
   def self.can_check? code
     card = self.find_by_code(code)
     if card.nil?
-      return :no_card
+      return :no_record
     else
       return card.can_check?
     end
@@ -127,7 +127,7 @@ class Card < ActiveRecord::Base
   def self.can_check_by_member? code, member
     card = self.find_by_code(code)
     if card.nil?
-      return :no_card
+      return :no_record
     else
       return card.can_check_by_member? member
     end
@@ -163,7 +163,7 @@ class Card < ActiveRecord::Base
         return can_check
       end
     else
-      return :no_card
+      return :no_record
     end
   end
 end

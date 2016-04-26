@@ -26,6 +26,7 @@ class CardTpl < ActiveRecord::Base
   scope :ab, ->{where(:type=>[:CardATpl, :CardBTpl])}
   scope :a, ->{where(:type=>:CardATpl)}
   scope :b, ->{where(:type=>:CardBTpl)}
+  scope :acquire_datetime_valid, ->{where(arel_table[:acquire_from].lt(DateTime.now)).where(arel_table[:acquire_to].gt(DateTime.now))}
 
   serialize :acquire_weeks
   serialize :check_weeks
@@ -77,19 +78,41 @@ class CardTpl < ActiveRecord::Base
         :card_tpl_inactive
       end
 
-      def can_acquire?
+      def can_acquire?(phone)
         :card_tpl_inactive
       end
     end
 
     state :active do
-
       def can_check?
         _can_check?
       end
 
-      def can_acquire?
-        true
+      
+      # card_tpl.remain
+      # card_tpl.acquire.from acquire.to
+      # card_tpl.week
+      # card_tpl.hour
+      # person_limit
+      # period.person_limit
+      # card_tpl.state
+      # 判断某手机号能否领优惠卷
+      def can_acquire? phone
+        if cards.not_acquired.empty?
+          :no_valid_card
+        elsif date_can_acquire? != true
+          :date_invalid
+        elsif weekday_can_acquire? != true
+          :weekday_invalid
+        elsif hour_can_acquire? != true
+          :hour_invalid
+        elsif phone_can_acquire?(phone) != true
+          :person_limit_overflow
+        elsif period_phone_can_acquire?(phone)!= true
+          :period_person_limit_overflow
+        else
+          true
+        end
       end
     end
 
@@ -98,7 +121,7 @@ class CardTpl < ActiveRecord::Base
         _can_check?
       end
 
-      def can_acquire?
+      def can_acquire?(phone)
         :card_tpl_paused
       end
     end
@@ -111,14 +134,39 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
+  # 验证用户
+  def period_phone_can_acquire? phone
+    if period = period_now
+      acquired_time_gt = Card.arel_table[:acquired_time].gt(period.from.strftime("%H:%M"))
+      acquired_time_lt = Card.arel_table[:acquired_time].lt(period.to.strftime("%H:%M"))
+      
+      cards.where(:phone=>phone).where(acquired_time_gt).where(acquired_time_lt).size < period.person_limit
+    end
+  end
+
+  # 验证用户
+  def phone_can_acquire? phone
+    cards.where(:phone=>phone).size < person_limit
+  end
+
+  # 验证投放日期日期
+  def date_can_acquire?
+    self.class.acquire_datetime_valid.exists?(id)
+  end
+
+  # 验证投放时间
   def hour_can_acquire?
+    !period_now.nil?
+  end
+
+  def period_now
     now = DateTime.now
     time = "#{now.hour}:#{now.minute}"
     where_from = Period.arel_table[:from].lt(time)
     where_to = Period.arel_table[:to].gt(time)
-    periods.where(where_from).where(where_to).size > 0
+    periods.where(where_from).where(where_to).first
   end
-
+  # 验证投放星期
   def weekday_can_acquire?
     now = DateTime.now
     acquire_weeks.reject(&:empty?).each do |week|
@@ -130,6 +178,7 @@ class CardTpl < ActiveRecord::Base
     false
   end
 
+  # 验证核销时间
   def hour_can_check?
     now = DateTime.now
     check_hours.reject(&:empty?).each do |hour|
@@ -140,6 +189,7 @@ class CardTpl < ActiveRecord::Base
     false
   end
 
+  # 验证核销星期
   def weekday_can_check?
     now = DateTime.now
     check_weeks.reject(&:empty?).each do |week|
@@ -157,16 +207,6 @@ class CardTpl < ActiveRecord::Base
     h["#{i-1}点~#{i}点"] = "#{i-1}-#{i}"
     end
     h
-  end
-
-  private
-
-  def self.inheritance_column
-    'type'
-  end 
-
-  def self.default_scope
-    where type: [:CardBTpl,:CardATpl]
   end
 
   def cover_url
@@ -193,8 +233,59 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-private
+  def acquire(phone, by_member, number=1)
+    can_acquire = can_acquire?(phone)
+    if can_acquire === true
+      can_send_by_member = self.class.can_send_by_member?(id, by_member)
+      if can_send_by_member === true
+        result = cards.not_acquired.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_member.phone)
+        return result
+      else
+        return can_send_by_member
+      end
+    else
+      return can_acquire
+    end
+  end
 
+  def self.can_acquire? id, phone
+    record = find_by_id(id)
+    if record
+      record.can_acquire? phone
+    else
+      :no_record
+    end
+  end
+
+  # 判断卡卷是否能被member投放
+  def self.can_send_by_member? id, member
+    member.sender_card_tpls.exists? id
+  end
+
+  # 判断卡卷是否能被member投放
+  def self.can_check_by_member? id, member
+    member.checker_card_tpls.exists? id
+  end
+
+  def self.acquire(id, phone, by_member, number=1)
+    record = find_by_id(id)
+    if record
+      record.acquire(phone, by_member, number)
+    else
+      :no_record
+    end
+  end
+
+  private
+
+  def self.inheritance_column
+    'type'
+  end 
+
+  def self.default_scope
+    where type: [:CardBTpl,:CardATpl]
+  end
+  # 卡卷是否可核销
   def _can_check?
     if weekday_can_check? != true
       return :weekday_cannot_check
