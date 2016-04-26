@@ -43,6 +43,7 @@ class Client < ActiveRecord::Base
   has_many :card_tpls
   has_many :card_a_tpls
   has_many :card_b_tpls
+  has_many :dayus, :as=>:dayuable
   has_one :client_setting
 
   scope :sp, ->{where(:is_sp=>true)}

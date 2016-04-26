@@ -15,8 +15,7 @@ class Dayu < ActiveRecord::Base
     dayu.smsParam = config['smsParam']
     dayu.recNum = config['recNum']
     dayu.smsTemplateCode = config['smsTemplateCode']
-    dayu.dayuable_type = dayuable.class.name
-    dayu.dayuable_id = dayuable.id
+    dayu.dayuable = dayuable
     dayu.appkey = 123
     dayu.sended_at = '0000-00-00 00:00:00'
     dayu.save
@@ -52,6 +51,14 @@ class Dayu < ActiveRecord::Base
     self.save
   end
 
+  def self.allow_send obj
+    if obj.dayus.order('sended_at desc').last
+      return (obj.dayus.order('sended_at desc').last.sended_at - DateTime.now).abs > 60
+    else
+      return true
+    end
+  end
+  
   private
   def run2
     `

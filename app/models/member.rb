@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class Member < ActiveRecord::Base
   attr_accessor :name,:sex,:borded_at,:pic,:address,:email, :client_id
   # Include default devise modules. Others available are:
@@ -20,6 +21,12 @@ class Member < ActiveRecord::Base
 
   has_many :client_managers
   has_many :managed_shops, :through=>:client_managers, :source=>:shop
+
+  # 用户具有发卷权限的卡卷
+  has_many :sender_card_tpls, ->{where(:client_managers=>{:sender=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
+
+  # 用户具有核销权限的卡卷
+  has_many :checker_card_tpls, ->{where(:client_managers=>{:checker=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
 
   def self.permit_params
     [:phone, :username, :password, :password_confirmation]
@@ -53,5 +60,8 @@ class Member < ActiveRecord::Base
 
   def username
     name
+    remember_me!
+
+    rememberable_value
   end
 end

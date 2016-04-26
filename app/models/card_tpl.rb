@@ -73,15 +73,33 @@ class CardTpl < ActiveRecord::Base
     end
 
     state :inactive do
-      
+      def can_check?
+        false
+      end
+
+      def can_acquire?
+        false
+      end
     end
 
     state :active do
-      
+      def can_check?
+        true
+      end
+
+      def can_acquire?
+        true
+      end
     end
 
     state :paused do
-      
+      def can_check?
+        true
+      end
+
+      def can_acquire?
+        false
+      end
     end
   end
 
@@ -107,5 +125,30 @@ class CardTpl < ActiveRecord::Base
 
   def self.default_scope
     where type: [:CardBTpl,:CardATpl]
-  end  
+  end
+
+  def cover_url
+    if cover.blank?
+      ''
+    else
+      cover.url(:medium)
+    end
+  end
+
+  def share_cover_url
+    if share_cover.blank?
+      ''
+    else
+      share_cover.url(:medium)
+    end
+  end
+
+  def guide_cover_url
+    if guide_cover.blank?
+      ''
+    else
+      guide_cover.url(:medium)
+    end
+  end
+
 end

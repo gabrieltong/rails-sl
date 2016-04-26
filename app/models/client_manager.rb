@@ -1,6 +1,7 @@
 class ClientManager < ActiveRecord::Base
   belongs_to :client
   belongs_to :shop
+  has_many :card_tpls, :through=>:shop
   belongs_to :manager, :class_name=>:Member, :foreign_key=>:phone, :primary_key=>:phone
 
   scope :admin, ->{where(:admin=>true)}
