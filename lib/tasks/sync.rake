@@ -24,6 +24,7 @@ namespace :sync do
         %x{cp #{source_path}/config/database.yml #{dest_path}/config/database.yml}
         %x{cp #{source_path}/config/secrets.yml #{dest_path}/config/secrets.yml}
         %x{cp #{source_path}/config/initializers/paperclip.rb #{dest_path}/config/initializers/paperclip.rb}
+        %x{cp #{source_path}/config/initializers/state_machine.rb #{dest_path}/config/initializers/state_machine.rb}
 
 
         # %x{cp #{source_path}/config/initializers/state_machine.rb #{dest_path}/config/initializers/state_machine.rb}
