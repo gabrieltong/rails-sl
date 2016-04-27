@@ -30,7 +30,9 @@ class Member < ActiveRecord::Base
 
   has_many :checked_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
   has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
-  
+
+  has_many :dayus, :as=>:dayuable
+
   def self.permit_params
     [:phone, :username, :password, :password_confirmation]
   end
@@ -66,5 +68,74 @@ class Member < ActiveRecord::Base
     remember_me!
 
     rememberable_value
+  end
+
+  def send_bind_wechat_capcha
+    type = :bind_wechat
+
+    if Dayu.allow_send(self, type) === true
+      self.bind_wechat_capcha = rand(100000..999999)
+      self.save
+
+      config = {
+        'type'=>type,
+        'smsType'=>:normal,
+        'smsFreeSignName'=>'前站',
+        'smsParam'=>{code: self.bind_wechat_capcha, product: '', item: "绑定微信"},
+        'recNum'=>phone,
+        'smsTemplateCode'=>:SMS_2145923
+      }
+
+      dy = Dayu.createByDayuable(self, config)
+      dy.run
+    else
+      false
+    end    
+  end
+
+  def send_update_password_capcha
+    type = :update_password
+
+    if Dayu.allow_send(self, type) === true
+      self.update_password_capcha = rand(100000..999999)
+      self.save
+
+      config = {
+        'type'=>type,
+        'smsType'=>:normal,
+        'smsFreeSignName'=>'前站',
+        'smsParam'=>{code: self.update_password_capcha, product: '', item: "修改密码"},
+        'recNum'=>phone,
+        'smsTemplateCode'=>:SMS_2145923
+      }
+
+      dy = Dayu.createByDayuable(self, config)
+      dy.run
+    else
+      false
+    end    
+  end
+
+  def send_recover_password_capcha
+    type = :recover_password
+
+    if Dayu.allow_send(self, type) === true
+      self.recover_password_capcha = rand(100000..999999)
+      self.save
+
+      config = {
+        'type'=>type,
+        'smsType'=>:normal,
+        'smsFreeSignName'=>'前站',
+        'smsParam'=>{code: self.recover_password_capcha, product: '', item: "找回密码"},
+        'recNum'=>phone,
+        'smsTemplateCode'=>:SMS_2145923
+      }
+
+      dy = Dayu.createByDayuable(self, config)
+      dy.run
+    else
+      false
+    end
   end
 end

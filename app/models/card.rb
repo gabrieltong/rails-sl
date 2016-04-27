@@ -108,11 +108,10 @@ class Card < ActiveRecord::Base
   end
 
   def send_check_capcha
-    config = check_capcha_config
-    if self.can_check? === true and Dayu.allow_send(self, config['type']) === true
+    if self.can_check? === true and Dayu.allow_send(self, check_capcha_config['type']) === true
       self.capcha = rand(100000..999999)
       self.save
-      dy = Dayu.createByDayuable(self, config)
+      dy = Dayu.createByDayuable(self, check_capcha_config)
       dy.run
     else
       false
