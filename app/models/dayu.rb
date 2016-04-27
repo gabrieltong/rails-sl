@@ -5,8 +5,11 @@ class Dayu < ActiveRecord::Base
 
   serialize :smsParam
 
+  validates :smsType, :smsFreeSignName, :smsParam, :recNum, :smsTemplateCode, :dayuable_id, :dayuable_type, :type, :presence => true
+
   scope :sended, ->{where(:sended=>true)}
   scope :not_sended, ->{where.not(:sended=>true)}
+  scope :of_type, ->(type){where(:type=>type)}
 
   def self.createByDayuable(dayuable, config)
     dayu = self.new
@@ -17,6 +20,7 @@ class Dayu < ActiveRecord::Base
     dayu.smsTemplateCode = config['smsTemplateCode']
     dayu.dayuable = dayuable
     dayu.appkey = 123
+    dayu.type = config['type']
     dayu.sended_at = '0000-00-00 00:00:00'
     dayu.save
     dayu
@@ -51,15 +55,20 @@ class Dayu < ActiveRecord::Base
     self.save
   end
 
-  def self.allow_send obj
-    if obj.dayus.order('sended_at desc').first
-      return (obj.dayus.order('sended_at desc').first.sended_at - DateTime.now).abs > 60
+  def self.allow_send obj, type
+    record = obj.dayus.of_type(type).order('sended_at desc').first
+    if record
+      return (record.sended_at - DateTime.now).abs > 60
     else
       return true
     end
   end
 
   private
+  def self.inheritance_column
+    nil
+  end
+
   def run2
     `
     php #{LaPath} dayu:send #{self.id}

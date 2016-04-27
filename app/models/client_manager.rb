@@ -23,6 +23,7 @@ class ClientManager < ActiveRecord::Base
     title = "#{self.client.title}的管理员"
     code = "123456"
     return {
+      'type'=>'assigned_admin',
       'smsType'=>'normal',
       'smsFreeSignName'=>'前站',
       'smsParam'=>{code: code, product: '', item: title},
@@ -31,10 +32,11 @@ class ClientManager < ActiveRecord::Base
     }
   end
 
-  def msg_admin_delete_config(admin_phone)
+  def msg_admin_delete_config
     title = "#{self.title}的管理员"
     code = "123456"
     return {
+      'type'=>'remove_admin',
       'smsType'=>'normal',
       'smsFreeSignName'=>'前站',
       'smsParam'=>"{'code':'#{code}','product'=>'','item'=>'#{title}'}",
@@ -46,8 +48,9 @@ class ClientManager < ActiveRecord::Base
 # 管理员权限添加短信
 # TODO 添加对admin_phone的验证 ， 类似  PhoneValidator.validate(admin_phone)
   def msg_admin_create
-    if self.class.admin.exists?(self.id) and Dayu.allow_send(self) === true
-      dy = Dayu.createByDayuable(self, msg_admin_create_config)
+    config = msg_admin_create_config['type']
+    if self.class.admin.exists?(self.id) and Dayu.allow_send(self, config['type']) === true
+      dy = Dayu.createByDayuable(self, config)
       dy.run
     end
   end

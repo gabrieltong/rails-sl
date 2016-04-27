@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160426070203) do
+ActiveRecord::Schema.define(version: 20160427094525) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -70,50 +70,88 @@ ActiveRecord::Schema.define(version: 20160426070203) do
   add_index "card_tpl_histories", ["member_id"], name: "index_card_tpl_histories_on_member_id", using: :btree
 
   create_table "card_tpl_settings", force: :cascade do |t|
-    t.integer  "card_tpl_id", limit: 4
-    t.boolean  "use_mon"
-    t.boolean  "use_tue"
-    t.boolean  "use_wed"
-    t.boolean  "use_thu"
-    t.boolean  "use_fri"
-    t.boolean  "use_sat"
-    t.boolean  "use_sun"
-    t.boolean  "get_mon"
-    t.boolean  "get_tue"
-    t.boolean  "get_wed"
-    t.boolean  "get_thu"
-    t.boolean  "get_fri"
-    t.boolean  "get_sat"
-    t.boolean  "get_sun"
-    t.boolean  "use_h00"
-    t.boolean  "use_h01"
-    t.boolean  "use_h02"
-    t.boolean  "use_h03"
-    t.boolean  "use_h04"
-    t.boolean  "use_h05"
-    t.boolean  "use_h06"
-    t.boolean  "use_h07"
-    t.boolean  "use_h08"
-    t.boolean  "use_h09"
-    t.boolean  "use_h10"
-    t.boolean  "use_h11"
-    t.boolean  "use_h12"
-    t.boolean  "use_h13"
-    t.boolean  "use_h14"
-    t.boolean  "use_h15"
-    t.boolean  "use_h16"
-    t.boolean  "use_h17"
-    t.boolean  "use_h18"
-    t.boolean  "use_h19"
-    t.boolean  "use_h20"
-    t.boolean  "use_h21"
-    t.boolean  "use_h22"
-    t.boolean  "use_h23"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.integer  "card_tpl_id",       limit: 4
+    t.boolean  "check_monday"
+    t.boolean  "check_tuesday"
+    t.boolean  "check_wednesday"
+    t.boolean  "check_thursday"
+    t.boolean  "check_friday"
+    t.boolean  "check_saturday"
+    t.boolean  "check_sunday"
+    t.boolean  "acquire_monday"
+    t.boolean  "acquire_tuesday"
+    t.boolean  "acquire_wednesday"
+    t.boolean  "acquire_thursday"
+    t.boolean  "acquire_friday"
+    t.boolean  "acquire_saturday"
+    t.boolean  "acquire_sunday"
+    t.boolean  "check_h0"
+    t.boolean  "check_h1"
+    t.boolean  "check_h2"
+    t.boolean  "check_h3"
+    t.boolean  "check_h4"
+    t.boolean  "check_h5"
+    t.boolean  "check_h6"
+    t.boolean  "check_h7"
+    t.boolean  "check_h8"
+    t.boolean  "check_h9"
+    t.boolean  "check_h10"
+    t.boolean  "check_h11"
+    t.boolean  "check_h12"
+    t.boolean  "check_h13"
+    t.boolean  "check_h14"
+    t.boolean  "check_h15"
+    t.boolean  "check_h16"
+    t.boolean  "check_h17"
+    t.boolean  "check_h18"
+    t.boolean  "check_h19"
+    t.boolean  "check_h20"
+    t.boolean  "check_h21"
+    t.boolean  "check_h22"
+    t.boolean  "check_h23"
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
+  add_index "card_tpl_settings", ["acquire_friday"], name: "index_card_tpl_settings_on_acquire_friday", using: :btree
+  add_index "card_tpl_settings", ["acquire_monday"], name: "index_card_tpl_settings_on_acquire_monday", using: :btree
+  add_index "card_tpl_settings", ["acquire_saturday"], name: "index_card_tpl_settings_on_acquire_saturday", using: :btree
+  add_index "card_tpl_settings", ["acquire_sunday"], name: "index_card_tpl_settings_on_acquire_sunday", using: :btree
+  add_index "card_tpl_settings", ["acquire_thursday"], name: "index_card_tpl_settings_on_acquire_thursday", using: :btree
+  add_index "card_tpl_settings", ["acquire_tuesday"], name: "index_card_tpl_settings_on_acquire_tuesday", using: :btree
+  add_index "card_tpl_settings", ["acquire_wednesday"], name: "index_card_tpl_settings_on_acquire_wednesday", using: :btree
   add_index "card_tpl_settings", ["card_tpl_id"], name: "index_card_tpl_settings_on_card_tpl_id", using: :btree
+  add_index "card_tpl_settings", ["check_friday"], name: "index_card_tpl_settings_on_check_friday", using: :btree
+  add_index "card_tpl_settings", ["check_h0"], name: "index_card_tpl_settings_on_check_h0", using: :btree
+  add_index "card_tpl_settings", ["check_h1"], name: "index_card_tpl_settings_on_check_h1", using: :btree
+  add_index "card_tpl_settings", ["check_h10"], name: "index_card_tpl_settings_on_check_h10", using: :btree
+  add_index "card_tpl_settings", ["check_h11"], name: "index_card_tpl_settings_on_check_h11", using: :btree
+  add_index "card_tpl_settings", ["check_h12"], name: "index_card_tpl_settings_on_check_h12", using: :btree
+  add_index "card_tpl_settings", ["check_h13"], name: "index_card_tpl_settings_on_check_h13", using: :btree
+  add_index "card_tpl_settings", ["check_h14"], name: "index_card_tpl_settings_on_check_h14", using: :btree
+  add_index "card_tpl_settings", ["check_h15"], name: "index_card_tpl_settings_on_check_h15", using: :btree
+  add_index "card_tpl_settings", ["check_h16"], name: "index_card_tpl_settings_on_check_h16", using: :btree
+  add_index "card_tpl_settings", ["check_h17"], name: "index_card_tpl_settings_on_check_h17", using: :btree
+  add_index "card_tpl_settings", ["check_h18"], name: "index_card_tpl_settings_on_check_h18", using: :btree
+  add_index "card_tpl_settings", ["check_h19"], name: "index_card_tpl_settings_on_check_h19", using: :btree
+  add_index "card_tpl_settings", ["check_h2"], name: "index_card_tpl_settings_on_check_h2", using: :btree
+  add_index "card_tpl_settings", ["check_h20"], name: "index_card_tpl_settings_on_check_h20", using: :btree
+  add_index "card_tpl_settings", ["check_h21"], name: "index_card_tpl_settings_on_check_h21", using: :btree
+  add_index "card_tpl_settings", ["check_h22"], name: "index_card_tpl_settings_on_check_h22", using: :btree
+  add_index "card_tpl_settings", ["check_h23"], name: "index_card_tpl_settings_on_check_h23", using: :btree
+  add_index "card_tpl_settings", ["check_h3"], name: "index_card_tpl_settings_on_check_h3", using: :btree
+  add_index "card_tpl_settings", ["check_h4"], name: "index_card_tpl_settings_on_check_h4", using: :btree
+  add_index "card_tpl_settings", ["check_h5"], name: "index_card_tpl_settings_on_check_h5", using: :btree
+  add_index "card_tpl_settings", ["check_h6"], name: "index_card_tpl_settings_on_check_h6", using: :btree
+  add_index "card_tpl_settings", ["check_h7"], name: "index_card_tpl_settings_on_check_h7", using: :btree
+  add_index "card_tpl_settings", ["check_h8"], name: "index_card_tpl_settings_on_check_h8", using: :btree
+  add_index "card_tpl_settings", ["check_h9"], name: "index_card_tpl_settings_on_check_h9", using: :btree
+  add_index "card_tpl_settings", ["check_monday"], name: "index_card_tpl_settings_on_check_monday", using: :btree
+  add_index "card_tpl_settings", ["check_saturday"], name: "index_card_tpl_settings_on_check_saturday", using: :btree
+  add_index "card_tpl_settings", ["check_sunday"], name: "index_card_tpl_settings_on_check_sunday", using: :btree
+  add_index "card_tpl_settings", ["check_thursday"], name: "index_card_tpl_settings_on_check_thursday", using: :btree
+  add_index "card_tpl_settings", ["check_tuesday"], name: "index_card_tpl_settings_on_check_tuesday", using: :btree
+  add_index "card_tpl_settings", ["check_wednesday"], name: "index_card_tpl_settings_on_check_wednesday", using: :btree
 
   create_table "card_tpl_shops", force: :cascade do |t|
     t.integer  "card_tpl_id", limit: 4
@@ -183,13 +221,13 @@ ActiveRecord::Schema.define(version: 20160426070203) do
   add_index "card_tpls", ["type"], name: "index_card_tpls_on_type", using: :btree
 
   create_table "cards", force: :cascade do |t|
-    t.string   "type",                limit: 10, default: "", null: false
+    t.string   "type",                limit: 10,  default: "", null: false
     t.integer  "card_tpl_id",         limit: 4
-    t.string   "code",                limit: 20, default: "", null: false
-    t.string   "state",               limit: 10, default: "", null: false
+    t.string   "code",                limit: 255
+    t.string   "state",               limit: 10,  default: "", null: false
     t.datetime "deleted_at"
-    t.integer  "card_a_id",           limit: 4
-    t.string   "phone",               limit: 20, default: "", null: false
+    t.integer  "locked_by_id",        limit: 4
+    t.string   "phone",               limit: 20,  default: "", null: false
     t.datetime "acquired_at"
     t.datetime "checked_at"
     t.datetime "created_at"
@@ -197,7 +235,7 @@ ActiveRecord::Schema.define(version: 20160426070203) do
     t.integer  "added_quantity_id",   limit: 4
     t.integer  "removed_quantity_id", limit: 4
     t.integer  "client_id",           limit: 4
-    t.string   "capcha",              limit: 10, default: ""
+    t.string   "capcha",              limit: 10,  default: ""
     t.datetime "from"
     t.datetime "to"
     t.string   "checker_phone",       limit: 11
@@ -210,10 +248,14 @@ ActiveRecord::Schema.define(version: 20160426070203) do
   add_index "cards", ["checker_phone"], name: "index_cards_on_checker_phone", using: :btree
   add_index "cards", ["client_id"], name: "index_cards_on_client_id", using: :btree
   add_index "cards", ["code"], name: "index_cards_on_code", unique: true, using: :btree
+  add_index "cards", ["deleted_at"], name: "index_cards_on_deleted_at", using: :btree
+  add_index "cards", ["from"], name: "index_cards_on_from", using: :btree
+  add_index "cards", ["locked_by_id"], name: "index_cards_on_locked_by_id", using: :btree
   add_index "cards", ["phone"], name: "index_cards_on_phone", using: :btree
   add_index "cards", ["removed_quantity_id"], name: "index_cards_on_removed_quantity_id", using: :btree
   add_index "cards", ["sender_phone"], name: "index_cards_on_sender_phone", using: :btree
   add_index "cards", ["state"], name: "index_cards_on_state", using: :btree
+  add_index "cards", ["to"], name: "index_cards_on_to", using: :btree
   add_index "cards", ["type"], name: "index_cards_on_type", using: :btree
 
   create_table "client_managers", force: :cascade do |t|
@@ -355,6 +397,7 @@ ActiveRecord::Schema.define(version: 20160426070203) do
     t.boolean  "sended",                      default: false, null: false
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "type",            limit: 255
   end
 
   add_index "gabe_dayus", ["appkey"], name: "gabe_dayus_appkey_index", using: :btree
@@ -366,6 +409,7 @@ ActiveRecord::Schema.define(version: 20160426070203) do
   add_index "gabe_dayus", ["smsFreeSignName"], name: "gabe_dayus_smsfreesignname_index", using: :btree
   add_index "gabe_dayus", ["smsTemplateCode"], name: "gabe_dayus_smstemplatecode_index", using: :btree
   add_index "gabe_dayus", ["smsType"], name: "gabe_dayus_smstype_index", using: :btree
+  add_index "gabe_dayus", ["type"], name: "index_gabe_dayus_on_type", using: :btree
 
   create_table "get_periods", force: :cascade do |t|
     t.integer  "card_tpl_id",  limit: 4
@@ -514,6 +558,8 @@ ActiveRecord::Schema.define(version: 20160426070203) do
   end
 
   add_index "periods", ["card_tpl_id"], name: "index_periods_on_card_tpl_id", using: :btree
+  add_index "periods", ["from"], name: "index_periods_on_from", using: :btree
+  add_index "periods", ["to"], name: "index_periods_on_to", using: :btree
   add_index "periods", ["type"], name: "index_periods_on_type", using: :btree
 
   create_table "quantities", force: :cascade do |t|

@@ -38,22 +38,18 @@ class Card < ActiveRecord::Base
 
   scope :acquirable, ->{where(:acquired_at=>nil, :locked_by_id=>nil)}
 
-  validates :card_tpl_id, :code, :added_quantity_id, :presence=>true
-  validates :code, :uniqueness=>true
-  # validates :type, :inclusion => %w(CardA CardB)
+  validates :card_tpl_id, :added_quantity_id, :presence=>true
+  
+  validates :type, :inclusion => %w(CardA CardB)
   validates :removed_quantity_id, :presence => true, :if=>'!deleted_at.nil?'
   validates :phone, :presence => true, :if=>'!acquired_at.nil?'
 
   before_validation do |record|
-    if code.blank?
-      record.generate_code
-    end
+    record.generate_code
   end
 
   before_create do |record|
-    if code.blank?
-      record.generate_code
-    end
+    record.generate_code
     record.generate_type
   end
 
@@ -62,9 +58,11 @@ class Card < ActiveRecord::Base
   end
 
   def generate_code
-    self.code = loop do
-      random_code = rand(100000000000...999999999999)
-      break random_code unless self.class.exists?(code: random_code)
+    if code.blank? and card_tpl.is_a? CardATpl
+      self.code = loop do
+        random_code = rand(100000000000...999999999999)
+        break random_code unless self.class.exists?(code: random_code)
+      end
     end
   end
 
@@ -110,10 +108,11 @@ class Card < ActiveRecord::Base
   end
 
   def send_check_capcha
-    if self.can_check? === true and Dayu.allow_send(self) === true
+    config = check_capcha_config
+    if self.can_check? === true and Dayu.allow_send(self, config['type']) === true
       self.capcha = rand(100000..999999)
       self.save
-      dy = Dayu.createByDayuable(self, check_capcha_config)
+      dy = Dayu.createByDayuable(self, config)
       dy.run
     else
       false
@@ -123,6 +122,7 @@ class Card < ActiveRecord::Base
   def check_capcha_config
     title = "#{card_tpl.title}的验证码"
     return {
+      'type'=>'check',
       'smsType'=>'normal',
       'smsFreeSignName'=>'前站',
       'smsParam'=>{code: capcha, product: '', item: title},

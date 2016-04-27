@@ -275,8 +275,15 @@ class CardTpl < ActiveRecord::Base
       self.setting.send("#{column}=", false)
     end
 
-    check_weeks.reject(&:empty?).each do |week|
+    (check_weeks||[]).reject(&:empty?).each do |week|
       check_method = "check_#{week}="
+      if self.setting.respond_to?(check_method)
+        self.setting.send(check_method, 1)
+      end
+    end
+
+    (check_hours||[]).reject(&:empty?).each do |hour|
+      check_method = "check_#{hour}="
       if self.setting.respond_to?(check_method)
         self.setting.send(check_method, 1)
       end
@@ -286,13 +293,6 @@ class CardTpl < ActiveRecord::Base
       acquire_method = "acquire_#{week}="
       if self.setting.respond_to?(acquire_method)
         self.setting.send(acquire_method, 1)
-      end
-    end
-
-    check_hours.reject(&:empty?).each do |hour|
-      check_method = "check_#{hour}="
-      if self.setting.respond_to?(check_method)
-        self.setting.send(check_method, 1)
       end
     end
 
