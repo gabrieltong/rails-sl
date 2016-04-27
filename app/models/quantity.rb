@@ -14,13 +14,15 @@ class Quantity < ActiveRecord::Base
     record.generate_cards
   end
 
+# TODO: 生成卡卷密钥
   def generate_cards
     if number > 0
-      Card.transaction do
-        (number - added_cards.size).times do
+      (number - added_cards.size).times do
+        begin
           card = self.added_cards.build(:card_tpl_id=>card_tpl_id)
-          card.save
-        end
+          result = card.save
+        rescue
+        end 
       end
     end
 

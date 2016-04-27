@@ -16,7 +16,7 @@ class CardTpl < ActiveRecord::Base
   has_many :card_tpl_groups
   has_many :groups, :through=>:card_tpl_groups
 
-  has_one :card_tpl_setting
+  has_one :setting, :class_name=>CardTplSetting
   has_many :periods
   has_many :quantities
   has_many :images, :as=>:imageable
@@ -26,7 +26,16 @@ class CardTpl < ActiveRecord::Base
   scope :ab, ->{where(:type=>[:CardATpl, :CardBTpl])}
   scope :a, ->{where(:type=>:CardATpl)}
   scope :b, ->{where(:type=>:CardBTpl)}
-  scope :acquire_datetime_valid, ->{where(arel_table[:acquire_from].lt(DateTime.now)).where(arel_table[:acquire_to].gt(DateTime.now))}
+
+  scope :datetime_acquirable, ->{where(arel_table[:acquire_from].lt(DateTime.now)).where(arel_table[:acquire_to].gt(DateTime.now))}
+  scope :week_acquirable, ->{joins(:setting).where(:card_tpl_settings=>{"acquire_#{DateTime.now.strftime('%A').downcase}"=>1})}
+  scope :hour_acquirable, ->{joins(:periods).where(Period.arel_table['from'].lt("#{DateTime.now.hour}:#{DateTime.now.min}")).where(Period.arel_table['to'].gt("#{DateTime.now.hour}:#{DateTime.now.min}"))}
+
+  scope :week_checkable, ->{joins(:setting).where(:card_tpl_settings=>{"check_#{DateTime.now.strftime('%A').downcase}"=>1})}
+  scope :hour_checkable, ->{joins(:setting).where(:card_tpl_settings=>{"check_h#{DateTime.now.hour}"=>1})}
+
+  scope :sendable_by, ->(phone){joins(:shops=>[:managers]).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:sender].eq(1))}
+  scope :checkable_by, ->(phone){joins(:shops=>[:managers]).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:checker].eq(1))}
 
   serialize :acquire_weeks
   serialize :check_weeks
@@ -54,11 +63,9 @@ class CardTpl < ActiveRecord::Base
   has_attached_file :guide_cover, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
   validates_attachment_content_type :guide_cover, content_type: /\Aimage\/.*\Z/
 
-  # before_save do |record|
-  #   record.use_weeks = self::UseWeeks.select do |k,v| 
-  #   record.use_weeks_zh.include? k
-  #   end.values
-  # end
+  after_save do |record|
+    update_setting
+  end
 
   state_machine :state, :initial => :inactive do
     event :activate do
@@ -98,14 +105,14 @@ class CardTpl < ActiveRecord::Base
       # card_tpl.state
       # 判断某手机号能否领优惠卷
       def can_acquire? phone
-        if cards.not_acquired.empty?
-          :no_valid_card
-        elsif date_can_acquire? != true
-          :date_invalid
-        elsif weekday_can_acquire? != true
-          :weekday_invalid
+        if cards.acquirable.empty?
+          :no_acquirable_card
+        elsif datetime_can_acquire? != true
+          :datetime_not_acquirable
+        elsif week_can_acquire? != true
+          :week_not_acquirable
         elsif hour_can_acquire? != true
-          :hour_invalid
+          :hour_not_acquirable
         elsif phone_can_acquire?(phone) != true
           :person_limit_overflow
         elsif period_phone_can_acquire?(phone)!= true
@@ -129,6 +136,7 @@ class CardTpl < ActiveRecord::Base
 
 
   before_validation do |record|
+    # 根据change_remain创建Quantity，通过Quantity的数量变化创建卡卷
     if record.change_remain and record.change_remain.to_i != 0
       quantities.build(:number=>change_remain)
     end
@@ -139,74 +147,46 @@ class CardTpl < ActiveRecord::Base
     if period = period_now
       acquired_time_gt = Card.arel_table[:acquired_time].gt(period.from.strftime("%H:%M"))
       acquired_time_lt = Card.arel_table[:acquired_time].lt(period.to.strftime("%H:%M"))
-      
-      cards.where(:phone=>phone).where(acquired_time_gt).where(acquired_time_lt).size < period.person_limit
+      cards.acquired_by(phone).where(acquired_time_gt).where(acquired_time_lt).size < period.person_limit
     end
   end
 
   # 验证用户
   def phone_can_acquire? phone
-    cards.where(:phone=>phone).size < person_limit
+    cards.acquired_by(phone).size < person_limit
   end
 
   # 验证投放日期日期
-  def date_can_acquire?
-    self.class.acquire_datetime_valid.exists?(id)
+  def datetime_can_acquire?
+    self.class.datetime_acquirable.exists?(id)
   end
 
   # 验证投放时间
   def hour_can_acquire?
-    !period_now.nil?
+    self.class.hour_acquirable.exists?(id)
   end
 
-  def period_now
-    now = DateTime.now
-    time = "#{now.hour}:#{now.minute}"
-    where_from = Period.arel_table[:from].lt(time)
-    where_to = Period.arel_table[:to].gt(time)
-    periods.where(where_from).where(where_to).first
-  end
   # 验证投放星期
-  def weekday_can_acquire?
-    now = DateTime.now
-    acquire_weeks.reject(&:empty?).each do |week|
-      method = "#{week}?"
-      if now.respond_to?(method) and now.send(method) == true
-        return true
-      end
-    end
-    false
+  def week_can_acquire?
+    self.class.week_acquirable.exists?self.id
   end
 
   # 验证核销时间
   def hour_can_check?
-    now = DateTime.now
-    check_hours.reject(&:empty?).each do |hour|
-      if now.hour == hour.gsub('h','').to_i
-        return true
-      end
-    end
-    false
+    self.class.hour_checkable.exists?self.id
   end
 
   # 验证核销星期
-  def weekday_can_check?
-    now = DateTime.now
-    check_weeks.reject(&:empty?).each do |week|
-      method = "#{week}?"
-      if now.respond_to?(method) and now.send(method) == true
-        return true
-      end
-    end
-    false
+  def week_can_check?
+    self.class.week_checkable.exists?self.id
   end
 
-  def self.generate_hours
-    h = {}
-    1.upto(24) do |i|
-    h["#{i-1}点~#{i}点"] = "#{i-1}-#{i}"
-    end
-    h
+  def can_send_by_phone? phone
+    self.class.sendable_by(phone).exists?(id)
+  end
+
+  def can_check_by_phone? phone
+    self.class.checkable_by(phone).exists?(id)
   end
 
   def cover_url
@@ -233,15 +213,15 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  def acquire(phone, by_member, number=1)
+  def acquire(phone, by_phone, number=1)
     can_acquire = can_acquire?(phone)
     if can_acquire === true
-      can_send_by_member = self.class.can_send_by_member?(id, by_member)
-      if can_send_by_member === true
-        result = cards.not_acquired.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_member.phone)
-        return result
+      can_send_by_phone = self.can_send_by_phone?(by_phone)
+      if can_send_by_phone === true
+        result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_phone)
+        return result 
       else
-        return can_send_by_member
+        return can_send_by_phone
       end
     else
       return can_acquire
@@ -258,22 +238,65 @@ class CardTpl < ActiveRecord::Base
   end
 
   # 判断卡卷是否能被member投放
-  def self.can_send_by_member? id, member
-    member.sender_card_tpls.exists? id
-  end
-
-  # 判断卡卷是否能被member投放
-  def self.can_check_by_member? id, member
-    member.checker_card_tpls.exists? id
-  end
-
-  def self.acquire(id, phone, by_member, number=1)
+  def self.can_send_by_phone? id, phone
     record = find_by_id(id)
     if record
-      record.acquire(phone, by_member, number)
+      record.can_send_by_phone?(phone)
     else
       :no_record
     end
+  end
+
+  # 判断卡卷是否能被member投放
+  def self.can_check_by_phone? id, phone
+    record = find_by_id(id)
+    if record
+      record.can_check_by_phone?(phone)
+    else
+      :no_record
+    end
+  end
+
+  def self.acquire(id, phone, by_phone, number=1)
+    record = find_by_id(id)
+    if record
+      record.acquire(phone, by_phone, number)
+    else
+      :no_record
+    end
+  end
+
+  def update_setting
+    if self.setting.nil?
+      self.setting = CardTplSetting.new(:card_tpl_id=>id)
+    end
+
+    [:check_monday,:check_tuesday,:check_wednesday,:check_thursday,:check_friday,:check_saturday,:check_sunday,:acquire_monday,:acquire_tuesday,:acquire_wednesday,:acquire_thursday,:acquire_friday,:acquire_saturday,:acquire_sunday,:check_h0,:check_h1,:check_h2,:check_h3,:check_h4,:check_h5,:check_h6,:check_h7,:check_h8,:check_h9,:check_h10,:check_h11,:check_h12,:check_h13,:check_h14,:check_h15,:check_h16,:check_h17,:check_h18,:check_h19,:check_h20,:check_h21,:check_h22,:check_h23].each do |column|
+      self.setting.send("#{column}=", false)
+    end
+
+    check_weeks.reject(&:empty?).each do |week|
+      check_method = "check_#{week}="
+      if self.setting.respond_to?(check_method)
+        self.setting.send(check_method, 1)
+      end
+    end
+
+    acquire_weeks.reject(&:empty?).each do |week|
+      acquire_method = "acquire_#{week}="
+      if self.setting.respond_to?(acquire_method)
+        self.setting.send(acquire_method, 1)
+      end
+    end
+
+    check_hours.reject(&:empty?).each do |hour|
+      check_method = "check_#{hour}="
+      if self.setting.respond_to?(check_method)
+        self.setting.send(check_method, 1)
+      end
+    end
+
+    self.setting.save
   end
 
   private
@@ -285,14 +308,24 @@ class CardTpl < ActiveRecord::Base
   def self.default_scope
     where type: [:CardBTpl,:CardATpl]
   end
-  # 卡卷是否可核销
+
+  # 卡卷是否可核销 , 需要结合卡密核销函数 card.can_check?
   def _can_check?
-    if weekday_can_check? != true
-      return :weekday_cannot_check
+    if week_can_check? != true
+      return :week_not_checkable
     elsif hour_can_check? != true
-      return :hour_cannot_check
+      return :hour_not_checkable
     else
       return true
     end
+  end
+
+  # 计算得出当前时间所在的period
+  def period_now
+    now = DateTime.now
+    time = "#{now.hour}:#{now.minute}"
+    where_from = Period.arel_table[:from].lt(time)
+    where_to = Period.arel_table[:to].gt(time)
+    periods.where(where_from).where(where_to).first
   end
 end

@@ -85,10 +85,10 @@ module SL
         requires :token, allow_blank: false, :type=>String
       end
       desc '能够发送的卡卷'
-      get :sender do
+      get :sendable_by do
         authenticate!
         render
-        present :result, current_member.sender_card_tpls, with: SL::Entities::CardTpl
+        present :result, CardTpl.sendable_by(current_member.phone), with: SL::Entities::CardTpl
       end
 
       params do
@@ -98,10 +98,10 @@ module SL
       params do
         requires :token, allow_blank: false, :type=>String
       end
-      get :checker do
+      get :checkable_by do
         authenticate!
         render
-        present :result, current_member.checker_card_tpls, with: SL::Entities::CardTpl
+        present :result, CardTpl.checkable_by(current_member.phone), with: SL::Entities::CardTpl
       end
 
       route_param :id do
@@ -128,10 +128,11 @@ module SL
         get :can_acquire do
           authenticate!
           render
-          if CardTpl.can_send_by_member? params[:id], current_member
+          can_send_by_phone = CardTpl.can_send_by_phone? params[:id], current_member.phone
+          if can_send_by_phone === true
             present :result, CardTpl.can_acquire?(params[:id], params[:phone])
           else
-            present :result, :no_record
+            present :result, can_send_by_phone
           end
         end
 
@@ -140,18 +141,30 @@ module SL
           requires :id, allow_blank: false, :type=>Integer
           requires :phone, allow_blank: false, :type=>Integer
           requires :token, allow_blank: false, :type=>String
-          requires :number, allow_blank: false, :type=>Integer, :values=>(1..1)
+          # requires :number, allow_blank: false, :type=>Integer, :values=>(1..1)
         end
         get :acquire do
           authenticate!
           render
-          present :result, CardTpl.acquire(params[:id], params[:phone], current_member, params[:number])
+          present :result, CardTpl.acquire(params[:id], params[:phone], current_member.phone)
         end
       end
     end
 
     resource :cards do
       route_param :code do
+        desc '发送核销验证码'
+        params do
+          requires :code, allow_blank: false, :type=>Integer
+          # requires :token, allow_blank: false, :type=>String
+        end
+        get :send_check_capcha do
+          # authenticate!
+          render
+          card = Card.find_by_code(params[:code])
+          present :result, card.send_check_capcha
+        end
+
         desc '核销前获取卡卷信息'
         params do
           requires :code, allow_blank: false, :type=>Integer
@@ -179,10 +192,11 @@ module SL
         get :can_check do
           authenticate!
           render
-          if Card.can_check_by_member? params[:code], current_member
+          can_check_by_phone = Card.can_check_by_phone? params[:code], current_member.phone
+          if can_check_by_phone === true
             present :result, Card.can_check?(params[:code])
           else
-            present :result, :no_record
+            present :result, can_check_by_phone
           end
         end
 
@@ -195,7 +209,7 @@ module SL
         get :check do
           authenticate!
           render
-          present :result, Card.check(params[:code], params[:capcha], current_member)
+          present :result, Card.check(params[:code], params[:capcha], current_member.phone)
         end
       end
     end

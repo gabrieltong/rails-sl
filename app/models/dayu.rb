@@ -52,13 +52,13 @@ class Dayu < ActiveRecord::Base
   end
 
   def self.allow_send obj
-    if obj.dayus.order('sended_at desc').last
-      return (obj.dayus.order('sended_at desc').last.sended_at - DateTime.now).abs > 60
+    if obj.dayus.order('sended_at desc').first
+      return (obj.dayus.order('sended_at desc').first.sended_at - DateTime.now).abs > 60
     else
       return true
     end
   end
-  
+
   private
   def run2
     `

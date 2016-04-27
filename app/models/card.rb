@@ -9,11 +9,23 @@ class Card < ActiveRecord::Base
   belongs_to :client
   belongs_to :checker, :class_name=>Member, :foreign_key=>:checker_phone, :primary_key=>:phone
   belongs_to :sender, :class_name=>Member, :foreign_key=>:sender_phone, :primary_key=>:phone
+  has_one :locked_card, :class_name=>Card, :foreign_key=>:locked_by_id
+  belongs_to :locked_by_card, :class_name=>Card, :foreign_key=>:locked_by_id
+
   has_many :dayus, :as=>:dayuable
 
+  delegate 'can_check_by_phone?', :to=>:card_tpl
+
+  scope :acquired_by, ->(phone){where(:phone=>phone)}
+  scope :sended_by, ->(phone){where(:sender_phone=>phone)}
+  scope :checked_by, ->(phone){where(:checker_phone=>phone)}
+  scope :locked_by, ->(card_id){where(:locked_by_id=>card_id)}
+
+  scope :locked, ->{where.not(:locked_by_id=>nil)}
   scope :acquired, ->{where.not(:acquired_at=>nil)}
   scope :checked, ->{where.not(:checked_at=>nil)}
 
+  scope :not_locked, ->{where(:locked_by_id=>nil)}
   scope :not_acquired, ->{where(:acquired_at=>nil)}
   scope :not_checked, ->{where(:checked_at=>nil)}
 
@@ -24,6 +36,7 @@ class Card < ActiveRecord::Base
   # 相当于 acquired.not_checked.active
   scope :checkable, ->{where(arel_table[:acquired_at].not_eq(nil)).where(arel_table[:checked_at].eq(nil)).where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
 
+  scope :acquirable, ->{where(:acquired_at=>nil, :locked_by_id=>nil)}
 
   validates :card_tpl_id, :code, :added_quantity_id, :presence=>true
   validates :code, :uniqueness=>true
@@ -44,10 +57,6 @@ class Card < ActiveRecord::Base
     record.generate_type
   end
 
-  # def self.default_scope
-  #   where type: [:CardB,:CardA]
-  # end
-
   def self.inheritance_column
     'type'
   end
@@ -59,6 +68,7 @@ class Card < ActiveRecord::Base
     end
   end
 
+# 为卡密生成正确类型
   def generate_type
     if card_tpl.is_a? CardATpl
       self.type = :CardA
@@ -69,6 +79,7 @@ class Card < ActiveRecord::Base
     end
   end
 
+# 测试用代码
   def self.generate_depot(number = 10**6)
     number.times do
       card = Card.new
@@ -76,18 +87,26 @@ class Card < ActiveRecord::Base
     end
   end
 
+# 核销需要验证的情况
+# 验证码，密钥， 二者绑定 card.capcha == capcha
+
+# 已获得 scope card.acquired
+# 未核销 scope card.not_checked
+# 卡卷实例在有效期内 scope card.active
+
+# 卡卷模板未下架 scope card_tpl.active or card_tpl.paused
+# 当前时间在可核销时间内 hour in use_hours 
+# 当前天(周1，2，3，4，5，6，7）在可核销cwday内 : cwday in use_weeks
+# 使用乐观锁 
+# 有可能需要验证码有效期 
 # 判断能否核销
   def can_check?
     return :not_acquired unless self.class.acquired.exists?(self.id)
-    return :checked if self.class.checked.exists?(self.id)
-    return :inactive unless self.class.active.exists?(self.id)
+    return :checked unless self.class.not_checked.exists?(self.id)
+    return :datetime_not_checkable unless self.class.active.exists?(self.id)
     card_tpl_can_check = self.card_tpl.can_check?
     return card_tpl_can_check unless card_tpl_can_check === true
     true
-  end
-
-  def can_check_by_member? member
-    CardTpl.can_check_by_member? card_tpl_id, member
   end
 
   def send_check_capcha
@@ -103,7 +122,6 @@ class Card < ActiveRecord::Base
 
   def check_capcha_config
     title = "#{card_tpl.title}的验证码"
-    code = "123456"
     return {
       'smsType'=>'normal',
       'smsFreeSignName'=>'前站',
@@ -124,26 +142,16 @@ class Card < ActiveRecord::Base
   end
 
 # 用户是否有核销某卡密的资格
-  def self.can_check_by_member? code, member
+  def self.can_check_by_phone? code, phone
     card = self.find_by_code(code)
     if card.nil?
       return :no_record
     else
-      return card.can_check_by_member? member
+      return card.can_check_by_phone? phone
     end
   end
 
-# 核销需要验证的情况
-# 已获得
-# 未核销
-# 验证码，密钥， 二者绑定
-# 卡卷实例在有效期内
-# 卡卷模板未下架
-# 当前时间在可核销时间内
-# 当前天(周1，2，3，4，5，6，7）在可核销cwday内
-# 使用乐观锁
-# 有可能需要验证码有效期
-  def self.check(code, capcha, memeber)
+  def self.check(code, capcha, by_phone)
     where_condition = {:code=>code, :capcha=>capcha}
     # 验证卡密是否存在
     card = self.where(where_condition).first
@@ -151,13 +159,13 @@ class Card < ActiveRecord::Base
       can_check = card.can_check?
       # 验证卡密权限
       if can_check === true 
-        can_check_by_member = card.can_check_by_member?(memeber)
+        can_check_by_phone = card.can_check_by_phone?(by_phone)
         # 验证用户权限
-        if can_check_by_member === true 
-          result = checkable.where(where_condition).limit(1).update_all(:checked_at=>DateTime.now,:checker_phone=>memeber.phone)
+        if can_check_by_phone === true 
+          result = checkable.where(where_condition).limit(1).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
           return result > 0  
         else
-          return can_check_by_member
+          return can_check_by_phone
         end
       else
         return can_check
