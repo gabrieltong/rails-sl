@@ -29,7 +29,6 @@ gem 'paperclip'
 gem 'cancan'
 gem "paranoia", "~> 2.0"
 gem 'acts-as-taggable-on', '~> 3.4'
-gem 'thin'
 gem 'devise'
 gem 'state_machine'
 gem 'draper'
@@ -42,6 +41,7 @@ gem 'roo', '~> 2.3.2'
 gem 'grape'
 gem 'grape-entity'
 gem 'public_activity'
+gem 'dotenv-rails'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

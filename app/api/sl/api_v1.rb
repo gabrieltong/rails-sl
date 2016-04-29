@@ -151,6 +151,38 @@ module SL
       end
     end
 
+    resource :money do
+      desc '给用户充值'
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :phone, allow_blank: false, :type=>Integer
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :money, allow_blank: false, :type=>Integer, :values=>(0..1000)
+      end
+      get :charge do
+        authenticate!
+        render
+        if current_member.managed_clients.exists? params[:client_id]
+          present :result, ClientMember.where(:client_id=>params[:client_id],:member_phone=>params[:phone]).first.charge_money(params[:money], current_member.id)
+        end
+      end
+
+      desc '消费'
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :phone, allow_blank: false, :type=>Integer
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :money, allow_blank: false, :type=>Integer, :values=>(0..1000)
+      end
+      get :spend do
+        authenticate!
+        render
+        if current_member.managed_clients.exists? params[:client_id]
+          present :result, ClientMember.where(:client_id=>params[:client_id],:member_phone=>params[:phone]).first.spend_money(params[:money], current_member.id)
+        end
+      end
+    end
+
     resource :cards do
       route_param :code do
         desc '发送核销验证码'
