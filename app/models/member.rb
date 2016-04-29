@@ -16,7 +16,7 @@ class Member < ActiveRecord::Base
   has_many :managed_clients, ->{where(:client_managers=>{:admin=>1})}, :through=>:client_managers, :source=>:client#, :foreign_key=>:admin_phone, :primary_key=>:phone
   has_many :managed_members, :class_name=>Member, :through=>:managed_clients, :source=>:members
 
-  has_many :client_members
+  has_many :client_members, :foreign_key=>:phone, :primary_key=>:phone
   has_many :clients, :through=>:client_members
 
   has_many :client_managers, :foreign_key=>:phone, :primary_key=>:phone

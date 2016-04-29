@@ -8,6 +8,7 @@ class Group < ActiveRecord::Base
 
   scope :default, ->{where(:default=>true)}
   scope :active, ->{where(:active=>true)}
+  
   def self.permit_params
     [:client_id,:title,:position,:desc,:active,:default]
   end

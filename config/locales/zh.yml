@@ -235,7 +235,7 @@
       client_member:
         id: '会员ID'
         groups: '会员组'
-        member_phone: '电话'
+        phone: '电话'
         wechat_binded: '微信绑定'
         collects: '收藏'
         borned_at: '出生日期'

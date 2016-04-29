@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160427102133) do
+ActiveRecord::Schema.define(version: 20160429072905) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -281,9 +281,8 @@ ActiveRecord::Schema.define(version: 20160427102133) do
 
   create_table "client_members", force: :cascade do |t|
     t.integer  "client_id",        limit: 4
-    t.integer  "member_id",        limit: 4
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.string   "name",             limit: 255
     t.string   "sex",              limit: 255
     t.date     "borned_at"
@@ -293,11 +292,11 @@ ActiveRecord::Schema.define(version: 20160427102133) do
     t.string   "pic_content_type", limit: 255
     t.integer  "pic_file_size",    limit: 4
     t.datetime "pic_updated_at"
-    t.string   "member_phone",     limit: 255
+    t.string   "phone",            limit: 255
+    t.float    "money",            limit: 24,  default: 0.0, null: false
   end
 
-  add_index "client_members", ["client_id", "member_id"], name: "index_client_members_on_client_id_and_member_id", unique: true, using: :btree
-  add_index "client_members", ["member_phone", "client_id"], name: "index_client_members_on_member_phone_and_client_id", unique: true, using: :btree
+  add_index "client_members", ["phone", "client_id"], name: "index_client_members_on_phone_and_client_id", unique: true, using: :btree
 
   create_table "client_settings", force: :cascade do |t|
     t.integer  "client_id",      limit: 4
@@ -424,20 +423,20 @@ ActiveRecord::Schema.define(version: 20160427102133) do
   add_index "get_periods", ["card_tpl_id"], name: "index_get_periods_on_card_tpl_id", using: :btree
 
   create_table "group_members", force: :cascade do |t|
-    t.integer  "group_id",     limit: 4
-    t.integer  "member_id",    limit: 4
+    t.integer  "group_id",   limit: 4
+    t.integer  "member_id",  limit: 4
     t.date     "started_at"
     t.date     "ended_at"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.string   "member_phone", limit: 255
-    t.integer  "client_id",    limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "phone",      limit: 255
+    t.integer  "client_id",  limit: 4
   end
 
   add_index "group_members", ["client_id"], name: "index_group_members_on_client_id", using: :btree
   add_index "group_members", ["group_id"], name: "index_group_members_on_group_id", using: :btree
   add_index "group_members", ["member_id"], name: "index_group_members_on_member_id", using: :btree
-  add_index "group_members", ["member_phone", "group_id"], name: "index_group_members_on_member_phone_and_group_id", unique: true, using: :btree
+  add_index "group_members", ["phone", "group_id"], name: "index_group_members_on_phone_and_group_id", unique: true, using: :btree
 
   create_table "groups", force: :cascade do |t|
     t.integer  "client_id",  limit: 4
@@ -458,7 +457,7 @@ ActiveRecord::Schema.define(version: 20160427102133) do
   create_table "images", force: :cascade do |t|
     t.integer  "imageable_id",      limit: 4
     t.string   "imageable_type",    limit: 255
-    t.integer  "member_id",         limit: 4
+    t.string   "phone",             limit: 15
     t.integer  "client_id",         limit: 4
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
@@ -470,7 +469,7 @@ ActiveRecord::Schema.define(version: 20160427102133) do
 
   add_index "images", ["client_id"], name: "index_images_on_client_id", using: :btree
   add_index "images", ["imageable_id", "imageable_type"], name: "index_images_on_imageable_id_and_imageable_type", using: :btree
-  add_index "images", ["member_id"], name: "index_images_on_member_id", using: :btree
+  add_index "images", ["phone"], name: "index_images_on_phone", using: :btree
 
   create_table "imports", force: :cascade do |t|
     t.string   "title",             limit: 255
@@ -540,6 +539,27 @@ ActiveRecord::Schema.define(version: 20160427102133) do
   add_index "mobile_files", ["type"], name: "index_mobile_files_on_type", using: :btree
   add_index "mobile_files", ["user_id"], name: "index_mobile_files_on_user_id", using: :btree
 
+  create_table "moneys", force: :cascade do |t|
+    t.integer  "member_id",        limit: 4
+    t.integer  "client_id",        limit: 4
+    t.integer  "client_member_id", limit: 4
+    t.float    "money",            limit: 24
+    t.integer  "spendable_id",     limit: 4
+    t.string   "spendable_type",   limit: 255
+    t.integer  "by_phone",         limit: 4
+    t.string   "type",             limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "moneys", ["by_phone"], name: "index_moneys_on_by_phone", using: :btree
+  add_index "moneys", ["client_id"], name: "index_moneys_on_client_id", using: :btree
+  add_index "moneys", ["client_member_id"], name: "index_moneys_on_client_member_id", using: :btree
+  add_index "moneys", ["member_id"], name: "index_moneys_on_member_id", using: :btree
+  add_index "moneys", ["spendable_id"], name: "index_moneys_on_spendable_id", using: :btree
+  add_index "moneys", ["spendable_type"], name: "index_moneys_on_spendable_type", using: :btree
+  add_index "moneys", ["type"], name: "index_moneys_on_type", using: :btree
+
   create_table "password_resets", id: false, force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
     t.string   "token",      limit: 255, null: false
@@ -589,6 +609,27 @@ ActiveRecord::Schema.define(version: 20160427102133) do
   end
 
   add_index "shops", ["client_id"], name: "index_shops_on_client_id", using: :btree
+
+  create_table "spends", force: :cascade do |t|
+    t.integer  "member_id",        limit: 4
+    t.integer  "client_id",        limit: 4
+    t.integer  "client_member_id", limit: 4
+    t.float    "money",            limit: 24
+    t.integer  "spendable_id",     limit: 4
+    t.string   "spendable_type",   limit: 255
+    t.integer  "by_member_id",     limit: 4
+    t.string   "type",             limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
+  add_index "spends", ["by_member_id"], name: "index_spends_on_by_member_id", using: :btree
+  add_index "spends", ["client_id"], name: "index_spends_on_client_id", using: :btree
+  add_index "spends", ["client_member_id"], name: "index_spends_on_client_member_id", using: :btree
+  add_index "spends", ["member_id"], name: "index_spends_on_member_id", using: :btree
+  add_index "spends", ["spendable_id"], name: "index_spends_on_spendable_id", using: :btree
+  add_index "spends", ["spendable_type"], name: "index_spends_on_spendable_type", using: :btree
+  add_index "spends", ["type"], name: "index_spends_on_type", using: :btree
 
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4

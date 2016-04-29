@@ -1,5 +1,33 @@
 module SL
   module Entities
+    class Image < Grape::Entity
+      expose :id
+      expose :file_url do |record|
+        record.file_url(:medium)
+      end
+    end
+
+    class Group < Grape::Entity
+      expose :id
+      expose :title
+      expose :default
+      expose :position
+      expose :desc
+    end
+
+    class GroupMember < Grape::Entity
+      expose :id
+      expose :started_at
+      expose :ended_at
+      expose :phone
+      expose :name
+      expose :sex
+      expose :borned_at
+      expose :address
+      expose :email
+      expose :pic
+    end
+
     class Member < Grape::Entity
       expose :id
       expose :remember_token
@@ -12,10 +40,16 @@ module SL
       expose :short_desc
       expose :desc
       expose :intro
-      expose :cover_url
+      expose :cover_url do |record|
+        record.cover_url(:medium)
+      end
       expose :person_limit
-      expose :share_cover_url
-      expose :guide_cover_url
+      expose :share_cover_url do |record|
+        record.share_cover_url(:medium)
+      end
+      expose :guide_cover_url do |record|
+        record.guide_cover_url(:medium)
+      end
       expose :website
       expose :check_weeks
       expose :acquire_weeks
@@ -51,8 +85,16 @@ module SL
         @current_member ||= Member.find_by_remember_token(params[:token])
       end
 
+      def current_client
+        @current_client ||= Client.find_by_id(params[:client_id])
+      end
+
       def authenticate!
         error!('401 Unauthorized', 401) unless current_member
+      end
+
+      def authenticate_client_manager!
+        error!('401 Unauthorized', 401) unless current_client
       end
     end
 
@@ -117,6 +159,98 @@ module SL
       end
     end
 
+    resource :images do
+      params do
+        # requires :token, allow_blank: false, :type=>String
+        optional :phone, allow_blank: false, :type=>Integer, :default=>13654265306
+      end
+      post :create do
+        # authenticate!
+        i = Image.new
+        i.phone = params[:phone]
+        i.file = params[:image_file].tempfile
+        if i.save
+          present :result, i, with: SL::Entities::Image
+        else
+          present :error, i.errors
+        end
+      end
+    end
+
+    resource :groups do 
+      desc '获取商户会员组列表'
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+      end
+      get :all do
+        authenticate!
+        authenticate_client_manager!
+        present :result, current_client.groups, with: SL::Entities::Group
+      end
+
+      route_param :group_id do 
+        desc '获取某会员在该会员组详情详情'
+        params do
+          requires :group_id, allow_blank: false, :type=>Integer, :desc=>'会员组ID'
+          requires :token, allow_blank: false, :type=>String
+          requires :client_id, allow_blank: false, :type=>Integer
+        end
+        get :member_info do
+          authenticate!
+          authenticate_client_manager!
+          gm = current_client.group_members.phone(params[:phone]).first
+          present :result, gm, with: SL::Entities::GroupMember
+        end
+
+        desc '更新群组信息'
+        params do
+          requires :token, allow_blank: false, :type=>String
+          requires :client_id, allow_blank: false, :type=>Integer
+          requires :phone, allow_blank: false, :type=>Integer
+          requires :group_id, allow_blank: false, :type=>Integer
+
+          requires :started_at, allow_blank: false, :type=>Date
+          requires :ended_at, allow_blank: false, :type=>Date
+
+          requires :sex, allow_blank: false, :values=>['male','female']
+          requires :name, allow_blank: false, :type=>String
+          requires :borned_at, allow_blank: false, :type=>Date
+        end
+
+        post :update_member_info do
+          authenticate!
+          authenticate_client_manager!
+          cm_attributes = {:sex=>params[:sex], :name=>params[:name], :borned_at=>params[:borned_at],:phone=>params[:phone]}
+          cm = current_client.client_members.phone(params[:phone]).first
+
+          if cm
+            cm.update_attributes(cm_attributes)
+          else
+            cm = current_client.client_members.build(cm_attributes)
+          end
+
+          gm_attributes = {:started_at=>params[:started_at], :ended_at=>params[:ended_at], :phone=>params[:phone]}
+          gm = current_client.group_members.phone(params[:phone]).first
+          if gm
+            gm.update_attributes(gm_attributes)
+          else
+            gm = current_client.group_members.build(gm_attributes)
+          end
+
+          if !cm.valid?
+            present :error, cm.errors
+          elsif !gm.valid?
+            present :error, gm.errors
+          else
+            cm.save
+            gm.save
+            render
+          end
+        end
+      end
+    end
+
     resource :card_tpls do
       route_param :id do
         desc '是否能够发卷'
@@ -161,10 +295,9 @@ module SL
       end
       get :charge do
         authenticate!
+        authenticate_client_manager!
         render
-        if current_member.managed_clients.exists? params[:client_id]
-          present :result, ClientMember.where(:client_id=>params[:client_id],:member_phone=>params[:phone]).first.charge_money(params[:money], current_member.id)
-        end
+        present :result, current_member.client_members.where(:phone=>params[:phone]).first.charge_money(params[:money], current_member.phone)
       end
 
       desc '消费'
@@ -176,10 +309,9 @@ module SL
       end
       get :spend do
         authenticate!
+        authenticate_client_manager!
         render
-        if current_member.managed_clients.exists? params[:client_id]
-          present :result, ClientMember.where(:client_id=>params[:client_id],:member_phone=>params[:phone]).first.spend_money(params[:money], current_member.id)
-        end
+        present :result, current_member.client_members.where(:phone=>params[:phone]).first.charge_money(params[:money], current_member.phone)
       end
     end
 

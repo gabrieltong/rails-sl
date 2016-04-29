@@ -21,7 +21,7 @@ class Import < ActiveRecord::Base
 
       xlsx.to_a.collect {|i|i[0]}.each do |phone|
         if group
-          cm = group.group_members.where(:member_phone=>phone).first || group.group_members.build(:member_phone=>phone)
+          cm = group.group_members.where(:phone=>phone).first || group.group_members.build(:phone=>phone)
           cm.started_at = DateTime.now
           cm.ended_at = DateTime.now + 1.year
           cm.client_id = client_id
