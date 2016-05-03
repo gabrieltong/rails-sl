@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160429072905) do
+ActiveRecord::Schema.define(version: 20160503030056) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -227,6 +227,9 @@ ActiveRecord::Schema.define(version: 20160429072905) do
     t.string   "state",               limit: 10,  default: "", null: false
     t.datetime "deleted_at"
     t.integer  "locked_by_id",        limit: 4
+    t.integer  "locked_by_tpl_id",    limit: 4
+    t.integer  "locked_tpl_id",       limit: 4
+    t.integer  "locked_id",           limit: 4
     t.string   "phone",               limit: 20,  default: "", null: false
     t.datetime "acquired_at"
     t.datetime "checked_at"
@@ -251,6 +254,9 @@ ActiveRecord::Schema.define(version: 20160429072905) do
   add_index "cards", ["deleted_at"], name: "index_cards_on_deleted_at", using: :btree
   add_index "cards", ["from"], name: "index_cards_on_from", using: :btree
   add_index "cards", ["locked_by_id"], name: "index_cards_on_locked_by_id", using: :btree
+  add_index "cards", ["locked_by_tpl_id"], name: "index_cards_on_locked_by_tpl_id", using: :btree
+  add_index "cards", ["locked_id"], name: "index_cards_on_locked_id", using: :btree
+  add_index "cards", ["locked_tpl_id"], name: "index_cards_on_locked_tpl_id", using: :btree
   add_index "cards", ["phone"], name: "index_cards_on_phone", using: :btree
   add_index "cards", ["removed_quantity_id"], name: "index_cards_on_removed_quantity_id", using: :btree
   add_index "cards", ["sender_phone"], name: "index_cards_on_sender_phone", using: :btree

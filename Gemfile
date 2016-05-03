@@ -44,6 +44,8 @@ gem 'grape_on_rails_routes'
 gem 'public_activity'
 gem 'dotenv-rails'
 gem 'activesupport-json_encoder'
+gem 'bulk_insert'
+gem 'randumb'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

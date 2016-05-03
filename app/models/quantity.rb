@@ -14,8 +14,43 @@ class Quantity < ActiveRecord::Base
     record.generate_cards
   end
 
-# TODO: 生成卡卷密钥
   def generate_cards
+    if CardATpl.exists?(card_tpl_id)
+      generate_cards_for_a
+    end
+    if CardBTpl.exists?(card_tpl_id)
+      generate_cards_for_b
+    end    
+  end
+
+  def generate_cards_for_b
+    if number > 0
+      (number - added_cards.size).times do
+        card = self.added_cards << CardB.new(:card_tpl_id=>card_tpl_id, :code=>nil)
+      end
+
+      card_tpl.draw_awards.each do |draw|
+        self.added_cards.locked_none.not_locked.not_acquired.not_checked.order_by_rand.limit(draw.number - added_cards.locked_by_tpl(draw.card_tpl_id).size).each do |card_try_to_lock|
+          draw.award_tpl.cards.locked_none.not_locked.not_acquired.not_checked.order_by_rand.limit(1).each do |card_to_be_locked|
+            card_try_to_lock.locked_card = card_to_be_locked
+            card_try_to_lock.save
+          end
+        end
+      end
+    end
+
+    if number < 0
+      # card_tpl.cards.not_acquired.limit(number.abs - removed_cards.size).destroy
+      card_tpl.cards.locked_none.not_locked.not_acquired.not_checked.limit(number.abs - removed_cards.size).each do |card|
+        card.destroy
+        card.removed_quantity = self
+        card.save
+      end
+    end
+  end
+
+# TODO: 生成卡卷密钥
+  def generate_cards_for_a
     if number > 0
       (number - added_cards.size).times do
         begin
