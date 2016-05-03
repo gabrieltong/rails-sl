@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class CardA < Card
   validates :code, :uniqueness=>true
   validates :code, :presence=>true
@@ -6,7 +7,8 @@ class CardA < Card
     record.generate_code
   end
   
-  before_create do |record|
+  # 卡卷创建后再生成密钥，这时才有card_tpl, 才能判断是不是CardATpl
+  after_create do |record|
     record.generate_code
   end
 

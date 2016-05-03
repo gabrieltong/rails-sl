@@ -51,10 +51,6 @@ class Card < ActiveRecord::Base
     record.generate_locked_info
   end
 
-  before_create do |record|
-    record.generate_type
-  end
-
   def self.inheritance_column
     'type'
   end

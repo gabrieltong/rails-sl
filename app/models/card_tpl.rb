@@ -289,7 +289,7 @@ class CardTpl < ActiveRecord::Base
       end
     end
 
-    acquire_weeks.reject(&:empty?).each do |week|
+    (acquire_weeks||[]).reject(&:empty?).each do |week|
       acquire_method = "acquire_#{week}="
       if self.setting.respond_to?(acquire_method)
         self.setting.send(acquire_method, 1)

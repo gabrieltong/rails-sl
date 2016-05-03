@@ -138,7 +138,8 @@
         member: '人员'
       draw_award:
         title: '奖品名称'
-        award: '奖品'
+        award_tpl: '奖品'
+        award_tpl_id: '奖品'
         number: '数量'
       image:
         file: '图片文件'
