@@ -31,3 +31,9 @@ validation
 
 发卷核销， 要结合乐观锁 - done
 重构管理员结构 client.admin_phone and client_managers.admin 要结合在一起, 包括， 登陆，  - done
+
+卡卷如何与门店结合在一起 ？核销的门店么 ？
+生成卡密有效期
+
+时区的问题需要解决 生成及验证卡卷的有效期
+

@@ -27,6 +27,9 @@ class CardTpl < ActiveRecord::Base
   scope :a, ->{where(:type=>:CardATpl)}
   scope :b, ->{where(:type=>:CardBTpl)}
 
+  scope :fixed, ->{where(:indate_type=>:fixed)}
+  scope :dynamic, ->{where(:indate_type=>:dynamic)}
+
   scope :datetime_acquirable, ->{where(arel_table[:acquire_from].lt(DateTime.now)).where(arel_table[:acquire_to].gt(DateTime.now))}
   scope :week_acquirable, ->{joins(:setting).where(:card_tpl_settings=>{"acquire_#{DateTime.now.strftime('%A').downcase}"=>1})}
   scope :hour_acquirable, ->{joins(:periods).where(Period.arel_table['from'].lt("#{DateTime.now.hour}:#{DateTime.now.min}")).where(Period.arel_table['to'].gt("#{DateTime.now.hour}:#{DateTime.now.min}"))}

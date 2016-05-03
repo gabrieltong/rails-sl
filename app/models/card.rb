@@ -32,6 +32,8 @@ class Card < ActiveRecord::Base
   scope :not_acquired, ->{where(:acquired_at=>nil)}
   scope :not_checked, ->{where(:checked_at=>nil)}
 
+  scope :bingo, ->{where.not(:locked_id=>nil).where.not(:acquired_at=>nil)}
+
   # 是否在可核销区间
   scope :active, ->{where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
   scope :inactive, ->{where(arel_table[:from].gt(DateTime.now).or(arel_table[:to].lt(DateTime.now)))}
@@ -47,6 +49,10 @@ class Card < ActiveRecord::Base
   validates :removed_quantity_id, :presence => true, :if=>'!deleted_at.nil?'
   validates :phone, :presence => true, :if=>'!acquired_at.nil?'
 
+  before_validation do |record|
+    record.generate_type
+  end
+  
   before_save do |record|
     record.generate_locked_info
   end
@@ -60,11 +66,12 @@ class Card < ActiveRecord::Base
     # 为被绑定的卡卷生成冗余
     if locked_by_card
       self.locked_by_tpl_id = locked_by_card.card_tpl_id
-    end
-    # 为绑定其他卡卷的卡卷生成冗余
-    if locked_card
-      self.locked_id = locked_card.id
-      self.locked_tpl_id = locked_card.card_tpl_id
+      if locked_by_card.locked_id.nil?
+        # 为绑定其他卡卷的卡卷生成冗余
+        locked_by_card.locked_id = id
+        locked_by_card.locked_tpl_id = card_tpl_id
+        locked_by_card.save
+      end
     end
   end
 # 为卡密生成正确类型
