@@ -148,8 +148,10 @@ class CardTpl < ActiveRecord::Base
   # 验证用户
   def period_phone_can_acquire? phone
     if period = period_now
-      acquired_time_gt = Card.arel_table[:acquired_time].gt(period.from.strftime("%H:%M"))
-      acquired_time_lt = Card.arel_table[:acquired_time].lt(period.to.strftime("%H:%M"))
+      from = DateTime.now.change({ hour: period.from.hour, min: period.from.min, sec: 0 })
+      to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
+      acquired_time_gt = Card.arel_table[:acquired_at].gt(from)
+      acquired_time_lt = Card.arel_table[:acquired_at].lt(to)
       cards.acquired_by(phone).where(acquired_time_gt).where(acquired_time_lt).size < period.person_limit
     end
   end
@@ -326,7 +328,7 @@ class CardTpl < ActiveRecord::Base
   # 计算得出当前时间所在的period
   def period_now
     now = DateTime.now
-    time = "#{now.hour}:#{now.minute}"
+    time = "#{now.hour}:#{now.minute}:00"
     where_from = Period.arel_table[:from].lt(time)
     where_to = Period.arel_table[:to].gt(time)
     periods.where(where_from).where(where_to).first
