@@ -15,10 +15,26 @@ module SL
       expose :desc
     end
 
+    class Card < Grape::Entity
+
+    end
+
     class GroupMember < Grape::Entity
       expose :id
+      expose :group_title
       expose :started_at
       expose :ended_at
+      expose :phone
+      expose :name
+      expose :sex
+      expose :borned_at
+      expose :address
+      expose :email
+      expose :pic
+    end
+
+    class ClientMember < Grape::Entity
+      expose :id
       expose :phone
       expose :name
       expose :sex
@@ -35,15 +51,16 @@ module SL
     end
 
     class CardTpl < Grape::Entity
+      format_with(:strftime) { |dt| dt.strftime("%F %T") }
       expose :id
       expose :title
       expose :short_desc
       expose :desc
       expose :intro
+      expose :person_limit
       expose :cover_url do |record|
         record.cover_url(:medium)
       end
-      expose :person_limit
       expose :share_cover_url do |record|
         record.share_cover_url(:medium)
       end
@@ -53,8 +70,16 @@ module SL
       expose :website
       expose :check_weeks
       expose :acquire_weeks
-      expose :acquire_from
-      expose :acquire_to
+      with_options(format_with: :strftime) do
+        expose :acquire_from
+        expose :acquire_to
+        expose :indate_from
+        expose :indate_to
+      end
+      # expose :acquire_from do |record|
+      #   record.acquire_from.strftime("%F %T")
+      # end
+      
       expose :public
       expose :allow_share
       expose :total
@@ -63,8 +88,7 @@ module SL
       expose :draw_type
       expose :check_hours
       expose :indate_type
-      expose :indate_from
-      expose :indate_to
+      
       expose :indate_after
       expose :indate_today
     end		
@@ -77,8 +101,13 @@ module SL
 
     helpers do
       def render
-        @status ||= 'success'
-        present :status, @status
+        @state ||= 'success'
+        @error ||= ''
+        @result ||= ''
+
+        present :status, @state
+        present :error, @error
+        present :result, @result
       end
 
       def current_member
@@ -96,6 +125,19 @@ module SL
       def authenticate_client_manager!
         error!('401 Unauthorized', 401) unless current_client
       end
+
+      def login_helper
+        @member = Member.includes(:managed_clients).where(:clients=>{:id=>params[:client_id]}).find_by_phone(params[:phone])
+        if @member and @member.valid_password? params[:password]
+          @result = @member
+        else
+          @error = ['no_user']
+          @state = 'fail'
+        end
+
+        render
+        present :result, @result, with: SL::Entities::Member if @result.is_a? Member
+      end
     end
 
     resource :members do
@@ -104,21 +146,27 @@ module SL
         requires :password, allow_blank: false, :type=>String
         requires :client_id, allow_blank: false, :type=>Integer
       end
+      post :login do
+        login_helper
+      end
       get :login do
-        @member = Member.includes(:managed_clients).where(:clients=>{:id=>params[:client_id]}).find_by_phone(params[:phone])
-        if @member and @member.valid_password? params[:password]
-          @result = @member
-        else
-          @error = ['no_user']
-          @status = 'fail'
-        end
+        login_helper
+      end
 
-        if @result.is_a? Member
-          present :result, @result, with: SL::Entities::Member
-        else
-          present :result, ''
+      route_param :phone do
+        desc '获取用户详情'
+        params do
+          requires :phone, allow_blank: false, :type=>Integer
+          requires :token, allow_blank: false, :type=>String
+          requires :client_id, allow_blank: false, :type=>Integer
         end
-        render
+        get :info do
+          authenticate!
+          authenticate_client_manager!
+          @client_member = current_client.client_members.by_phone(params[:phone]).first
+          @group_members = current_client.client_members.includes(:groups).by_phone(params[:phone])
+          # @cards = 
+        end
       end
     end
 
@@ -165,10 +213,11 @@ module SL
         optional :phone, allow_blank: false, :type=>Integer, :default=>13654265306
       end
       post :create do
-        # authenticate!
         i = Image.new
         i.phone = params[:phone]
-        i.file = params[:image_file].tempfile
+        i.file = params[:file]
+
+        render
         if i.save
           present :result, i, with: SL::Entities::Image
         else
@@ -186,6 +235,7 @@ module SL
       get :all do
         authenticate!
         authenticate_client_manager!
+        render
         present :result, current_client.groups, with: SL::Entities::Group
       end
 
@@ -200,6 +250,7 @@ module SL
           authenticate!
           authenticate_client_manager!
           gm = current_client.group_members.phone(params[:phone]).first
+          render
           present :result, gm, with: SL::Entities::GroupMember
         end
 
@@ -216,12 +267,14 @@ module SL
           requires :sex, allow_blank: false, :values=>['male','female']
           requires :name, allow_blank: false, :type=>String
           requires :borned_at, allow_blank: false, :type=>Date
+          requires :image_id, allow_blank: false, :type=>Integer
         end
 
         post :update_member_info do
+          p params
           authenticate!
           authenticate_client_manager!
-          cm_attributes = {:sex=>params[:sex], :name=>params[:name], :borned_at=>params[:borned_at],:phone=>params[:phone]}
+          cm_attributes = {:client_id=>params[:client_id], :sex=>params[:sex], :name=>params[:name], :borned_at=>params[:borned_at],:phone=>params[:phone]}
           cm = current_client.client_members.phone(params[:phone]).first
 
           if cm
@@ -230,7 +283,7 @@ module SL
             cm = current_client.client_members.build(cm_attributes)
           end
 
-          gm_attributes = {:started_at=>params[:started_at], :ended_at=>params[:ended_at], :phone=>params[:phone]}
+          gm_attributes = {:group_id=>params[:group_id], :client_id=>params[:client_id], :started_at=>params[:started_at], :ended_at=>params[:ended_at], :phone=>params[:phone]}
           gm = current_client.group_members.phone(params[:phone]).first
           if gm
             gm.update_attributes(gm_attributes)
@@ -238,19 +291,22 @@ module SL
             gm = current_client.group_members.build(gm_attributes)
           end
 
+          
           if !cm.valid?
             present :error, cm.errors
           elsif !gm.valid?
             present :error, gm.errors
           else
+            @result = true
+            cm.pic = File.open(Image.find(params[:image_id]).file.path(:large)) if Image.exists?(params[:image_id])
             cm.save
             gm.save
-            render
           end
+          render
         end
       end
     end
-
+# TODO: 验证用户是否是 client 管理员
     resource :card_tpls do
       route_param :id do
         desc '是否能够发卷'
@@ -265,6 +321,7 @@ module SL
           can_send_by_phone = CardTpl.can_send_by_phone? params[:id], current_member.phone
           if can_send_by_phone === true
             present :result, CardTpl.can_acquire?(params[:id], params[:phone])
+            present :number, CardTpl.find(params[:id]).period_phone_can_acquire_count(params[:phone])
           else
             present :result, can_send_by_phone
           end
@@ -275,7 +332,7 @@ module SL
           requires :id, allow_blank: false, :type=>Integer
           requires :phone, allow_blank: false, :type=>Integer
           requires :token, allow_blank: false, :type=>String
-          # requires :number, allow_blank: false, :type=>Integer, :values=>(1..1)
+          requires :number, allow_blank: false, :type=>Integer, :values=>(1..100)
         end
         get :acquire do
           authenticate!
