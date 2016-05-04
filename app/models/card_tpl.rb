@@ -145,15 +145,20 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  # 验证用户
-  def period_phone_can_acquire? phone
+  def period_phone_can_acquire_count phone
     if period = period_now
       from = DateTime.now.change({ hour: period.from.hour, min: period.from.min, sec: 0 })
       to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
       acquired_time_gt = Card.arel_table[:acquired_at].gt(from)
       acquired_time_lt = Card.arel_table[:acquired_at].lt(to)
-      cards.acquired_by(phone).where(acquired_time_gt).where(acquired_time_lt).size < period.person_limit
-    end
+      period.person_limit - cards.acquired_by(phone).where(acquired_time_gt).where(acquired_time_lt).size
+    else
+      0
+    end    
+  end
+  # 验证用户
+  def period_phone_can_acquire? phone
+    period_phone_can_acquire_count(phone) > 0 
   end
 
   # 验证用户
@@ -194,27 +199,27 @@ class CardTpl < ActiveRecord::Base
     self.class.checkable_by(phone).exists?(id)
   end
 
-  def cover_url
+  def cover_url(style=:medium)
     if cover.blank?
       ''
     else
-      cover.url(:medium)
+      cover.url(style)
     end
   end
 
-  def share_cover_url
+  def share_cover_url(style=:medium)
     if share_cover.blank?
       ''
     else
-      share_cover.url(:medium)
+      share_cover.url(style)
     end
   end
 
-  def guide_cover_url
+  def guide_cover_url(style=:medium)
     if guide_cover.blank?
       ''
     else
-      guide_cover.url(:medium)
+      guide_cover.url(style)
     end
   end
 

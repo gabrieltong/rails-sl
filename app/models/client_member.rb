@@ -5,10 +5,15 @@ class ClientMember < ActiveRecord::Base
   has_many :group_members, :primary_key=>:phone, :foreign_key=>:phone
   has_many :groups, :through=>:group_members
   has_many :moneys
+  has_many :acquired_cards, ->(i){where("client_id = ?", i.client_id)}, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:phone
+
+  validates :client_id, :phone, :presence=>true
 
   scope :enough_money, ->(money){where(arel_table[:money].gteq(money))}
   scope :id, ->(id){where(:id=>id)}
+  scope :by_id, ->(id){where(:id=>id)}
   scope :phone, ->(phone){where(:phone=>phone)}
+  scope :by_phone, ->(phone){where(:phone=>phone)}
 
   has_attached_file :pic, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
   validates_attachment_content_type :pic, content_type: /\Aimage\/.*\Z/	

@@ -1,22 +1,23 @@
 #rails-sl
 
-发卷 - 结合indate
-发卷和核销， 结合卡卷的投放时间及有效时间
+接口上传client_id
+发卷 - 结合indate done
+发卷和核销， 结合卡卷的投放时间及有效时间 done 
 
-发卷结合没人限领次数及没时间段限领次数
+发卷结合没人限领次数及没时间段限领次数 done
 
-报表功能
+报表功能 done
 
-批量生成卡卷的实现
-批量生成抽奖券的实现
-先使用简单方法， 遍历生成
+批量生成卡卷的实现 - waiting
+批量生成抽奖券的实现 - waiting
+先使用简单方法， 遍历生成 
 
 当卡卷生效时 ，不可编辑卡卷信息
 
 validation
 	memeber.phone, 定义为phone validator
 
-在 rails-sl-client 重构 use_weeks use_hours
+在 rails-sl-client 重构 use_weeks use_hours - done
 
 核销需要验证的情况
 	已获得

@@ -4,6 +4,7 @@ class GroupMember < ActiveRecord::Base
   belongs_to :client_member, ->(gm){where("client_id = ?", gm.client_id)}, :primary_key=>:phone, :foreign_key=>:phone
   validates :client_id, :group_id, :phone, :started_at, :ended_at, :presence=>true
 
+  # client_member delegate
   delegate :name, :to=>:client_member, :allow_nil=>true
   delegate :sex, :to=>:client_member, :allow_nil=>true
   delegate :borned_at, :to=>:client_member, :allow_nil=>true
@@ -11,8 +12,12 @@ class GroupMember < ActiveRecord::Base
   delegate :email, :to=>:client_member, :allow_nil=>true
   delegate :pic, :to=>:client_member, :allow_nil=>true
 
+  # group delegate
+  delegate :title, :to=>:group, :allow_nil=>true, :prefix=>true
+
   scope :by_client, ->(client_id){where(:client_id=>client_id)}
   scope :phone, ->(a){where(:phone=>a)}
+  scope :by_phone, ->(a){where(:phone=>a)}
 
   before_validation do |gm|
     gm.client_id = gm.group.client_id if gm.group

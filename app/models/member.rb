@@ -29,7 +29,8 @@ class Member < ActiveRecord::Base
   has_many :checker_card_tpls, ->{where(:client_managers=>{:checker=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
 
   has_many :checked_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
-  has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
+  has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:sender_phone
+  has_many :acquired_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:phone
 
   has_many :dayus, :as=>:dayuable
 
@@ -44,7 +45,7 @@ class Member < ActiveRecord::Base
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     client_id = conditions.delete(:client_id)
-    where(conditions.to_h).includes(:managed_clients).where(:clients=>{:id=>client_id},:managed_clients=>{:admin=>true}).first
+    where(conditions.to_h).includes(:managed_clients).where(:clients=>{:id=>client_id},:client_managers=>{:admin=>true}).first
   end  
 
   def email_required?
