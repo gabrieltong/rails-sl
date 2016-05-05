@@ -30,8 +30,6 @@ class Quantity < ActiveRecord::Base
         self.added_cards << CardB.new(:card_tpl_id=>card_tpl_id, :code=>nil)
       end
 
-      
-
       card_tpl.draw_awards.each do |draw|
         p (draw.number - added_cards.has_locked.size)
         self.added_cards.locked_none.not_locked.not_acquired.not_checked.limit(draw.number_need_create).each do |card_try_to_lock|
@@ -41,15 +39,12 @@ class Quantity < ActiveRecord::Base
             p :card_to_be_locked
             p card_to_be_locked
             card_try_to_lock.locked_card = card_to_be_locked
-            # card_try_to_lock.generate_locked_info
-            # card_try_to_lock.save
           end
         end
       end
     end
 
     if number < 0
-      # card_tpl.cards.not_acquired.limit(number.abs - removed_cards.size).destroy
       card_tpl.cards.locked_none.not_locked.not_acquired.not_checked.limit(number.abs - removed_cards.size).each do |card|
         card.destroy
         card.removed_quantity = self

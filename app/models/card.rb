@@ -16,6 +16,7 @@ class Card < ActiveRecord::Base
 
   delegate 'can_check_by_phone?', :to=>:card_tpl
 
+  scope :by_client, ->(client_id){where(:client_id=>client_id)}
   scope :acquired_by, ->(phone){where(:phone=>phone)}
   scope :sended_by, ->(phone){where(:sender_phone=>phone)}
   scope :checked_by, ->(phone){where(:checker_phone=>phone)}
@@ -158,8 +159,8 @@ class Card < ActiveRecord::Base
     end
   end
 
-  def self.check(code, capcha, by_phone)
-    where_condition = {:code=>code, :capcha=>capcha}
+  def self.check(code, by_phone)
+    where_condition = {:code=>code}
     # 验证卡密是否存在
     card = self.where(where_condition).first
     if card

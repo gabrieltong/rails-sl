@@ -1,4 +1,11 @@
+对接短信验证码
+
+Card.acquired_by(13654265306).by_client(1007).not_checked.active.eager_load(:card_tpl)
+
 #rails-sl
+
+CardTpl.can_check 支持判断可核销数量
+抽奖券 删除卡卷
 
 接口上传client_id
 发卷 - 结合indate done

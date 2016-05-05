@@ -1,5 +1,6 @@
 class CardTpl < ActiveRecord::Base
   attr_accessor :change_remain
+  attr_accessor :member_cards_count
 
   State = { I18n.t('card_tpl.state.active')=>'active', I18n.t('card_tpl.state.inactive')=>'inactive', I18n.t('card_tpl.state.paused')=>'paused'}
   UseWeeks = {I18n.t("use_weeks.monday")=>'monday', I18n.t("use_weeks.tuesday")=>'tuesday', I18n.t("use_weeks.wednesday")=>'wednesday', I18n.t("use_weeks.thursday")=>'thursday', I18n.t("use_weeks.friday")=>'friday', I18n.t("use_weeks.saturday")=>'saturday', I18n.t("use_weeks.sunday")=>'sunday'}
@@ -94,8 +95,8 @@ class CardTpl < ActiveRecord::Base
     end
 
     state :active do
-      def can_check?
-        _can_check?
+      def can_check? number=1
+        _can_check? number
       end
 
       
@@ -116,10 +117,12 @@ class CardTpl < ActiveRecord::Base
           :week_not_acquirable
         elsif hour_can_acquire? != true
           :hour_not_acquirable
+        elsif period_card_can_acquire? != true
+          :period_card_limit_overflow
         elsif phone_can_acquire?(phone) != true
-          :person_limit_overflow
+          :phone_limit_overflow
         elsif period_phone_can_acquire?(phone)!= true
-          :period_person_limit_overflow
+          :period_phone_limit_overflow
         else
           true
         end
@@ -127,8 +130,8 @@ class CardTpl < ActiveRecord::Base
     end
 
     state :paused do
-      def can_check?
-        _can_check?
+      def can_check? number=1
+        _can_check? number
       end
 
       def can_acquire?(phone)
@@ -142,6 +145,24 @@ class CardTpl < ActiveRecord::Base
     # 根据change_remain创建Quantity，通过Quantity的数量变化创建卡卷
     if record.change_remain and record.change_remain.to_i != 0
       quantities.build(:number=>change_remain)
+    end
+  end
+
+  def can_check_count phone
+    if can_check?
+      cards.acquired_by(phone).checkable.size
+    else
+      0
+    end
+  end
+
+  def check phone, by_phone, number=1
+    if can_check?(number) != true
+      can_check?(number)
+    elsif can_check_by_phone? by_phone != true
+      :by_phone_no_permission
+    else
+      cards.acquired_by(phone).checkable.limit(params[:number]).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
     end
   end
 
@@ -320,13 +341,13 @@ class CardTpl < ActiveRecord::Base
   end
 
   # 卡卷是否可核销 , 需要结合卡密核销函数 card.can_check?
-  def _can_check?
+  def _can_check? number=1
     if week_can_check? != true
       return :week_not_checkable
     elsif hour_can_check? != true
       return :hour_not_checkable
     else
-      return true
+      true
     end
   end
 

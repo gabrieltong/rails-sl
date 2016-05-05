@@ -31,6 +31,7 @@ module SL
       expose :address
       expose :email
       expose :pic
+      expose :money
     end
 
     class ClientMember < Grape::Entity
@@ -51,7 +52,7 @@ module SL
     end
 
     class CardTpl < Grape::Entity
-      format_with(:strftime) { |dt| dt.strftime("%F %T") }
+      format_with(:strftime) { |dt| dt.respond_to?(:strftime) ? dt.strftime("%F %T") : ''}
       expose :id
       expose :title
       expose :short_desc
@@ -79,7 +80,7 @@ module SL
       # expose :acquire_from do |record|
       #   record.acquire_from.strftime("%F %T")
       # end
-      
+      expose :member_cards_count
       expose :public
       expose :allow_share
       expose :total
@@ -164,8 +165,9 @@ module SL
           authenticate!
           authenticate_client_manager!
           @client_member = current_client.client_members.by_phone(params[:phone]).first
-          @group_members = current_client.client_members.includes(:groups).by_phone(params[:phone])
-          # @cards = 
+          @group_members = current_client.group_members.includes(:group).by_phone(params[:phone])
+          render
+          present :result, @group_members, with: SL::Entities::GroupMember
         end
       end
     end
@@ -210,7 +212,7 @@ module SL
     resource :images do
       params do
         # requires :token, allow_blank: false, :type=>String
-        optional :phone, allow_blank: false, :type=>Integer, :default=>13654265306
+        optional :phone, allow_blank: false, :type=>Integer, :default=>''
       end
       post :create do
         i = Image.new
@@ -308,7 +310,65 @@ module SL
     end
 # TODO: 验证用户是否是 client 管理员
     resource :card_tpls do
+      desc '用户拥有的卡卷列表'
+      params do
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :token, allow_blank: false, :type=>String
+        requires :phone, allow_blank: false, :type=>Integer
+      end
+      get :member_info do
+        authenticate!
+        authenticate_client_manager!
+        cards = Card.acquired_by(params[:phone]).by_client(params[:client_id]).not_checked.includes(:card_tpl)
+        card_tpls = cards.collect {|card|card.card_tpl}.uniq
+
+        card_tpls.each do |card_tpl|
+          card_tpl.member_cards_count = cards.select {|card|card.card_tpl == card_tpl}.size
+        end
+
+        render
+        present :result, card_tpls, with: SL::Entities::CardTpl
+      end
+
       route_param :id do
+        desc '卡卷能否核销'
+        params do
+          requires :id, allow_blank: false, :type=>Integer
+          requires :client_id, allow_blank: false, :type=>Integer
+          requires :phone, allow_blank: false, :type=>Integer
+          requires :token, allow_blank: false, :type=>String
+        end
+        get :can_check do
+          authenticate!
+          authenticate_client_manager!
+
+          card_tpl = CardTpl.find(params[:id])
+          result = if card_tpl.can_check? != true
+                    card_tpl.can_check?
+                  elsif card_tpl.can_check_by_phone?(current_member.phone) != true
+                    :by_phone_no_permission
+                  else
+                    true
+                  end
+          render
+          present :result, result
+          present :number, card_tpl.can_check_count(params[:phone])
+        end
+
+        desc '核销多张卡密'
+        params do
+          requires :token, allow_blank: false, :type=>String
+          requires :client_id, allow_blank: false, :type=>Integer
+          requires :id, allow_blank: false, :type=>Integer
+          requires :phone, allow_blank: false, :type=>Integer
+          requires :number, allow_blank: false, :type=>Integer, :values=>(1..100)
+        end
+        get :check do
+          authenticate!
+          authenticate_client_manager!
+          present :result, CardTpl.find(params[:id]).check(params[:phone], current_member.phone, params[:number])
+        end
+
         desc '是否能够发卷'
         params do
           requires :id, allow_blank: false, :type=>Integer
@@ -373,6 +433,7 @@ module SL
     end
 
     resource :cards do
+
       route_param :code do
         desc '发送核销验证码'
         params do
@@ -394,12 +455,16 @@ module SL
         get :card_info do
           authenticate!
           card = Card.includes(:card_tpl).find_by_code(params[:code].to_s)
-          card_tpl = card.card_tpl
-
-          if current_member.checker_card_tpls.include? card_tpl
-            present :result, card_tpl, with: SL::Entities::CardTpl
+          if card 
+            card_tpl = card.card_tpl
+            render
+            if current_member.checker_card_tpls.include? card_tpl
+              present :result, card_tpl, with: SL::Entities::CardTpl
+            end
+          else
+            @error = ['no_user']
+            @state = 'fail'
           end
-          # present :result, ''
         end
 
         # 卡能否可笑
@@ -425,12 +490,11 @@ module SL
         params do
           requires :token, allow_blank: false, :type=>String
           requires :code, allow_blank: false, :type=>Integer
-          requires :capcha, allow_blank: false, :type=>String
         end
         get :check do
           authenticate!
           render
-          present :result, Card.check(params[:code], params[:capcha], current_member.phone)
+          present :result, Card.check(params[:code], current_member.phone)
         end
       end
     end

@@ -11,6 +11,7 @@ class GroupMember < ActiveRecord::Base
   delegate :address, :to=>:client_member, :allow_nil=>true
   delegate :email, :to=>:client_member, :allow_nil=>true
   delegate :pic, :to=>:client_member, :allow_nil=>true
+  delegate :money, :to=>:client_member, :allow_nil=>true
 
   # group delegate
   delegate :title, :to=>:group, :allow_nil=>true, :prefix=>true
