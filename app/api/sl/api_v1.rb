@@ -382,7 +382,7 @@ module SL
           can_send_by_phone = CardTpl.can_send_by_phone? params[:id], current_member.phone
           if can_send_by_phone === true
             present :result, CardTpl.can_acquire?(params[:id], params[:phone])
-            present :number, CardTpl.find(params[:id]).period_phone_can_acquire_count(params[:phone])
+            present :number, [CardTpl.find(params[:id]).period_phone_can_acquire_count(params[:phone]), CardTpl.cards.acquirable].min
           else
             present :result, can_send_by_phone
           end
@@ -398,7 +398,7 @@ module SL
         get :acquire do
           authenticate!
           render
-          present :result, CardTpl.acquire(params[:id], params[:phone], current_member.phone)
+          present :result, CardTpl.acquire(params[:id], params[:phone], current_member.phone, params[:number])
         end
       end
     end
@@ -415,7 +415,7 @@ module SL
         authenticate!
         authenticate_client_manager!
         render
-        present :result, current_member.client_members.where(:phone=>params[:phone]).first.charge_money(params[:money], current_member.phone)
+        present :result, current_client.client_members.where(:phone=>params[:phone]).first.charge_money(params[:money], current_member.phone)
       end
 
       desc '消费'
@@ -429,7 +429,63 @@ module SL
         authenticate!
         authenticate_client_manager!
         render
-        present :result, current_member.client_members.where(:phone=>params[:phone]).first.spend_money(params[:money], current_member.phone)
+        present :result, current_client.client_members.where(:phone=>params[:phone]).first.spend_money(params[:money], current_member.phone)
+      end
+    end
+
+    resource :capchas do
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :phone, allow_blank: false, :type=>Integer
+        requires :type, allow_blank: false, :type=>String
+        requires :code, allow_blank: false, :type=>String
+      end
+      get :valid_code do
+        authenticate!
+        authenticate_client_manager!
+        render
+        present :result, Capcha.valid_code(params[:client_id], params[:phone], params[:type], params[:code])
+      end
+
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :phone, allow_blank: false, :type=>Integer
+        requires :card_tpl_id, allow_blank: false, :type=>Integer
+        requires :number, allow_blank: false, :type=>Integer, :values=>(0..1000)
+      end
+      get :validate_check_cards do
+        authenticate!
+        authenticate_client_manager!
+        render
+        present :result, Capcha.validate_check_cards(params[:client_id], params[:phone], params[:card_tpl_id], params[:number])
+      end
+
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :phone, allow_blank: false, :type=>Integer
+        requires :group_id, allow_blank: false, :type=>Integer
+      end
+      get :validate_group do
+        authenticate!
+        authenticate_client_manager!
+        render
+        present :result, Capcha.validate_group(params[:client_id], params[:phone])
+      end
+
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :phone, allow_blank: false, :type=>Integer
+        requires :money, allow_blank: false, :type=>Float
+      end
+      get :validate_spend_money do
+        authenticate!
+        authenticate_client_manager!
+        render
+        present :result, Capcha.validate_spend_money(params[:client_id], params[:phone], params[:money])
       end
     end
 

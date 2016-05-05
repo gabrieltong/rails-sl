@@ -157,7 +157,10 @@ class CardTpl < ActiveRecord::Base
     elsif can_check_by_phone? by_phone != true
       :by_phone_no_permission
     else
-      cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
+      # Card.transaction do
+        cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
+      #   raise ActiveRecord::Rollback
+      # end
     end
   end
 
@@ -172,6 +175,12 @@ class CardTpl < ActiveRecord::Base
       0
     end    
   end
+
+# TODO:
+  def period_card_can_acquire?
+    true
+  end
+
   # 验证用户
   def period_phone_can_acquire? phone
     period_phone_can_acquire_count(phone) > 0 

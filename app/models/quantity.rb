@@ -4,6 +4,8 @@ class Quantity < ActiveRecord::Base
   has_many :added_cards, :class_name=>:Card, :foreign_key=>:added_quantity_id
   has_many :removed_cards, ->{where.not(:deleted_at=>nil)}, :class_name=>:Card, :foreign_key=>:removed_quantity_id
 
+  delegate :client_id, :to=>:card_tpl
+
   counter_culture :card_tpl, :column_name => 'total', :delta_column => 'number'
   counter_culture :card_tpl, :column_name => 'remain', :delta_column => 'number'
 
@@ -27,7 +29,7 @@ class Quantity < ActiveRecord::Base
     count = 0
     if number > 0
       (number - added_cards.size).times do
-        self.added_cards << CardB.new(:card_tpl_id=>card_tpl_id, :code=>nil)
+        self.added_cards << CardB.new(:card_tpl_id=>card_tpl_id, :code=>nil, :client_id=>client_id)
       end
 
       card_tpl.draw_awards.each do |draw|
@@ -57,7 +59,7 @@ class Quantity < ActiveRecord::Base
   def generate_cards_for_a
     if number > 0
       (number - added_cards.size).times do
-        card = self.added_cards << CardA.new(:card_tpl_id=>card_tpl_id)
+        card = self.added_cards << CardA.new(:card_tpl_id=>card_tpl_id, :client_id=>client_id)
       end
     end
 

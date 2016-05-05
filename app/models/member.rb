@@ -9,6 +9,7 @@ class Member < ActiveRecord::Base
 
   scope :wechat_binded, ->{where(:wechat_binded=>true)}
   scope :wechat_unbinded, ->{where.not(:wechat_binded=>true)}
+  scope :capcha_not_expired, ->{where(arel_table[:capcha_expired_at].lteq(DateTime.now))}
 
   validates :phone, :presence=>true, :uniqueness=>true
   validates_datetime :borded_at, :allow_nil=>true
@@ -71,7 +72,7 @@ class Member < ActiveRecord::Base
     rememberable_value
   end
 
-  def send_bind_wechat_capcha
+  def send_capcha_bind_wechat
     type = :bind_wechat
 
     if Dayu.allow_send(self, type) === true
@@ -94,7 +95,7 @@ class Member < ActiveRecord::Base
     end    
   end
 
-  def send_update_password_capcha
+  def send_capcha_update_password
     type = :update_password
 
     if Dayu.allow_send(self, type) === true
@@ -117,7 +118,7 @@ class Member < ActiveRecord::Base
     end    
   end
 
-  def send_recover_password_capcha
+  def send_capcha_recover_password
     type = :recover_password
 
     if Dayu.allow_send(self, type) === true
@@ -139,4 +140,29 @@ class Member < ActiveRecord::Base
       false
     end
   end
+
+  def send_capcha_validate_user
+    type = :validate_user
+
+    if Dayu.allow_send(self, type) === true
+      self.capcha = rand(100000..999999)
+      self.save
+
+      config = {
+        'type'=>type,
+        'smsType'=>:normal,
+        'smsFreeSignName'=>'前站',
+        'smsParam'=>{code: self.update_password_capcha, product: '', item: "修改密码"},
+        'recNum'=>phone,
+        'smsTemplateCode'=>:SMS_2145923
+      }
+
+      dy = Dayu.createByDayuable(self, config)
+      dy.run
+    else
+      false
+    end    
+  end
+
+  
 end
