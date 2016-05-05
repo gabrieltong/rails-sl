@@ -158,11 +158,15 @@ class CardTpl < ActiveRecord::Base
     elsif can_check_by_phone? by_phone != true
       :by_phone_no_permission
     else
-      # Card.transaction do
-        cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
+      result = false
+      Card.transaction do
+        result = cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
+        if result != number
+          raise ActiveRecord::Rollback
+        end
         client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'核销',:msg=>"#{phone}被核销了#{number}张卡卷,操作员#{by_phone}"}
-      #   raise ActiveRecord::Rollback
-      # end
+      end
+      result
     end
   end
 
@@ -175,12 +179,19 @@ class CardTpl < ActiveRecord::Base
       period.person_limit - cards.acquired_by(phone).where(acquired_time_gt).where(acquired_time_lt).size
     else
       0
-    end    
+    end
   end
 
-# TODO:
   def period_card_can_acquire?
-    true
+    if period = period_now
+      from = DateTime.now.change({ hour: period.from.hour, min: period.from.min, sec: 0 })
+      to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
+      acquired_time_gt = Card.arel_table[:acquired_at].gt(from)
+      acquired_time_lt = Card.arel_table[:acquired_at].lt(to)
+      period.number - cards.where(acquired_time_gt).where(acquired_time_lt).size
+    else
+      0
+    end
   end
 
   # 验证用户

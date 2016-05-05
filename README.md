@@ -1,16 +1,15 @@
 对接短信验证码
 
-卡卷核销有效期修改时 ， 更新未被使用的卡卷有效期
-核销短信的数量限制 
-update_all 添加 transaction 处理 , 如果 update_all 的 数量 和 number 不一致
-bug : card.client_id = null
-完善 card_tpl.period_card_can_acquire
-Card.acquired_by(13654265306).by_client(1007).not_checked.active.eager_load(:card_tpl)
+卡卷核销有效期修改时 ， 更新未被使用的卡卷有效期 done
+核销短信的数量限制 done
+update_all 添加 transaction 处理 , 如果 update_all 的 数量 和 number 不一致 done
+bug : card.client_id = null  done
+完善 card_tpl.period_card_can_acquire done
 
 #rails-sl
 
-CardTpl.can_check 支持判断可核销数量
-抽奖券 删除卡卷
+CardTpl.can_check 支持判断可核销数量 done
+抽奖券 删除卡卷 done
 
 接口上传client_id
 发卷 - 结合indate done

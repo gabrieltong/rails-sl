@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160503060912) do
+ActiveRecord::Schema.define(version: 20160505084455) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -27,6 +27,23 @@ ActiveRecord::Schema.define(version: 20160503060912) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "activities", force: :cascade do |t|
+    t.integer  "trackable_id",   limit: 4
+    t.string   "trackable_type", limit: 255
+    t.integer  "owner_id",       limit: 4
+    t.string   "owner_type",     limit: 255
+    t.string   "key",            limit: 255
+    t.text     "parameters",     limit: 65535
+    t.integer  "recipient_id",   limit: 4
+    t.string   "recipient_type", limit: 255
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "activities", ["owner_id", "owner_type"], name: "index_activities_on_owner_id_and_owner_type", using: :btree
+  add_index "activities", ["recipient_id", "recipient_type"], name: "index_activities_on_recipient_id_and_recipient_type", using: :btree
+  add_index "activities", ["trackable_id", "trackable_type"], name: "index_activities_on_trackable_id_and_trackable_type", using: :btree
 
   create_table "admin_users", force: :cascade do |t|
     t.string   "email",                  limit: 255, default: "", null: false
@@ -45,6 +62,21 @@ ActiveRecord::Schema.define(version: 20160503060912) do
 
   add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "capchas", force: :cascade do |t|
+    t.string   "phone",      limit: 255
+    t.string   "type",       limit: 255
+    t.datetime "expired_at"
+    t.datetime "deleted_at"
+    t.string   "code",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.integer  "client_id",  limit: 4
+  end
+
+  add_index "capchas", ["client_id"], name: "index_capchas_on_client_id", using: :btree
+  add_index "capchas", ["phone"], name: "index_capchas_on_phone", using: :btree
+  add_index "capchas", ["type"], name: "index_capchas_on_type", using: :btree
 
   create_table "card_tpl_groups", force: :cascade do |t|
     t.integer  "card_tpl_id", limit: 4
@@ -515,11 +547,14 @@ ActiveRecord::Schema.define(version: 20160503060912) do
     t.string   "phone",                   limit: 255
     t.boolean  "wechat_binded"
     t.string   "remember_token",          limit: 255
+    t.string   "capcha",                  limit: 255
     t.string   "recover_password_capcha", limit: 10
     t.string   "update_password_capcha",  limit: 10
     t.string   "bind_wechat_capcha",      limit: 10
+    t.datetime "capcha_expired_at"
   end
 
+  add_index "members", ["capcha"], name: "index_members_on_capcha", using: :btree
   add_index "members", ["phone"], name: "index_members_on_phone", unique: true, using: :btree
   add_index "members", ["remember_token"], name: "index_members_on_remember_token", using: :btree
   add_index "members", ["reset_password_token"], name: "index_members_on_reset_password_token", unique: true, using: :btree
@@ -552,7 +587,7 @@ ActiveRecord::Schema.define(version: 20160503060912) do
     t.float    "money",            limit: 24
     t.integer  "spendable_id",     limit: 4
     t.string   "spendable_type",   limit: 255
-    t.integer  "by_phone",         limit: 4
+    t.string   "by_phone",         limit: 20
     t.string   "type",             limit: 255
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
@@ -562,6 +597,7 @@ ActiveRecord::Schema.define(version: 20160503060912) do
   add_index "moneys", ["client_id"], name: "index_moneys_on_client_id", using: :btree
   add_index "moneys", ["client_member_id"], name: "index_moneys_on_client_member_id", using: :btree
   add_index "moneys", ["member_id"], name: "index_moneys_on_member_id", using: :btree
+  add_index "moneys", ["money"], name: "index_moneys_on_money", using: :btree
   add_index "moneys", ["spendable_id"], name: "index_moneys_on_spendable_id", using: :btree
   add_index "moneys", ["spendable_type"], name: "index_moneys_on_spendable_type", using: :btree
   add_index "moneys", ["type"], name: "index_moneys_on_type", using: :btree
