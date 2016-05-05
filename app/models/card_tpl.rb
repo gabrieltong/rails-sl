@@ -159,6 +159,7 @@ class CardTpl < ActiveRecord::Base
     else
       # Card.transaction do
         cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
+        client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number}
       #   raise ActiveRecord::Rollback
       # end
     end
@@ -254,6 +255,7 @@ class CardTpl < ActiveRecord::Base
       can_send_by_phone = self.can_send_by_phone?(by_phone)
       if can_send_by_phone === true
         result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_phone)
+        client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number}
         return result 
       else
         return can_send_by_phone

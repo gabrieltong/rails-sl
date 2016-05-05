@@ -1,4 +1,6 @@
 class Client < ActiveRecord::Base
+  include PublicActivity::Model
+  
   alias_attribute :service_started_at, :service_started
   alias_attribute :longitude, :location_y
   alias_attribute :latitude, :localtion_x

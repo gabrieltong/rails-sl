@@ -45,6 +45,7 @@ gem 'public_activity'
 gem 'dotenv-rails'
 gem 'activesupport-json_encoder'
 gem 'bulk_insert'
+gem 'will_paginate'
 gem 'randumb'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

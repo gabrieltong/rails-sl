@@ -31,9 +31,11 @@ class ClientMember < ActiveRecord::Base
 
   def spend_money money, by_phone
   	add_money -money, by_phone
+    client.create_activity key: 'member.spend_money', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money}
   end
 
   def charge_money money, by_phone
   	add_money money, by_phone
+    client.create_activity key: 'member.charge_money', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money}
   end
 end

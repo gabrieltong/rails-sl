@@ -15,6 +15,17 @@ module SL
       expose :desc
     end
 
+    class Activity < Grape::Entity
+      format_with(:strftime) { |dt| dt.respond_to?(:strftime) ? dt.strftime("%F %T") : ''}
+      # unexpose :updated_at
+      expose :id
+      expose :key
+      expose :parameters
+      with_options(format_with: :strftime) do
+        expose :created_at
+      end
+    end
+
     class Card < Grape::Entity
 
     end
@@ -487,6 +498,21 @@ module SL
         render
         present :result, Capcha.validate_spend_money(params[:client_id], params[:phone], params[:money])
       end
+    end
+
+    resource :activities do
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        optional :page, allow_blank: false, :type=>Integer, :default=>1
+        optional :per_page, allow_blank: false, :type=>Integer, :default=>10, :values=>(1...100)
+      end
+      get :client_info do
+        authenticate!
+        authenticate_client_manager!
+        render
+        present :result, current_client.activities.order('id desc').paginate(:page=>params[:page],:per_page=>params[:per_page]), with: SL::Entities::Activity
+      end      
     end
 
     resource :cards do
