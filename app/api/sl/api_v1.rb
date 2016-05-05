@@ -319,7 +319,7 @@ module SL
       get :member_info do
         authenticate!
         authenticate_client_manager!
-        cards = Card.acquired_by(params[:phone]).by_client(params[:client_id]).not_checked.includes(:card_tpl)
+        cards = Card.acquired_by(params[:phone]).by_client(params[:client_id]).checkable.includes(:card_tpl)
         card_tpls = cards.collect {|card|card.card_tpl}.uniq
 
         card_tpls.each do |card_tpl|
@@ -352,7 +352,7 @@ module SL
                   end
           render
           present :result, result
-          present :number, card_tpl.can_check_count(params[:phone])
+          present :number, card_tpl.cards.acquired_by(params[:phone]).checkable.size
         end
 
         desc '核销多张卡密'
@@ -366,6 +366,7 @@ module SL
         get :check do
           authenticate!
           authenticate_client_manager!
+          render
           present :result, CardTpl.find(params[:id]).check(params[:phone], current_member.phone, params[:number])
         end
 
@@ -428,7 +429,7 @@ module SL
         authenticate!
         authenticate_client_manager!
         render
-        present :result, current_member.client_members.where(:phone=>params[:phone]).first.charge_money(params[:money], current_member.phone)
+        present :result, current_member.client_members.where(:phone=>params[:phone]).first.spend_money(params[:money], current_member.phone)
       end
     end
 

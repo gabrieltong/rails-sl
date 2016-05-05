@@ -95,8 +95,8 @@ class CardTpl < ActiveRecord::Base
     end
 
     state :active do
-      def can_check? number=1
-        _can_check? number
+      def can_check?
+        _can_check?
       end
 
       
@@ -130,7 +130,7 @@ class CardTpl < ActiveRecord::Base
     end
 
     state :paused do
-      def can_check? number=1
+      def can_check?
         _can_check? number
       end
 
@@ -148,21 +148,16 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  def can_check_count phone
-    if can_check?
-      cards.acquired_by(phone).checkable.size
-    else
-      0
-    end
-  end
 
   def check phone, by_phone, number=1
-    if can_check?(number) != true
-      can_check?(number)
+    if can_check? != true
+      can_check?
+    elsif cards.acquired_by(phone).checkable.size < number
+      :number_overflow
     elsif can_check_by_phone? by_phone != true
       :by_phone_no_permission
     else
-      cards.acquired_by(phone).checkable.limit(params[:number]).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
+      cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
     end
   end
 
@@ -341,7 +336,7 @@ class CardTpl < ActiveRecord::Base
   end
 
   # 卡卷是否可核销 , 需要结合卡密核销函数 card.can_check?
-  def _can_check? number=1
+  def _can_check?
     if week_can_check? != true
       return :week_not_checkable
     elsif hour_can_check? != true
