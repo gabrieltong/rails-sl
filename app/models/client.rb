@@ -1,6 +1,6 @@
 class Client < ActiveRecord::Base
   include PublicActivity::Model
-  
+
   alias_attribute :service_started_at, :service_started
   alias_attribute :longitude, :location_y
   alias_attribute :latitude, :localtion_x
@@ -41,6 +41,7 @@ class Client < ActiveRecord::Base
   has_many :group_members, :through=>:groups
   has_many :client_managers
   has_many :imports
+  has_many :moneys
   has_many :managers, :through=>:client_managers
   has_many :card_tpls
   has_many :card_a_tpls

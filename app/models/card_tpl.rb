@@ -1,3 +1,4 @@
+# encoding: UTF-8
 class CardTpl < ActiveRecord::Base
   attr_accessor :change_remain
   attr_accessor :member_cards_count
@@ -159,7 +160,7 @@ class CardTpl < ActiveRecord::Base
     else
       # Card.transaction do
         cards.acquired_by(phone).checkable.limit(number).update_all(:checked_at=>DateTime.now,:checker_phone=>by_phone)
-        client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number}
+        client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'核销',:msg=>"#{phone}被核销了#{number}张卡卷,操作员#{by_phone}"}
       #   raise ActiveRecord::Rollback
       # end
     end
@@ -254,9 +255,19 @@ class CardTpl < ActiveRecord::Base
     if can_acquire === true
       can_send_by_phone = self.can_send_by_phone?(by_phone)
       if can_send_by_phone === true
-        result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_phone)
-        client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number}
-        return result 
+        result = false
+
+        Card.transaction do 
+          result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_phone)
+          if result != number
+            raise ActiveRecord::Rollback
+          end
+          cards.acquired_by(phone).limit(number).order('id desc').each do |card|
+            card.notify_acquired_phone
+          end
+          client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'发卷',:msg=>"#{phone}获得了#{number}张卡卷,操作员#{by_phone}"}
+        end
+        return result
       else
         return can_send_by_phone
       end

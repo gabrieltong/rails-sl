@@ -1,5 +1,6 @@
 class GroupMember < ActiveRecord::Base
   belongs_to :group
+  belongs_to :client
   belongs_to :member, :primary_key=>:phone, :foreign_key=>:phone
   belongs_to :client_member, ->(gm){where("client_id = ?", gm.client_id)}, :primary_key=>:phone, :foreign_key=>:phone
   validates :client_id, :group_id, :phone, :started_at, :ended_at, :presence=>true
@@ -26,6 +27,7 @@ class GroupMember < ActiveRecord::Base
 
   after_create do |gm|
     gm.generate_client_member
+    gm.notify_join_group
   end
 
   def generate_client_member
@@ -33,5 +35,21 @@ class GroupMember < ActiveRecord::Base
       cm = ClientMember.new(:phone=>phone, :client_id=>client_id)
       cm.save
     end
+  end
+
+  def notify_join_group
+
+    config = {
+      'type'=>__callee__,
+      'smsType'=>'normal',
+      'smsFreeSignName'=>'红券',
+      'smsParam'=>{brand: group.title.to_s, vipgroup: group.title.to_s, startdate: started_at.strftime("%F %T"), enddate: ended_at.strftime("%F %T")},
+      'recNum'=>phone,
+      'smsTemplateCode'=>'SMS_8495283'
+    }
+  
+    dy = Dayu.createByDayuable(Member.first, config)
+    dy.run
+    dy.sended
   end
 end

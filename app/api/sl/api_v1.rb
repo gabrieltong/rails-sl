@@ -103,6 +103,14 @@ module SL
       
       expose :indate_after
       expose :indate_today
+
+      expose :acquired_count, if: lambda { |instance, options| options[:report] == true } do |instance, options|
+        instance.cards.acquired_in_range(options[:from], options[:to]).size
+      end
+
+      expose :checked_count, if: lambda { |instance, options| options[:report] == true } do |instance, options|
+        instance.cards.checked_in_range(options[:from], options[:to]).size
+      end
     end		
   end
 
@@ -149,6 +157,26 @@ module SL
 
         render
         present :result, @result, with: SL::Entities::Member if @result.is_a? Member
+      end
+    end
+
+    resource :clients do
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        optional :from, allow_blank: false, :type=>Date, :default=>(Date.today - 100.days)
+        optional :to, allow_blank: false, :type=>Date, :default=>Date.today + 1.day
+      end
+      get :report do
+        authenticate!
+        authenticate_client_manager!
+        render
+
+        present :member_joined_count, current_client.group_members.where(GroupMember.arel_table[:created_at].gteq(params[:from])).where(GroupMember.arel_table[:created_at].lteq(params[:to])).size
+        present :valided_joined_count, current_client.group_members.where(GroupMember.arel_table[:created_at].gteq(params[:from])).where(GroupMember.arel_table[:created_at].lteq(params[:to])).size
+        present :charge_money, current_client.moneys.where(Money.arel_table[:created_at].gteq(params[:from])).where(Money.arel_table[:created_at].lteq(params[:to])).charge.sum(:money)
+        present :spend_money, -current_client.moneys.where(Money.arel_table[:created_at].gteq(params[:from])).where(Money.arel_table[:created_at].lteq(params[:to])).spend.sum(:money)
+        present :result, current_client.card_tpls, with: SL::Entities::CardTpl, :report=>true, :from=>params[:from], :to=>params[:to]
       end
     end
 
@@ -511,6 +539,7 @@ module SL
         authenticate!
         authenticate_client_manager!
         render
+        present :total_pages, current_client.activities.order('id desc').paginate(:page=>params[:page],:per_page=>params[:per_page]).total_pages
         present :result, current_client.activities.order('id desc').paginate(:page=>params[:page],:per_page=>params[:per_page]), with: SL::Entities::Activity
       end      
     end

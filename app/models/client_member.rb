@@ -24,18 +24,18 @@ class ClientMember < ActiveRecord::Base
   def add_money money, by_phone
   	result = self.class.enough_money(-money).id(id).update_all(:money=>self.money + money) == 1 ? true : false
   	if result === true
-  		moneys << Money.new(:money=>money, :client_member_id=>id, :by_phone=>by_phone)
+  		moneys << Money.new(:money=>money, :client_member_id=>id, :by_phone=>by_phone, :client_id=>client_id, :member_id=>member_id)
   	end
   	result
   end
 
   def spend_money money, by_phone
   	add_money -money, by_phone
-    client.create_activity key: 'member.spend_money', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money}
+    client.create_activity key: 'member.spend_money', owner: Member.find_by_phone(by_phone),recipient: self,  :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money,:type=>'消费',:msg=>"#{phone}消费#{money},操作员#{by_phone}"}
   end
 
   def charge_money money, by_phone
   	add_money money, by_phone
-    client.create_activity key: 'member.charge_money', owner: Member.find_by_phone(by_phone), :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money}
+    client.create_activity key: 'member.charge_money', owner: Member.find_by_phone(by_phone),recipient: self,  :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money,:type=>'充值',:msg=>"#{phone}充值#{money},操作员#{by_phone}"}
   end
 end

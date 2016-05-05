@@ -44,6 +44,9 @@ class Card < ActiveRecord::Base
 
   scope :acquirable, ->{where(:acquired_at=>nil, :locked_by_id=>nil).where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
 
+  scope :acquired_in_range, ->(from, to){where(arel_table[:acquired_at].gt(from)).where(arel_table[:acquired_at].lt(to))}
+  scope :checked_in_range, ->(from, to){where(arel_table[:checked_at].gt(from)).where(arel_table[:checked_at].lt(to))}
+
   validates :card_tpl_id, :added_quantity_id, :presence=>true
   
   validates :type, :inclusion => %w(CardA CardB)
