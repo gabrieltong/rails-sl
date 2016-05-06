@@ -220,10 +220,10 @@ module SL
               member.password = params[:phone]
               member.save
             else
-              present :result false
+              present :result, false
             end
           else
-            present :result false
+            present :result, false
           end
         end        
 
