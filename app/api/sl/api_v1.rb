@@ -421,7 +421,7 @@ module SL
           can_send_by_phone = CardTpl.can_send_by_phone? params[:id], current_member.phone
           if can_send_by_phone === true
             present :result, CardTpl.can_acquire?(params[:id], params[:phone])
-            present :number, [CardTpl.find(params[:id]).period_phone_can_acquire_count(params[:phone]), CardTpl.find(params[:id]).cards.acquirable].min
+            present :number, [CardTpl.find(params[:id]).period_phone_can_acquire_count(params[:phone]), CardTpl.find(params[:id]).cards.acquirable.size].min
           else
             present :result, can_send_by_phone
           end
