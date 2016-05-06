@@ -194,6 +194,39 @@ module SL
       end
 
       route_param :phone do
+        params do
+          requires :phone, allow_blank: false, :type=>Integer
+        end
+        get :send_capcha_recover_password do
+          render
+          member = Member.find_by_phone(params[:phone])
+          if member
+            present :result, Capcha.send_capcha_recover_password(nil, params[:phone])
+          else
+            :no_member
+          end
+        end
+
+        params do
+          requires :code, allow_blank: false, :type=>String
+          requires :phone, allow_blank: false, :type=>Integer
+          requires :password, allow_blank: false, :type=>String
+        end
+        get :change_password do
+          render
+          if Capcha.valid_code(nil , params[:phone], :send_capcha_recover_password, params[:code])
+            member = Member.find_by_phone(params[:phone])
+            if member
+              member.password = params[:phone]
+              member.save
+            else
+              present :result false
+            end
+          else
+            present :result false
+          end
+        end        
+
         desc '获取用户详情'
         params do
           requires :phone, allow_blank: false, :type=>Integer
