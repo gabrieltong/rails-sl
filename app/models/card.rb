@@ -188,7 +188,7 @@ class Card < ActiveRecord::Base
   end
 
   # 用户给参与用户发送卡券密码
-  def notify_acquired_phone
+  def send_message_acquired
 
     config = {
       'type'=>__callee__,
@@ -208,5 +208,17 @@ class Card < ActiveRecord::Base
     client_id = added_quantity.client_id
     save
     p errors
+  end
+
+  def send_message_will_expire
+    config = {
+      'type'=>__callee__,
+      'smsType'=>'normal',
+      'smsFreeSignName'=>'红券',
+      'smsParam'=>{brand: client.try(:brand), cardname: card_tpl.try(:title),  wechatid: client.try(:wechat_account)},
+      'recNum'=>phone,
+      'smsTemplateCode'=>'SMS_8525379'
+    }
+    Dayu.createByDayuable(Member.first, config).run
   end
 end

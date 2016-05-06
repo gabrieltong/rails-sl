@@ -29,10 +29,8 @@ gem 'paperclip'
 gem 'cancan'
 gem "paranoia", "~> 2.0"
 gem 'acts-as-taggable-on', '~> 3.4'
-gem 'devise'
 gem 'state_machine'
 gem 'draper'
-gem 'devise-i18n'
 gem 'validates_timeliness'
 gem 'counter_culture'
 gem 'exception_notification'
@@ -47,6 +45,10 @@ gem 'activesupport-json_encoder'
 gem 'bulk_insert'
 gem 'will_paginate'
 gem 'randumb'
+gem 'whenever'
+
+gem 'devise'
+gem 'devise-i18n'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

@@ -28,6 +28,6 @@ module RailsSl
 
     config.paths.add File.join('app', 'api'), glob: File.join('**', '*.rb')
     config.autoload_paths += Dir[Rails.root.join('app', 'api', '*')]
-    config.web_console.whiny_requests = false
+    # config.web_console.whiny_requests = false
   end
 end

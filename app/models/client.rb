@@ -5,6 +5,10 @@ class Client < ActiveRecord::Base
   alias_attribute :longitude, :location_y
   alias_attribute :latitude, :localtion_x
 
+  alias_attribute :brand, :title
+  alias_attribute :product, :reg
+  alias_attribute :wechatid, :wechat_account
+
   attr_accessor :tags_text
   validates :title, presence: true
   validates :reg, :presence=>true

@@ -27,7 +27,7 @@ class GroupMember < ActiveRecord::Base
 
   after_create do |gm|
     gm.generate_client_member
-    gm.notify_join_group
+    gm.send_message_joined_group
   end
 
   def generate_client_member
@@ -37,19 +37,27 @@ class GroupMember < ActiveRecord::Base
     end
   end
 
-  def notify_join_group
-
+  def send_message_joined_group
     config = {
       'type'=>__callee__,
       'smsType'=>'normal',
       'smsFreeSignName'=>'红券',
-      'smsParam'=>{brand: group.title.to_s, vipgroup: group.title.to_s, startdate: started_at.strftime("%F %T"), enddate: ended_at.strftime("%F %T")},
+      'smsParam'=>{brand: client.try(:brand), vipgroup: group.title.to_s, wechatid: client.try(:wechat_account)},
       'recNum'=>phone,
-      'smsTemplateCode'=>'SMS_8495283'
+      'smsTemplateCode'=>'SMS_8540626'
     }
-  
-    dy = Dayu.createByDayuable(Member.first, config)
-    dy.run
-    dy.sended
+    Dayu.createByDayuable(Member.first, config).run
+  end
+
+  def send_message_will_expire
+    config = {
+      'type'=>__callee__,
+      'smsType'=>'normal',
+      'smsFreeSignName'=>'红券',
+      'smsParam'=>{brand: client.try(:brand), vipgroup: group.title.to_s, wechatid: client.try(:wechat_account)},
+      'recNum'=>phone,
+      'smsTemplateCode'=>'SMS_8480701'
+    }
+    Dayu.createByDayuable(Member.first, config).run
   end
 end

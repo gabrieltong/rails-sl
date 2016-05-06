@@ -33,7 +33,7 @@ class Capcha < ActiveRecord::Base
       'type'=>__callee__,
       'smsType'=>'normal',
       'smsFreeSignName'=>'红券',
-      'smsParam'=>{code: capcha.code.to_s, cardname: card_tpl.title, cardnumber: number.to_s},
+      'smsParam'=>{code: capcha.code.to_s, cardname: card_tpl.try(:title), cardnumber: number.to_s},
       'recNum'=>phone,
       'smsTemplateCode'=>'SMS_8560750'
     }
@@ -51,7 +51,7 @@ class Capcha < ActiveRecord::Base
       'type'=>__callee__,
       'smsType'=>'normal',
       'smsFreeSignName'=>'红券',
-      'smsParam'=>{code: capcha.code.to_s, brand: client.title},
+      'smsParam'=>{code: capcha.code.to_s, brand: client.try(:brand)},
       'recNum'=>phone,
       'smsTemplateCode'=>'SMS_8480487'
     }
@@ -69,7 +69,7 @@ class Capcha < ActiveRecord::Base
       'type'=>__callee__,
       'smsType'=>'normal',
       'smsFreeSignName'=>'红券',
-      'smsParam'=>{code: capcha.code.to_s, brand: client.title, consumptionamount: money.to_s},
+      'smsParam'=>{code: capcha.code.to_s, brand: client.try(:title), consumptionamount: money.to_s},
       'recNum'=>phone,
       'smsTemplateCode'=>'SMS_8515444'
     }
@@ -77,6 +77,36 @@ class Capcha < ActiveRecord::Base
     dy = Dayu.createByDayuable(Member.first, config)
     dy.run
     dy.sended
+  end
+
+  def send_capcha_bind_wechat
+  end
+  def send_capcha_update_password
+  end
+
+  def self.send_capcha_recover_password client_id, phone
+    member = Member.find_by_phone(phone)
+    if member
+      capcha = self.create_instance client_id, phone, __callee__
+
+      config = {
+        'type'=>__callee__,
+        'smsType'=>'normal',
+        'smsFreeSignName'=>'红券',
+        'smsParam'=>{code: capcha.code.to_s, phonenumber: phone.to_s },
+        'recNum'=>phone,
+        'smsTemplateCode'=>'SMS_8510408'
+      }
+    
+      dy = Dayu.createByDayuable(Member.first, config)
+      dy.run
+      dy.sended
+    else
+      :no_member
+    end
+  end
+
+  def send_capcha_validate_user
   end
 
   def self.valid_code(client_id, phone, type, code)

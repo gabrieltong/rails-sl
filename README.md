@@ -1,5 +1,8 @@
 对接短信验证码
 
+whenever 发送 短信过期提醒 ， 短信即将过期的时间范围
+whenever 发送 会员身份即将过期提醒 ， 短信即将过期的时间范围
+
 卡卷核销有效期修改时 ， 更新未被使用的卡卷有效期 done
 核销短信的数量限制 done
 update_all 添加 transaction 处理 , 如果 update_all 的 数量 和 number 不一致 done

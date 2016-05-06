@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160505084455) do
+ActiveRecord::Schema.define(version: 20160506062157) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -581,7 +581,6 @@ ActiveRecord::Schema.define(version: 20160505084455) do
   add_index "mobile_files", ["user_id"], name: "index_mobile_files_on_user_id", using: :btree
 
   create_table "moneys", force: :cascade do |t|
-    t.integer  "member_id",        limit: 4
     t.integer  "client_id",        limit: 4
     t.integer  "client_member_id", limit: 4
     t.float    "money",            limit: 24
@@ -591,13 +590,14 @@ ActiveRecord::Schema.define(version: 20160505084455) do
     t.string   "type",             limit: 255
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.string   "phone",            limit: 255, null: false
   end
 
   add_index "moneys", ["by_phone"], name: "index_moneys_on_by_phone", using: :btree
   add_index "moneys", ["client_id"], name: "index_moneys_on_client_id", using: :btree
   add_index "moneys", ["client_member_id"], name: "index_moneys_on_client_member_id", using: :btree
-  add_index "moneys", ["member_id"], name: "index_moneys_on_member_id", using: :btree
   add_index "moneys", ["money"], name: "index_moneys_on_money", using: :btree
+  add_index "moneys", ["phone"], name: "index_moneys_on_phone", using: :btree
   add_index "moneys", ["spendable_id"], name: "index_moneys_on_spendable_id", using: :btree
   add_index "moneys", ["spendable_type"], name: "index_moneys_on_spendable_type", using: :btree
   add_index "moneys", ["type"], name: "index_moneys_on_type", using: :btree
