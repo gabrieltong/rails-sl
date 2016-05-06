@@ -44,5 +44,6 @@ class ClientMember < ActiveRecord::Base
     if result === true
       client.create_activity key: 'member.charge_money', owner: Member.find_by_phone(by_phone),recipient: self,  :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money,:type=>'充值',:msg=>"#{phone}充值#{money},操作员#{by_phone}"}
     end
+    result
   end
 end
