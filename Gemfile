@@ -46,6 +46,7 @@ gem 'bulk_insert'
 gem 'will_paginate'
 gem 'randumb'
 gem 'whenever'
+gem 'wechat'
 
 gem 'devise'
 gem 'devise-i18n'

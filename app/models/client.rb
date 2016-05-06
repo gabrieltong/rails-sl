@@ -27,6 +27,7 @@ class Client < ActiveRecord::Base
   # validates :wechat_account, :presence=>true
   # validates :wechat_title, :presence=>true
   # validates :sp, :presence=>true, :if=>"is_sp != 1"
+  Type = %w(餐饮 酒店 景点 美容 洗浴 按摩 影院 演出 家居 服饰 母婴 户外 汽车 鞋包 培训 摄影 亲子 鲜花 礼品 宠物 医疗 家政 商场 配镜 婚庆 旅游 票务 银行 其他) 
   validates :longitude, :numericality=>{:greater_than_or_equal_to=>-180, :less_than_or_equal_to=>180}, :allow_nil=>true
   validates :latitude, :numericality=>{:greater_than_or_equal_to=>-90, :less_than_or_equal_to=>90}, :allow_nil=>true
 
