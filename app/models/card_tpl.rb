@@ -294,7 +294,7 @@ class CardTpl < ActiveRecord::Base
       'smsFreeSignName'=>'红券',
       'smsParam'=>{cardnumber: number.to_s, brand: client.try(:brand).to_s, cardname: title.to_s, wechatid: client.try(:wechat_account) },
       'recNum'=>phone,
-      'smsTemplateCode'=>'SMS_8475963'
+      'smsTemplateCode'=>'SMS_8970466'
     }
     Dayu.createByDayuable(self, config).run
   end
