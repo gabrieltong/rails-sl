@@ -188,7 +188,7 @@ class CardTpl < ActiveRecord::Base
       to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
       acquired_time_gt = Card.arel_table[:acquired_at].gt(from)
       acquired_time_lt = Card.arel_table[:acquired_at].lt(to)
-      period.number - cards.where(acquired_time_gt).where(acquired_time_lt).size
+      period.number > cards.where(acquired_time_gt).where(acquired_time_lt).size
     else
       0
     end
@@ -304,9 +304,9 @@ class CardTpl < ActiveRecord::Base
       'type'=>'acquired_cards',
       'smsType'=>'normal',
       'smsFreeSignName'=>'红券',
-      'smsParam'=>{cardnumber: number.to_s, brand: client.try(:brand).to_s, cardname: title.to_s, wechatid: client.try(:wechat_account) },
+      'smsParam'=>{phonenumber: phone.to_s, brand: client.try(:brand).to_s, cardname: title.to_s, wechatid: client.try(:wechat_account) },
       'recNum'=>phone,
-      'smsTemplateCode'=>'SMS_8475963'
+      'smsTemplateCode'=>'SMS_8495282'
     }
     Dayu.createByDayuable(self, config).run
   end
