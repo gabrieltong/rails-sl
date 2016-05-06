@@ -274,7 +274,7 @@ class CardTpl < ActiveRecord::Base
             raise ActiveRecord::Rollback
           end
 
-          send_message_acquired_cards number
+          send_message_acquired_cards phone, number
 
           client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'发卷',:msg=>"#{phone}获得了#{number}张卡卷,操作员#{by_phone}"}
         end
