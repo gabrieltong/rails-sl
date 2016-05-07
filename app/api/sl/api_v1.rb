@@ -217,7 +217,7 @@ module SL
           if Capcha.valid_code(nil , params[:phone], :send_capcha_recover_password, params[:code])
             member = Member.find_by_phone(params[:phone])
             if member
-              member.password = params[:phone]
+              member.password = params[:password]
               member.save
             else
               present :result, false
