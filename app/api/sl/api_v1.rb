@@ -218,7 +218,7 @@ module SL
             member = Member.find_by_phone(params[:phone])
             if member
               member.password = params[:password]
-              member.save
+              present :result, member.save
             else
               present :result, false
             end
