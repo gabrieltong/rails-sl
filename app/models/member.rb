@@ -35,6 +35,10 @@ class Member < ActiveRecord::Base
 
   has_many :dayus, :as=>:dayuable
 
+  after_create do |member|
+    member.remember_me!
+  end
+
   def self.permit_params
     [:phone, :username, :password, :password_confirmation]
   end
@@ -67,8 +71,6 @@ class Member < ActiveRecord::Base
 
   def username
     name
-    remember_me!
-
     rememberable_value
   end
 end
