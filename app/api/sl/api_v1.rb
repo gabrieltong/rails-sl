@@ -31,18 +31,21 @@ module SL
     end
 
     class GroupMember < Grape::Entity
-      expose :id
-      expose :group_title
-      expose :started_at
-      expose :ended_at
-      expose :phone
-      expose :name
-      expose :sex
-      expose :borned_at
-      expose :address
-      expose :email
-      expose :pic
-      expose :money
+      format_with(:no_null) { |attr| attr.nil? ? '' : attr}
+      with_options(format_with: :no_null) do
+        expose :id
+        expose :group_title
+        expose :started_at
+        expose :ended_at
+        expose :phone
+        expose :name
+        expose :sex
+        expose :borned_at
+        expose :address
+        expose :email
+        expose :pic
+        expose :money
+      end
     end
 
     class ClientMember < Grape::Entity
@@ -347,7 +350,7 @@ module SL
         get :member_info do
           authenticate!
           authenticate_client_manager!
-          gm = current_client.group_members.phone(params[:phone]).first || GroupMember.new
+          gm = current_client.group_members.phone(params[:phone]).where(:group_id=>params[:group_id]).first || GroupMember.new
           render
           present :result, gm, with: SL::Entities::GroupMember
         end
