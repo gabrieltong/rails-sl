@@ -347,7 +347,7 @@ module SL
         get :member_info do
           authenticate!
           authenticate_client_manager!
-          gm = current_client.group_members.phone(params[:phone]).first
+          gm = current_client.group_members.phone(params[:phone]).first || GroupMember.new
           render
           present :result, gm, with: SL::Entities::GroupMember
         end
