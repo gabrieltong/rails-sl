@@ -43,5 +43,6 @@ class ClientDecorator < Draper::Decorator
 			:type=>:Enum,
 			:values=>Member::Sex.invert
 		}) if self.show_sex
+		result
   end
 end
