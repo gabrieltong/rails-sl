@@ -7,33 +7,6 @@ module SL
       end
     end
 
-    class Setting < Grape::Entity
-      expose :name, if: lambda { |instance, options| instance.show_name } do |record|
-        :String
-      end
-      expose :phone, if: lambda { |instance, options| instance.show_phone } do |record|
-        :Integer
-      end
-      expose :borned_at, if: lambda { |instance, options| instance.show_borned_at } do |record|
-        :Date
-      end
-      
-      expose :address, if: lambda { |instance, options| instance.show_address } do |record|
-        :String
-      end
-      expose :email, if: lambda { |instance, options| instance.show_email } do |record|
-        :Email
-      end
-      expose :pic, if: lambda { |instance, options| instance.show_pic } do |record|
-        :Image
-      end
-      expose :sex, if: lambda { |instance, options| instance.show_sex } do |record|
-        { I18n.t(:male)=>:male, I18n.t(:female)=>:female}.invert
-        # ClientMember::Sex
-      end
-
-    end
-
     class Group < Grape::Entity
       expose :id
       expose :title
@@ -212,7 +185,8 @@ module SL
           requires :client_id, allow_blank: false, :type=>Integer
         end
         get :setting do 
-          present :result, current_client, with: SL::Entities::Setting
+          render
+          present :result, current_client.decorate.settings
         end
       end
     end
