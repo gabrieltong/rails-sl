@@ -52,7 +52,6 @@ class Client < ActiveRecord::Base
   has_many :card_a_tpls
   has_many :card_b_tpls
   has_many :admins, ->{where(:client_managers=>{:admin=>1})}, :through=>:client_managers, :source=>:manager
-  has_one :client_setting
 
   scope :sp, ->{where(:is_sp=>true)}
   scope :not_sp, ->{where.not(:is_sp=>true)}

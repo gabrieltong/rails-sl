@@ -7,6 +7,33 @@ module SL
       end
     end
 
+    class Setting < Grape::Entity
+      expose :name, if: lambda { |instance, options| instance.show_name } do |record|
+        :String
+      end
+      expose :phone, if: lambda { |instance, options| instance.show_phone } do |record|
+        :Integer
+      end
+      expose :borned_at, if: lambda { |instance, options| instance.show_borned_at } do |record|
+        :Date
+      end
+      
+      expose :address, if: lambda { |instance, options| instance.show_address } do |record|
+        :String
+      end
+      expose :email, if: lambda { |instance, options| instance.show_email } do |record|
+        :Email
+      end
+      expose :pic, if: lambda { |instance, options| instance.show_pic } do |record|
+        :Image
+      end
+      expose :sex, if: lambda { |instance, options| instance.show_sex } do |record|
+        { I18n.t(:male)=>:male, I18n.t(:female)=>:female}.invert
+        # ClientMember::Sex
+      end
+
+    end
+
     class Group < Grape::Entity
       expose :id
       expose :title
@@ -161,6 +188,7 @@ module SL
     end
 
     resource :clients do
+
       params do
         requires :token, allow_blank: false, :type=>String
         requires :client_id, allow_blank: false, :type=>Integer
@@ -177,6 +205,15 @@ module SL
         present :charge_money, current_client.moneys.where(Money.arel_table[:created_at].gteq(params[:from])).where(Money.arel_table[:created_at].lteq(params[:to])).charge.sum(:money)
         present :spend_money, -current_client.moneys.where(Money.arel_table[:created_at].gteq(params[:from])).where(Money.arel_table[:created_at].lteq(params[:to])).spend.sum(:money)
         present :result, current_client.card_tpls, with: SL::Entities::CardTpl, :report=>true, :from=>params[:from], :to=>params[:to]
+      end
+
+      route_param :client_id do
+        params do
+          requires :client_id, allow_blank: false, :type=>Integer
+        end
+        get :setting do 
+          present :result, current_client, with: SL::Entities::Setting
+        end
       end
     end
 
@@ -313,6 +350,19 @@ module SL
         present :result, current_client.groups, with: SL::Entities::Group
       end
 
+      desc '获取商户会员组列表'
+      params do
+        requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
+        requires :phone, allow_blank: false, :type=>Integer
+      end
+      get :member_groups do
+        authenticate!
+        authenticate_client_manager!
+        render
+        present :result, current_client.groups, with: SL::Entities::Group
+      end      
+
       route_param :group_id do 
         desc '获取某会员在该会员组详情详情'
         params do
@@ -338,14 +388,13 @@ module SL
           requires :started_at, allow_blank: false, :type=>Date
           requires :ended_at, allow_blank: false, :type=>Date
 
-          requires :sex, allow_blank: false, :values=>['male','female']
-          requires :name, allow_blank: false, :type=>String
-          requires :borned_at, allow_blank: false, :type=>Date
-          requires :image_id, allow_blank: false, :type=>Integer
+          # requires :sex, allow_blank: false, :values=>['male','female']
+          # requires :name, allow_blank: false, :type=>String
+          # requires :borned_at, allow_blank: false, :type=>Date
+          # requires :image_id, allow_blank: false, :type=>Integer
         end
 
         post :update_member_info do
-          p params
           authenticate!
           authenticate_client_manager!
           cm_attributes = {:client_id=>params[:client_id], :sex=>params[:sex], :name=>params[:name], :borned_at=>params[:borned_at],:phone=>params[:phone]}
@@ -364,7 +413,6 @@ module SL
           else
             gm = current_client.group_members.build(gm_attributes)
           end
-
           
           if !cm.valid?
             present :error, cm.errors
