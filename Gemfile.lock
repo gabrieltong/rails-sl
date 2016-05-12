@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/gabrieltong/wechat-1.git
-  revision: f49fbae6e62d208260a81e74149182b67f78e135
+  revision: abaaf59bdac865578f6afb4201c4dbd30afc8fc6
   specs:
     wechat (0.7.11)
       activesupport (>= 3.2, < 5.1.x)
