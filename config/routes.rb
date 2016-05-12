@@ -1,14 +1,14 @@
 Rails.application.routes.draw do
 
-  get 'members/info'
-
-  get 'members/bind'
-
-  get 'members/bind_success'
-
-  get 'members/money'
-
-  get 'members/recover_password'
+  resources :members do 
+    collection do 
+      get :info
+      get :bind
+      get :bind_success
+      get :money
+      get :recover_password      
+    end
+  end
 
   resource :wechat, only: [:show, :create]
   mount SL::API_V1 => '/'

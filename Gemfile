@@ -46,7 +46,7 @@ gem 'bulk_insert'
 gem 'will_paginate'
 gem 'randumb'
 gem 'whenever'
-gem 'wechat'
+gem 'wechat', :github=>'gabrieltong/wechat-1'
 
 gem 'devise'
 gem 'devise-i18n'
