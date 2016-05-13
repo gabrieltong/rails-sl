@@ -6,10 +6,12 @@
     <title>HONGCARD</title>
     <link href="//cdn.bootcss.com/weui/0.4.0/style/weui.min.css" rel="stylesheet">
     <script type="text/javascript" src='http://res.wx.qq.com/open/js/jweixin-1.1.0.js'></script>
-		    
+    <script src="//cdn.bootcss.com/zepto/1.1.6/zepto.min.js"></script>
+		<%= stylesheet_link_tag    'layout', media: 'all', 'data-turbolinks-track' => true %>
+		<%= Gon::Base.render_data %>
 </head>
 <body ontouchstart>
-	<%= wechat_config_js debug: true, api: %w(hideMenuItems closeWindow) -%>
+	<%= wechat_config_js debug: false, api: %w(hideMenuItems closeWindow) -%>
 	<script type="application/javascript">
 	  wx.ready(function() {
       console.log('ready')
@@ -19,8 +21,6 @@
       // wx.hideOptionMenu();
 	  });
 	</script>
-	<a href="javascript:wx.closeWindow();">Close</a>
-
 	<%= yield %>
 	<div class="footer">
 		<a href="">服务商:麦咖啡</a> | <a href="">POWERD BY 红券</a>        

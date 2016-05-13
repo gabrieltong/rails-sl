@@ -56,7 +56,7 @@ class Capcha < ActiveRecord::Base
       'smsTemplateCode'=>'SMS_8480487'
     }
   
-    dy = Dayu.createByDayuable(Member.first, config)
+    dy = Dayu.createByDayuable(Member.find_by_phone(phone), config)
     dy.run
     dy.sended
   end
@@ -74,7 +74,7 @@ class Capcha < ActiveRecord::Base
       'smsTemplateCode'=>'SMS_8515444'
     }
   
-    dy = Dayu.createByDayuable(Member.first, config)
+    dy = Dayu.createByDayuable(Member.find_by_phone(phone), config)
     dy.run
     dy.sended
   end
@@ -98,7 +98,7 @@ class Capcha < ActiveRecord::Base
         'smsTemplateCode'=>'SMS_8510408'
       }
     
-      dy = Dayu.createByDayuable(Member.first, config)
+      dy = Dayu.createByDayuable(Member.find_by_phone(phone), config)
       dy.run
       dy.sended
     else
@@ -106,6 +106,35 @@ class Capcha < ActiveRecord::Base
     end
   end
 
+  def self.send_capcha_bind_phone phone
+    if phone.to_s.match ChinaPhoneValidator::REGEX
+      member = Member.find_by_phone(phone)
+      if member.nil?
+        member = Member.new(:phone=>phone)
+        member.password = rand(10000000..99999999)
+        member.save
+      end
+
+      capcha = self.create_instance nil, phone, __callee__
+
+      config = {
+        'type'=>__callee__,
+        'smsType'=>'normal',
+        'smsFreeSignName'=>'红券',
+        'smsParam'=>{code: capcha.code.to_s, product: "红卷" },
+        'recNum'=>phone,
+        'smsTemplateCode'=>'SMS_2100912'
+      }
+    
+      dy = Dayu.createByDayuable(Member.find_by_phone(phone), config)
+      dy.run
+      dy.sended
+    else
+      :phone_is_invalid
+    end
+  end
+
+  
   def send_capcha_validate_user
   end
 

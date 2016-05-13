@@ -211,6 +211,15 @@ module SL
         params do
           requires :phone, allow_blank: false, :type=>Integer
         end
+        get :send_capcha_bind_phone do
+          render
+          present :result, Capcha.send_capcha_bind_phone(params[:phone])
+          render
+        end
+
+        params do
+          requires :phone, allow_blank: false, :type=>Integer
+        end
         get :send_capcha_recover_password do
           render
           member = Member.find_by_phone(params[:phone])

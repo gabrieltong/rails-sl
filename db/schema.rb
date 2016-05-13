@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160513035748) do
+ActiveRecord::Schema.define(version: 20160513065849) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -728,6 +728,8 @@ ActiveRecord::Schema.define(version: 20160513035748) do
     t.string   "refresh_token", limit: 255
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.integer  "expires_in",    limit: 4
+    t.string   "scope",         limit: 255
   end
 
   add_index "wechat_users", ["city"], name: "index_wechat_users_on_city", using: :btree
@@ -736,6 +738,7 @@ ActiveRecord::Schema.define(version: 20160513035748) do
   add_index "wechat_users", ["openid"], name: "index_wechat_users_on_openid", unique: true, using: :btree
   add_index "wechat_users", ["phone"], name: "index_wechat_users_on_phone", using: :btree
   add_index "wechat_users", ["province"], name: "index_wechat_users_on_province", using: :btree
+  add_index "wechat_users", ["scope"], name: "index_wechat_users_on_scope", using: :btree
   add_index "wechat_users", ["sex"], name: "index_wechat_users_on_sex", using: :btree
   add_index "wechat_users", ["unionid"], name: "index_wechat_users_on_unionid", using: :btree
 

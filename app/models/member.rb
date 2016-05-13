@@ -14,7 +14,8 @@ class Member < ActiveRecord::Base
 
   delegate :openid, :to=>:wechat_user, :allow_nil=>true
 
-  validates :phone, :presence=>true, :uniqueness=>true
+  validates :phone, :presence=>true, :uniqueness=>true, :china_phone=>true
+
   validates_datetime :borded_at, :allow_nil=>true
 
   has_many :managed_clients, ->{where(:client_managers=>{:admin=>1})}, :through=>:client_managers, :source=>:client#, :foreign_key=>:admin_phone, :primary_key=>:phone
