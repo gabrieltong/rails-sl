@@ -7,9 +7,12 @@ class Member < ActiveRecord::Base
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :trackable, :validatable, :authentication_keys => [:client_id, :phone]
 
-  scope :wechat_binded, ->{where(:wechat_binded=>true)}
-  scope :wechat_unbinded, ->{where.not(:wechat_binded=>true)}
+  scope :wechat_binded, ->{joins(:wechat_user).where.not(WechatUser.arel_table['openid'].eq(nil))}
+  # scope :wechat_unbinded, ->{joins(:wechat_user).where.not(WechatUser.where("wechat_users.phone = members.phone").limit(1).arel.exists)}
+
   scope :capcha_not_expired, ->{where(arel_table[:capcha_expired_at].lteq(DateTime.now))}
+
+  delegate :openid, :to=>:wechat_user, :allow_nil=>true
 
   validates :phone, :presence=>true, :uniqueness=>true
   validates_datetime :borded_at, :allow_nil=>true
@@ -37,6 +40,8 @@ class Member < ActiveRecord::Base
   has_many :acquired_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:phone
 
   has_many :dayus, :as=>:dayuable
+
+  has_one :wechat_user, :primary_key=>:phone, :foreign_key=>:phone
 
   after_create do |member|
     member.remember_me!

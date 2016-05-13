@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160508085245) do
+ActiveRecord::Schema.define(version: 20160513035748) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -712,5 +712,31 @@ ActiveRecord::Schema.define(version: 20160508085245) do
   end
 
   add_index "wechat_sessions", ["openid"], name: "index_wechat_sessions_on_openid", unique: true, using: :btree
+
+  create_table "wechat_users", force: :cascade do |t|
+    t.string   "phone",         limit: 255
+    t.string   "openid",        limit: 255
+    t.string   "unionid",       limit: 255
+    t.string   "nickname",      limit: 255
+    t.integer  "sex",           limit: 4
+    t.string   "language",      limit: 255
+    t.string   "city",          limit: 255
+    t.string   "province",      limit: 255
+    t.string   "country",       limit: 255
+    t.string   "headimgurl",    limit: 255
+    t.string   "access_token",  limit: 255
+    t.string   "refresh_token", limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "wechat_users", ["city"], name: "index_wechat_users_on_city", using: :btree
+  add_index "wechat_users", ["country"], name: "index_wechat_users_on_country", using: :btree
+  add_index "wechat_users", ["language"], name: "index_wechat_users_on_language", using: :btree
+  add_index "wechat_users", ["openid"], name: "index_wechat_users_on_openid", unique: true, using: :btree
+  add_index "wechat_users", ["phone"], name: "index_wechat_users_on_phone", using: :btree
+  add_index "wechat_users", ["province"], name: "index_wechat_users_on_province", using: :btree
+  add_index "wechat_users", ["sex"], name: "index_wechat_users_on_sex", using: :btree
+  add_index "wechat_users", ["unionid"], name: "index_wechat_users_on_unionid", using: :btree
 
 end

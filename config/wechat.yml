@@ -32,7 +32,7 @@ production:
 
 development:
   <<: *default
-  trusted_domain_fullname: "http://your_dev.proxy.qqbrowser.cc"
+  trusted_domain_fullname: "http://user.hongq.net"
 
 test:
   <<: *default
