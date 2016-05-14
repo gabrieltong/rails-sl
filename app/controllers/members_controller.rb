@@ -11,7 +11,6 @@ class MembersController < ApplicationController
   end
 
   def bind
-
     if(!params[:phone].blank? and !params[:capcha].blank?)
       if Capcha.valid_code(nil, params[:phone], :send_capcha_bind_phone, params[:capcha])
         @wechat_user.phone = params[:phone]
@@ -24,7 +23,6 @@ class MembersController < ApplicationController
   end
 
   def bind_success
-    # @wechat_user =  WechatUser.first
     logger.info 
   end
 
@@ -32,6 +30,16 @@ class MembersController < ApplicationController
   end
 
   def recover_password
+    if request.post?
+      if Capcha.valid_code(nil, params[:phone], :send_capcha_recover_password, params[:capcha])
+        @member = @wechat_user.member
+        @member.password = params[:password]
+        @member.save
+        redirect_to info_members_path
+      else
+        flash[:message] = '绑定失败'
+      end
+    end
   end
 
 private
@@ -43,6 +51,8 @@ private
   end
 
   def get_wechat_info
+    # @wechat_user =  WechatUser.first
+    # return 
     wechat_oauth2 'snsapi_userinfo' do |openid, info|
       logger.info "openid: #{openid}"
       # if openid.blank?

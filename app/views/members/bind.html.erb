@@ -1,16 +1,5 @@
 <script type="text/javascript">
-function validate_phone(phone)
-{
-	return phone.match(/^(13|15|17|18)[0-9]\d{8}$/)
-}
-
-function validate_capcha(capcha)
-{
-	return capcha.match(/^\d{6}$/)
-}
-
 $(function(){
-
 	$('.send_capcha').click(function(){
 		var phone = $('.phone').val()
 		if(validate_phone(phone)){

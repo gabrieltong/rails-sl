@@ -6,7 +6,8 @@ Rails.application.routes.draw do
       get :bind
       get :bind_success
       get :money
-      get :recover_password      
+      get :recover_password
+      post :recover_password
     end
   end
 
