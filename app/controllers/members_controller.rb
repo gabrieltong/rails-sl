@@ -11,6 +11,7 @@ class MembersController < ApplicationController
   end
 
   def bind
+
     if(!params[:phone].blank? and !params[:capcha].blank?)
       if Capcha.valid_code(nil, params[:phone], :send_capcha_bind_phone, params[:capcha])
         @wechat_user.phone = params[:phone]
@@ -23,6 +24,8 @@ class MembersController < ApplicationController
   end
 
   def bind_success
+    # @wechat_user =  WechatUser.first
+    logger.info 
   end
 
   def money
@@ -41,6 +44,7 @@ private
 
   def get_wechat_info
     wechat_oauth2 'snsapi_userinfo' do |openid, info|
+      logger.info "openid: #{openid}"
       # if openid.blank?
       #   redirect_to wechat_oauth2(request.original_url.gsub(/\?.*/, ''))
       # else
@@ -59,9 +63,11 @@ private
           wechat_user.save
         end
         @wechat_user = wechat_user
-        if @wechat_user.member.nil?
+        if @wechat_user.member.nil? && !(request.original_url.include?(bind_members_path))
           redirect_to bind_members_path
         end
+
+        logger.info @wechat_user
       end
     end    
   end
