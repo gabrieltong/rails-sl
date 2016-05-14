@@ -42,6 +42,7 @@ class Member < ActiveRecord::Base
 
   has_many :dayus, :as=>:dayuable
 
+  has_many :moneys, :through=>:client_members
   has_one :wechat_user, :primary_key=>:phone, :foreign_key=>:phone
 
   after_create do |member|

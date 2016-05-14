@@ -1,2 +1,24 @@
-<h1>Members#money</h1>
-<p>Find me in app/views/members/money.html.erb</p>
+<div class="hd">
+  <h1 class="page_title">我的余额:<%=@member.moneys.sum(:money)%>元</h1>
+  <p class="page_desc">会员:<%=@member.phone%></p>  
+</div>
+<div class="bd">
+	<div class="weui_opr_area">
+	  <p class="weui_btn_area">	            
+      <a href="<%= info_members_path %>" class="weui_btn weui_btn_default">返回我的会员中心</a>
+	  </p>
+	</div>
+<div class="weui_panel weui_panel_access">
+  <div class="weui_panel_hd">充值明细</div>
+  	<% @member.moneys.charge.each do |money|%>
+    <div class="weui_panel_bd">  
+      <div class="weui_cell">
+          <div class="weui_cell_bd weui_cell_primary">
+              <p><%=money.client_title%></p>
+          </div>
+          <div class="weui_cell_ft"><%=money.money%></div>
+      </div>
+  	</div>  
+  	<% end %>
+	</div>
+</div>

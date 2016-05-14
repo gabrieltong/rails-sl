@@ -52,7 +52,8 @@ private
 
   def get_wechat_info
     # @wechat_user =  WechatUser.first
-    # return 
+    # @member = @wechat_user.member
+    # return
     wechat_oauth2 'snsapi_userinfo' do |openid, info|
       logger.info "openid: #{openid}"
       # if openid.blank?
@@ -73,10 +74,10 @@ private
           wechat_user.save
         end
         @wechat_user = wechat_user
+        @member = wechat_user.member
         if @wechat_user.member.nil? && !(request.original_url.include?(bind_members_path))
           redirect_to bind_members_path
         end
-
         logger.info @wechat_user
       end
     end    
