@@ -4,7 +4,7 @@ class MembersController < ApplicationController
   wechat_api
   wechat_responder
   
-  # before_action :get_wechat_info
+  before_action :get_wechat_info
 
   def info
 
@@ -32,11 +32,20 @@ class MembersController < ApplicationController
   end
 
 private
+  def get_wechat_info_simple
+    wechat_oauth2 'snsapi_userinfo' do |openid, info|
+      logger.info openid
+      logger.info info
+    end
+  end
+
   def get_wechat_info
     wechat_oauth2 'snsapi_userinfo' do |openid, info|
-      if openid.blank?
-        redirect_to wechat_oauth2(request.original_url.gsub(/\?.*/, ''))
-      else
+      # if openid.blank?
+      #   redirect_to wechat_oauth2(request.original_url.gsub(/\?.*/, ''))
+      # else
+      if openid
+        info ||= {}
         if info['access_token']
           info = info.merge!(wechat.web_userinfo(info['access_token'], openid))
         end
