@@ -15,6 +15,7 @@ class Card < ActiveRecord::Base
   has_many :dayus, :as=>:dayuable
 
   delegate 'can_check_by_phone?', :to=>:card_tpl
+  delegate :title, :to=>:card_tpl
 
   scope :by_client, ->(client_id){where(:client_id=>client_id)}
   scope :acquired_by, ->(phone){where(:phone=>phone)}

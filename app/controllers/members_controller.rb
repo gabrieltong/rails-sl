@@ -6,7 +6,19 @@ class MembersController < ApplicationController
   
   before_action :get_wechat_info
 
+  def profile
+
+  end
+
+  def cards
+    @cards = CardDecorator.decorate_collection(@member.acquired_cards.includes(:card_tpl).order('id desc'))
+  end
+
   def info
+
+  end
+
+  def permission
 
   end
 
@@ -51,9 +63,10 @@ private
   end
 
   def get_wechat_info
-    # @wechat_user =  WechatUser.first
-    # @member = @wechat_user.member
-    # return
+    @wechat_user =  WechatUser.first
+    @member = @wechat_user.member.decorate
+    return
+
     wechat_oauth2 'snsapi_userinfo' do |openid, info|
       logger.info "openid: #{openid}"
       # if openid.blank?

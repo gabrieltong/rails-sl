@@ -1,6 +1,14 @@
-class MemberDecorator < Draper::Decorator
+# encoding: UTF-8
+class CardDecorator < Draper::Decorator
   delegate_all
 
+  def text_used
+  	object.decorator_class.checked.include?(object) ? '已使用' : '未使用'
+  end
+
+  def weui_line_though_class
+  	object.decorator_class.checked.include?(object) ? 'line-through' : ''
+  end
   # Define presentation-specific methods here. Helpers are accessed through
   # `helpers` (aka `h`). You can override attributes, for example:
   #
@@ -9,14 +17,5 @@ class MemberDecorator < Draper::Decorator
   #       object.created_at.strftime("%a %m/%d/%y")
   #     end
   #   end
-  def text_sex
-  	case sex 
-  	when 'male'
-  		'男'
-  	when 'female'
-  		'女'
-  	else
-  		''
-  	end  		
-  end
+
 end

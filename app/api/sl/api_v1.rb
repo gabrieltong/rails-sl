@@ -425,9 +425,9 @@ module SL
       get :member_info do
         authenticate!
         authenticate_client_manager!
+
         cards = Card.acquired_by(params[:phone]).by_client(params[:client_id]).checkable.includes(:card_tpl)
         card_tpls = cards.collect {|card|card.card_tpl}.uniq
-
         card_tpls.each do |card_tpl|
           card_tpl.member_cards_count = cards.select {|card|card.card_tpl == card_tpl}.size
         end

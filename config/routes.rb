@@ -8,6 +8,9 @@ Rails.application.routes.draw do
       get :money
       get :recover_password
       post :recover_password
+      get :permission
+      get :profile
+      get :cards
     end
   end
 

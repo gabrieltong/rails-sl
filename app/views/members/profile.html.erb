@@ -1,0 +1,39 @@
+<div class="hd">
+    <h1 class="page_title">个人信息</h1>
+    <p class="page_desc">副标题说明</p>
+</div> 
+<div class="bd">
+  <div class="weui_opr_area">
+    <p class="weui_btn_area">             
+      <a href="<%= info_members_path %>" class="weui_btn weui_btn_default">返回我的会员中心</a>
+    </p>
+  </div>
+  <div class="weui_cells weui_cells_access">
+    <a class="weui_cell" href="<%=bind_members_path%>">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>手机号: <%=@member.phone%></p>
+        </div>
+        <div class="weui_cell_ft"></div>
+    </a>
+    <a class="weui_cell" href="<%=recover_password_members_path%>">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>修改密码</p>
+        </div>
+        <div class="weui_cell_ft"></div>
+    </a>
+    <a class="weui_cell" href="javascript:;">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>姓名: <%=@member.name%></p>
+        </div>
+        <div class="weui_cell_ft"></div>
+    </a>
+
+    <a class="weui_cell" href="javascript:;">
+        <div class="weui_cell_bd weui_cell_primary">
+            <p>性别: <%=@member.text_sex%></p>
+        </div>
+        <div class="weui_cell_ft"></div>
+    </a>
+
+</div>
+ </div>

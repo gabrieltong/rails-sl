@@ -36,9 +36,21 @@ class Member < ActiveRecord::Base
   # 用户具有核销权限的卡卷
   has_many :checker_card_tpls, ->{where(:client_managers=>{:checker=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
 
+  
+  # 用户可以核销的卡密
+  has_many :active_cards, ->{where(Card.arel_table[:from].lt(DateTime.now)).where(Card.arel_table[:to].gt(DateTime.now))}, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:phone
+  # 用户被核销的卡密
   has_many :checked_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:checker_phone
-  has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:sender_phone
+  # 用户得到的卡密
   has_many :acquired_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:phone
+  # 用户发送的卡密
+  has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:sender_phone
+  # 用户得到的卡卷， 通过卡密搜索
+  has_many :acquired_card_tpls, -> {uniq}, :through=>:acquired_cards, :source=>:card_tpl
+  # 用户已核销的卡卷， 通过卡密搜索
+  has_many :checked_card_tpls, -> {uniq}, :through=>:checked_cards, :source=>:card_tpl
+  # 用户可以核销的卡卷
+  has_many :active_card_tpls, -> {uniq}, :through=>:active_cards, :source=>:card_tpl
 
   has_many :dayus, :as=>:dayuable
 
