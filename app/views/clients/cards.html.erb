@@ -1,0 +1,31 @@
+<div class="hd">
+    <h1 class="page_title">红券使用记录</h1>
+    <p class="page_desc">会员:18841188115</p>	    
+</div>
+ 
+<div class="weui_opr_area">
+  <p class="weui_btn_area">	            
+      <a href="<%=info_members_path%>" class="weui_btn weui_btn_default">返回我的会员中心</a>
+  </p>
+</div>
+  
+<% @cards.each do |card|%>  
+<div class="weui_panel">
+    <div class="weui_panel_hd r_myhqlist_title"><%=card.title%></div>
+    <div class="weui_panel_bd">
+        <div class="weui_media_box weui_media_text">
+            <a class="weui_cell r_myhqlist_qh" href="javascript:;">
+                <div class="weui_cell_hd r_myhqlist_qh_l ">券号</div>
+                <div class="weui_cell_bd weui_cell_primary r_myhqlist_qh_m <%=card.weui_line_though_class%>">
+                    <p><%=card.code%></p>
+                </div>
+                <span class="weui_cell_ft r_myhqlist_qh_r"><%=card.text_used%></span>
+            </a>
+            <ul class="weui_media_info">
+                <li class="weui_media_info_meta">订单编号：2016050212</li>
+                <li class="weui_media_info_meta">使用时间：<%=card.checked_at.try(:strftime, "%F") %></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<% end %>

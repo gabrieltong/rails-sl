@@ -1,15 +1,6 @@
 class ClientDecorator < Draper::Decorator
   delegate_all
 
-  # Define presentation-specific methods here. Helpers are accessed through
-  # `helpers` (aka `h`). You can override attributes, for example:
-  #
-  #   def created_at
-  #     helpers.content_tag :span, class: 'time' do
-  #       object.created_at.strftime("%a %m/%d/%y")
-  #     end
-  #   end
-
   def settings
   	result = []
 		result.push({
@@ -43,6 +34,47 @@ class ClientDecorator < Draper::Decorator
 			:type=>:Enum,
 			:values=>Member::Sex.invert
 		}) if self.show_sex
+		result.push({
+			:key=>:license_plate,
+			:i18n=>I18n.t('activerecord.attributes.client_member.license_plate'),
+			:type=>:String,
+		}) if self.show_license_plate
+		result.push({
+			:key=>:identity,
+			:i18n=>I18n.t('activerecord.attributes.client_member.identity'),
+			:type=>:String,
+		}) if self.show_identity
+		result.push({
+			:key=>:position,
+			:i18n=>I18n.t('activerecord.attributes.client_member.position'),
+			:type=>:String,
+		}) if self.show_position
+		result.push({
+			:key=>:company,
+			:i18n=>I18n.t('activerecord.attributes.client_member.company'),
+			:type=>:String,
+		}) if self.show_company
+		result.push({
+			:key=>:collage,
+			:i18n=>I18n.t('activerecord.attributes.client_member.collage'),
+			:type=>:String,
+		}) if self.show_collage
+		result.push({
+			:key=>:emotion,
+			:i18n=>I18n.t('activerecord.attributes.client_member.emotion'),
+			:type=>:Enum,
+			:values=>ClientMember::Emotion
+		}) if self.show_emotion
+		result.push({
+			:key=>:car_type,
+			:i18n=>I18n.t('activerecord.attributes.client_member.car_type'),
+			:type=>:String,
+		}) if self.show_car_type
+		result.push({
+			:key=>:remark,
+			:i18n=>I18n.t('activerecord.attributes.client_member.remark'),
+			:type=>:Text,
+		}) if self.show_remark
 		result
   end
 end

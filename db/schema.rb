@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160516031053) do
+ActiveRecord::Schema.define(version: 20160516091258) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -319,8 +319,8 @@ ActiveRecord::Schema.define(version: 20160516031053) do
 
   create_table "client_members", force: :cascade do |t|
     t.integer  "client_id",        limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
     t.string   "name",             limit: 255
     t.string   "sex",              limit: 255
     t.date     "borned_at"
@@ -331,9 +331,22 @@ ActiveRecord::Schema.define(version: 20160516031053) do
     t.integer  "pic_file_size",    limit: 4
     t.datetime "pic_updated_at"
     t.string   "phone",            limit: 255
-    t.float    "money",            limit: 24,  default: 0.0, null: false
+    t.float    "money",            limit: 24,   default: 0.0, null: false
+    t.string   "license_plate",    limit: 255,  default: ""
+    t.string   "identity",         limit: 255,  default: ""
+    t.string   "position",         limit: 255,  default: ""
+    t.string   "company",          limit: 255,  default: ""
+    t.string   "collage",          limit: 255,  default: ""
+    t.string   "emotion",          limit: 255,  default: ""
+    t.string   "car_type",         limit: 255,  default: ""
+    t.string   "remark",           limit: 3000, default: ""
+    t.string   "major",            limit: 255,  default: ""
   end
 
+  add_index "client_members", ["collage"], name: "index_client_members_on_collage", using: :btree
+  add_index "client_members", ["company"], name: "index_client_members_on_company", using: :btree
+  add_index "client_members", ["emotion"], name: "index_client_members_on_emotion", using: :btree
+  add_index "client_members", ["major"], name: "index_client_members_on_major", using: :btree
   add_index "client_members", ["phone", "client_id"], name: "index_client_members_on_phone_and_client_id", unique: true, using: :btree
 
   create_table "client_settings", force: :cascade do |t|
@@ -371,8 +384,8 @@ ActiveRecord::Schema.define(version: 20160516031053) do
     t.string   "website",                  limit: 255
     t.string   "wechat_account",           limit: 255
     t.string   "wechat_title",             limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
     t.string   "logo_file_name",           limit: 255
     t.string   "logo_content_type",        limit: 255
     t.integer  "logo_file_size",           limit: 4
@@ -391,9 +404,22 @@ ActiveRecord::Schema.define(version: 20160516031053) do
     t.boolean  "show_pic"
     t.boolean  "show_address"
     t.boolean  "show_email"
+    t.boolean  "show_license_plate",                   default: true
+    t.boolean  "show_identity",                        default: true
+    t.boolean  "show_position",                        default: true
+    t.boolean  "show_company",                         default: true
+    t.boolean  "show_collage",                         default: true
+    t.boolean  "show_emotion",                         default: true
+    t.boolean  "show_car_type",                        default: true
+    t.boolean  "show_remark",                          default: true
+    t.boolean  "major",                                default: true
   end
 
   add_index "clients", ["is_sp"], name: "index_clients_on_is_sp", using: :btree
+  add_index "clients", ["major"], name: "index_clients_on_major", using: :btree
+  add_index "clients", ["show_collage"], name: "index_clients_on_show_collage", using: :btree
+  add_index "clients", ["show_company"], name: "index_clients_on_show_company", using: :btree
+  add_index "clients", ["show_emotion"], name: "index_clients_on_show_emotion", using: :btree
   add_index "clients", ["sp_id"], name: "index_clients_on_sp_id", using: :btree
 
   create_table "draw_awards", force: :cascade do |t|

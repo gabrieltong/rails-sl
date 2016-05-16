@@ -14,6 +14,20 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :clients do 
+    member do
+      get :info
+      get :bind
+      get :bind_success
+      get :money
+      get :recover_password
+      post :recover_password
+      get :permission
+      get :profile
+      get :cards
+    end
+  end
+
   resource :wechat, only: [:show, :create]
   mount SL::API_V1 => '/'
   # The priority is based upon order of creation: first created -> highest priority.

@@ -1,0 +1,71 @@
+	<!--<div class="hd">
+	    <h1 class="page_title">会员中心</h1>
+	    <p class="page_desc">18640862977</p>
+	</div> -->
+   <div class="bd">
+   	
+   	<div class="weui_cells weui_cells_form">
+   		<div class="weui_cell">
+            <div class="weui_cell_hd"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAC4AAAAuCAMAAABgZ9sFAAAAVFBMVEXx8fHMzMzr6+vn5+fv7+/t7e3d3d2+vr7W1tbHx8eysrKdnZ3p6enk5OTR0dG7u7u3t7ejo6PY2Njh4eHf39/T09PExMSvr6+goKCqqqqnp6e4uLgcLY/OAAAAnklEQVRIx+3RSRLDIAxE0QYhAbGZPNu5/z0zrXHiqiz5W72FqhqtVuuXAl3iOV7iPV/iSsAqZa9BS7YOmMXnNNX4TWGxRMn3R6SxRNgy0bzXOW8EBO8SAClsPdB3psqlvG+Lw7ONXg/pTld52BjgSSkA3PV2OOemjIDcZQWgVvONw60q7sIpR38EnHPSMDQ4MjDjLPozhAkGrVbr/z0ANjAF4AcbXmYAAAAASUVORK5CYII=" alt="" style="width:20px;margin-right:5px;display:block"></div>
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>商户名称</p>
+            </div>
+            <div class="weui_cell_ft">
+            </div>
+        </div>               
+    </div>
+  
+    <div class="weui_cells_title">会员:<%=@member.phone%></div>
+    <div class="weui_cells weui_cells_access">
+        <a class="weui_cell" href="<%=money_members_path%>">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>我的余额: <%=@member.moneys.sum(:money)%> 元</p>
+            </div>
+            <div class="weui_cell_ft"></div>
+        </a>
+        <a class="weui_cell" href="<%=cards_members_path%>">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>红券使用记录</p>
+            </div>
+            <div class="weui_cell_ft"></div>
+        </a>
+        <a class="weui_cell" href="<%=permission_members_path%>">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>会员权限</p>
+            </div>
+            <div class="weui_cell_ft"></div>
+        </a>
+        <a class="weui_cell" href="<%=profile_members_path%>">
+            <div class="weui_cell_bd weui_cell_primary">
+                <p>个人信息</p>
+            </div>
+            <div class="weui_cell_ft"></div>
+        </a>
+    </div>
+    
+    <div class="weui_panel weui_panel_access">
+        <div class="weui_panel_hd">我的红券</div>
+        <div class="weui_panel_bd">
+            <% @member.active_card_tpls.each do |card_tpl|%>
+            <a href="javascript:void(0);" class="weui_media_box weui_media_appmsg r_myhq">
+                <div class="weui_media_hd">
+                    <img class="weui_media_appmsg_thumb" src="<%=card_tpl.cover.url(:thumb)%>" alt="">
+                </div>
+                <div class="weui_media_bd">
+                    <h4 class="weui_media_title"><%=card_tpl.title%></h4>
+                    <p class="weui_media_desc">有效期:<%="#{card_tpl.acquire_from.strftime("%F")}~#{card_tpl.acquire_to.strftime("%F")}"%></p>
+                </div>
+                 <div class="weui_media_hd">
+                    <h4 class="weui_media_title">X<%=@member.active_cards.where(:card_tpl_id=>card_tpl.id).size%></h4>
+                </div>
+            </a> 
+            <% end %>           
+        </div>
+        <a class="weui_panel_ft" href="javascript:void(0);">查看更多</a>
+    </div>
+    
+    
+    </div>
+    
+      	
+   </div>

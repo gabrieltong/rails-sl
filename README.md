@@ -1,6 +1,6 @@
-对接短信验证码
+对接短信验证码 done
 
-卡卷已过期的提醒
+卡卷已过期的提醒-done
 
 重点解决时区问题，-done
 
@@ -9,8 +9,8 @@
 卡卷验证 必须选择至少一个门店 - done
 卡卷默认创建是下架 ， 点上架需验证投放开始时间与投放结束时间 - done
 
-whenever 发送 短信过期提醒 ， 短信即将过期的时间范围
-whenever 发送 会员身份即将过期提醒 ， 短信即将过期的时间范围
+whenever 发送 短信过期提醒 ， 短信即将过期的时间范围 done
+whenever 发送 会员身份即将过期提醒 ， 短信即将过期的时间范围 done 
 
 卡卷核销有效期修改时 ， 更新未被使用的卡卷有效期 done
 核销短信的数量限制 done
@@ -24,7 +24,7 @@ CardTpl.can_check 支持判断可核销数量 done
 抽奖券 删除卡卷 done
 
 接口上传client_id
-发卷 - 结合indate done
+发卷 - 结合indate done done
 发卷和核销， 结合卡卷的投放时间及有效时间 done 
 
 发卷结合没人限领次数及没时间段限领次数 done
@@ -33,12 +33,12 @@ CardTpl.can_check 支持判断可核销数量 done
 
 批量生成卡卷的实现 - waiting
 批量生成抽奖券的实现 - waiting
-先使用简单方法， 遍历生成 
+先使用简单方法， 遍历生成 done
 
-当卡卷生效时 ，不可编辑卡卷信息
+当卡卷生效时 ，不可编辑卡卷信息 done
 
-validation
-	memeber.phone, 定义为phone validator
+validation 
+	memeber.phone, 定义为phone validator - done
 
 在 rails-sl-client 重构 use_weeks use_hours - done
 

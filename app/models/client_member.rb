@@ -1,5 +1,7 @@
 # encoding: UTF-8
 class ClientMember < ActiveRecord::Base
+  Emotion = %w(单身 已婚 离异 丧偶)
+
   belongs_to :member, :primary_key=>:phone, :foreign_key=>:phone
   belongs_to :client
   has_many :group_members, :primary_key=>:phone, :foreign_key=>:phone
