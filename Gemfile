@@ -47,6 +47,7 @@ gem 'will_paginate'
 gem 'randumb'
 gem 'whenever'
 gem 'wechat', '~> 0.7.12'
+gem 'whenever'
 
 gem 'devise'
 gem 'devise-i18n'

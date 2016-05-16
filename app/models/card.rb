@@ -47,6 +47,7 @@ class Card < ActiveRecord::Base
 
   scope :acquired_in_range, ->(from, to){where(arel_table[:acquired_at].gt(from)).where(arel_table[:acquired_at].lt(to))}
   scope :checked_in_range, ->(from, to){where(arel_table[:checked_at].gt(from)).where(arel_table[:checked_at].lt(to))}
+  scope :will_expire, ->(seconds=60*60*24) {where(arel_table[:to].lt(DateTime.now + seconds.seconds)).where(arel_table[:to].gt(DateTime.now))}
 
   validates :card_tpl_id, :added_quantity_id, :presence=>true
   
@@ -212,14 +213,25 @@ class Card < ActiveRecord::Base
   end
 
   def send_message_will_expire
-    config = {
-      'type'=>__callee__,
-      'smsType'=>'normal',
-      'smsFreeSignName'=>'红券',
-      'smsParam'=>{brand: client.try(:brand), cardname: card_tpl.try(:title),  wechatid: client.try(:wechat_account)},
-      'recNum'=>phone,
-      'smsTemplateCode'=>'SMS_8525379'
-    }
-    Dayu.createByDayuable(Member.first, config).run
+    if Dayu.allow_send self, __callee__, 60*60*24
+      config = {
+        'type'=>__callee__,
+        'smsType'=>'normal',
+        'smsFreeSignName'=>'红券',
+        'smsParam'=>{brand: client.try(:brand), cardname: card_tpl.try(:title),  wechatid: client.try(:wechat_account)},
+        'recNum'=>phone,
+        'smsTemplateCode'=>'SMS_8525379'
+      }
+      Dayu.createByDayuable(self, config).run
+    end
+  end
+
+  def self.send_message_will_expire
+    # Card.where(:phone=>13654265306).limit(1) do |record|
+    checkable.will_expire.each do |record|
+      if Dayu.allow_send record, :send_message_will_expire
+        record.send_message_will_expire
+      end
+    end
   end
 end

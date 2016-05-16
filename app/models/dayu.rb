@@ -55,10 +55,10 @@ class Dayu < ActiveRecord::Base
     self.save
   end
 
-  def self.allow_send obj, type
+  def self.allow_send obj, type, seconds=60*60*24
     record = obj.dayus.of_type(type).order('sended_at desc').first
     if record
-      return (record.sended_at - DateTime.now).abs > 60
+      return (record.sended_at - DateTime.now).abs > seconds
     else
       return true
     end

@@ -20,7 +20,7 @@ class Money < ActiveRecord::Base
       'recNum'=>phone,
       'smsTemplateCode'=>'SMS_8490409'
     }
-    Dayu.createByDayuable(Member.first, config).run
+    Dayu.createByDayuable(member, config).run
   end
 
 	private
