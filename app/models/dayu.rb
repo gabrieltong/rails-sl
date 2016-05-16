@@ -31,7 +31,7 @@ class Dayu < ActiveRecord::Base
   end
 
   def run
-    bigfish = Alibaba::Bigfish.new(23265315,'a01020d3de3b53fc9cd86ed51d8bb981')
+    bigfish = Alibaba::Bigfish.new(ENV['Bigfish_AK'],ENV['Bigfish_SK'])
 
     params = {
         rec_num: recNum , 

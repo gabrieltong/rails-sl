@@ -10,6 +10,9 @@ namespace :sync do
         # %x{rm #{dest_path}/app/models/*.rb}
         %x{cp #{source_path}/app/models/*.rb #{dest_path}/app/models/}
         %x{cp #{source_path}/app/decorators/*.rb #{dest_path}/app/decorators/}
+        %x{mkdir -p #{dest_path}/app/validators}
+        %x{cp #{source_path}/app/validators/*.rb #{dest_path}/app/validators/}
+        
 
         # %x{cp #{source_path}/test/models/*_test.rb #{dest_path}/test/models/}
 

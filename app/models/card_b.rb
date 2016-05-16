@@ -15,7 +15,7 @@ class CardB < Card
 
 # 确认抽奖券都是在有效期内
   def generate_from_to
-		self.from = Date.today - 100.years
-    self.to = Date.today + 100.years
+		self.from = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) - 100.years
+    self.to = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) + 100.years
   end
 end

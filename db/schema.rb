@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160514032336) do
+ActiveRecord::Schema.define(version: 20160516031053) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -208,8 +208,8 @@ ActiveRecord::Schema.define(version: 20160514032336) do
     t.datetime "indate_from"
     t.datetime "indate_to"
     t.integer  "indate_after",             limit: 4
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.datetime "created_at",                                                null: false
+    t.datetime "updated_at",                                                null: false
     t.string   "cover_file_name",          limit: 255
     t.string   "cover_content_type",       limit: 255
     t.integer  "cover_file_size",          limit: 4
@@ -229,7 +229,7 @@ ActiveRecord::Schema.define(version: 20160514032336) do
     t.string   "check_hours",              limit: 255
     t.string   "draw_type",                limit: 255
     t.integer  "prediction",               limit: 4
-    t.string   "state",                    limit: 255, default: "active"
+    t.string   "state",                    limit: 255, default: "inactive"
     t.integer  "total",                    limit: 4,   default: 0
     t.integer  "remain",                   limit: 4,   default: 0
     t.integer  "person_limit",             limit: 4,   default: 1

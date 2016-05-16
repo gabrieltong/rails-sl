@@ -51,6 +51,7 @@ class CardTpl < ActiveRecord::Base
   accepts_nested_attributes_for :groups, :allow_destroy => true
   accepts_nested_attributes_for :quantities, :allow_destroy => false
 
+  validates :shops, :presence=> true
   validates :client_id, :title, :presence=>true
   validates :person_limit, :numericality => {:greater_than => 0}
   validates :total, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
@@ -174,9 +175,9 @@ class CardTpl < ActiveRecord::Base
     if period = period_now
       from = DateTime.now.change({ hour: period.from.hour, min: period.from.min, sec: 0 })
       to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
-      acquired_time_gt = Card.arel_table[:acquired_at].gt(from)
-      acquired_time_lt = Card.arel_table[:acquired_at].lt(to)
-      period.person_limit - cards.acquired_by(phone).where(acquired_time_gt).where(acquired_time_lt).size
+      acquired_at_gt = Card.arel_table[:acquired_at].gt(from)
+      acquired_at_lt = Card.arel_table[:acquired_at].lt(to)
+      period.person_limit - cards.acquired_by(phone).where(acquired_at_gt).where(acquired_at_lt).size
     else
       0
     end
@@ -186,9 +187,9 @@ class CardTpl < ActiveRecord::Base
     if period = period_now
       from = DateTime.now.change({ hour: period.from.hour, min: period.from.min, sec: 0 })
       to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
-      acquired_time_gt = Card.arel_table[:acquired_at].gt(from)
-      acquired_time_lt = Card.arel_table[:acquired_at].lt(to)
-      period.number > cards.where(acquired_time_gt).where(acquired_time_lt).size
+      acquired_at_gt = Card.arel_table[:acquired_at].gt(from)
+      acquired_at_lt = Card.arel_table[:acquired_at].lt(to)
+      period.number > cards.where(acquired_at_gt).where(acquired_at_lt).size
     else
       0
     end
@@ -269,7 +270,7 @@ class CardTpl < ActiveRecord::Base
         result = false
 
         Card.transaction do 
-          result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :acquired_time=>DateTime.now.strftime("%H:%M"), :sender_phone=>by_phone)
+          result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :sender_phone=>by_phone)
           if result != number
             raise ActiveRecord::Rollback
           end
