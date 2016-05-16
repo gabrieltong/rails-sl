@@ -11,7 +11,7 @@ class ClientsController < ApplicationController
   end
 
   def cards
-    @cards = CardDecorator.decorate_collection(@member.acquired_cards.includes(:card_tpl).order('id desc'))
+    @cards = CardDecorator.decorate_collection(@member.acquired_cards.by_client(@client.id).includes(:card_tpl).order('id desc'))
   end
 
   def info

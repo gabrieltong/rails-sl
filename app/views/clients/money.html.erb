@@ -1,5 +1,5 @@
 <div class="hd">
-  <h1 class="page_title">我的余额:<%=@member.moneys.sum(:money)%>元</h1>
+  <h1 class="page_title">我的余额:<%=@member.moneys.by_client(@client.id).sum(:money)%>元</h1>
   <p class="page_desc">会员:<%=@member.phone%></p>  
 </div>
 <div class="bd">
@@ -10,7 +10,7 @@
 	</div>
 <div class="weui_panel weui_panel_access">
   <div class="weui_panel_hd">充值明细</div>
-  	<% @member.moneys.charge.each do |money|%>
+  	<% @member.moneys.by_client(@client.id).charge.each do |money|%>
     <div class="weui_panel_bd">  
       <div class="weui_cell">
           <div class="weui_cell_bd weui_cell_primary">

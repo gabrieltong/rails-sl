@@ -19,7 +19,7 @@
     <div class="weui_cells weui_cells_access">
         <a class="weui_cell" href="<%=money_members_path%>">
             <div class="weui_cell_bd weui_cell_primary">
-                <p>我的余额: <%=@member.moneys.sum(:money)%> 元</p>
+                <p>我的余额: <%=@member.moneys.by_client(@client.id).sum(:money)%> 元</p>
             </div>
             <div class="weui_cell_ft"></div>
         </a>
@@ -46,7 +46,7 @@
     <div class="weui_panel weui_panel_access">
         <div class="weui_panel_hd">我的红券</div>
         <div class="weui_panel_bd">
-            <% @member.active_card_tpls.each do |card_tpl|%>
+            <% @member.active_card_tpls.by_client(@client.id).each do |card_tpl|%>
             <a href="javascript:void(0);" class="weui_media_box weui_media_appmsg r_myhq">
                 <div class="weui_media_hd">
                     <img class="weui_media_appmsg_thumb" src="<%=card_tpl.cover.url(:thumb)%>" alt="">
@@ -56,7 +56,7 @@
                     <p class="weui_media_desc">有效期:<%="#{card_tpl.acquire_from.strftime("%F")}~#{card_tpl.acquire_to.strftime("%F")}"%></p>
                 </div>
                  <div class="weui_media_hd">
-                    <h4 class="weui_media_title">X<%=@member.active_cards.where(:card_tpl_id=>card_tpl.id).size%></h4>
+                    <h4 class="weui_media_title">X<%=@member.active_cards.by_client(@client.id).where(:card_tpl_id=>card_tpl.id).size%></h4>
                 </div>
             </a> 
             <% end %>           

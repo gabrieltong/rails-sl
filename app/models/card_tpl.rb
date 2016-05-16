@@ -25,6 +25,7 @@ class CardTpl < ActiveRecord::Base
   has_many :draw_awards
   has_many :cards
 
+  scope :by_client, ->(client_id){where(:client_id=>client_id)}
   scope :ab, ->{where(:type=>[:CardATpl, :CardBTpl])}
   scope :a, ->{where(:type=>:CardATpl)}
   scope :b, ->{where(:type=>:CardBTpl)}
