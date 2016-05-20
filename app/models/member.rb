@@ -28,7 +28,7 @@ class Member < ActiveRecord::Base
   has_many :groups, :through=>:group_members
 
   has_many :client_managers, :foreign_key=>:phone, :primary_key=>:phone
-  has_many :managed_shops, :through=>:client_managers, :source=>:shop
+  has_many :managed_shops, :through=>:client_managers, :source=>:shops
 
   # 用户具有发卷权限的卡卷
   has_many :sender_card_tpls, ->{where(:client_managers=>{:sender=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls

@@ -1,22 +1,23 @@
 class ClientManager < ActiveRecord::Base
   belongs_to :client
-  belongs_to :shop
   belongs_to :manager, :class_name=>:Member, :foreign_key=>:phone, :primary_key=>:phone
   has_many :dayus, :as=>:dayuable
+  has_many :manager_shops
+  has_many :shops, :through=>:manager_shops, :source=>:shop
 
   scope :admin, ->{where(:admin=>true)}
   scope :sender, ->{where(:sender=>true)}
   scope :checker, ->{where(:checker=>true)}
 
   validates :phone, :name, :client_id, :presence=>true
-  validates :shop_id, :presence=>true, :if=>'admin != true' 
+  validates :shops, :presence=>true, :if=>'admin != true' 
 
   after_create do |record|
     record.msg_admin_create
   end
 
   def self.permit_params
-    [:phone, :name, :shop_id, :admin, :checker, :sender]
+    [:phone, :name, :admin, :checker, :sender]
   end
 
   def msg_admin_create_config
