@@ -2,8 +2,8 @@ namespace :sync do
 
   desc 'Copy common models and tests from Master'
   task :copy do
-    source_path = '/Users/shangliang/Sites/rails-sl'
-    dest_paths = ['/Users/shangliang/Sites/rails-sl-client', '/Users/shangliang/Sites/rails-sl-admin']
+    source_path = '~/Sites/rails-sl'
+    dest_paths = ['~/Sites/rails-sl-client', '~/Sites/rails-sl-admin']
 
     dest_paths.each do |dest_path|
         # Copy all models & tests

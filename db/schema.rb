@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160516091258) do
+ActiveRecord::Schema.define(version: 20160520055507) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -75,6 +75,7 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   end
 
   add_index "capchas", ["client_id"], name: "index_capchas_on_client_id", using: :btree
+  add_index "capchas", ["deleted_at"], name: "index_capchas_on_deleted_at", using: :btree
   add_index "capchas", ["phone"], name: "index_capchas_on_phone", using: :btree
   add_index "capchas", ["type"], name: "index_capchas_on_type", using: :btree
 
@@ -89,17 +90,6 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   add_index "card_tpl_groups", ["card_tpl_id"], name: "index_card_tpl_groups_on_card_tpl_id", using: :btree
   add_index "card_tpl_groups", ["client_id"], name: "index_card_tpl_groups_on_client_id", using: :btree
   add_index "card_tpl_groups", ["group_id"], name: "index_card_tpl_groups_on_group_id", using: :btree
-
-  create_table "card_tpl_histories", force: :cascade do |t|
-    t.integer  "card_tpl_id", limit: 4
-    t.integer  "number",      limit: 4
-    t.integer  "member_id",   limit: 4
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
-  end
-
-  add_index "card_tpl_histories", ["card_tpl_id"], name: "index_card_tpl_histories_on_card_tpl_id", using: :btree
-  add_index "card_tpl_histories", ["member_id"], name: "index_card_tpl_histories_on_member_id", using: :btree
 
   create_table "card_tpl_settings", force: :cascade do |t|
     t.integer  "card_tpl_id",       limit: 4
@@ -265,8 +255,8 @@ ActiveRecord::Schema.define(version: 20160516091258) do
     t.string   "phone",               limit: 20,  default: "", null: false
     t.datetime "acquired_at"
     t.datetime "checked_at"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
     t.integer  "added_quantity_id",   limit: 4
     t.integer  "removed_quantity_id", limit: 4
     t.integer  "client_id",           limit: 4
@@ -447,44 +437,44 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   add_index "files", ["file_owner_id", "file_owner_type"], name: "index_files_on_file_owner_id_and_file_owner_type", using: :btree
 
   create_table "gabe_dayus", force: :cascade do |t|
-    t.string   "smsType",         limit: 255, default: "",    null: false
-    t.string   "smsFreeSignName", limit: 255, default: "",    null: false
-    t.string   "smsParam",        limit: 255, default: "",    null: false
-    t.string   "recNum",          limit: 255, default: "",    null: false
-    t.string   "smsTemplateCode", limit: 255, default: "",    null: false
-    t.string   "appkey",          limit: 255,                 null: false
-    t.integer  "dayuable_id",     limit: 4,                   null: false
-    t.string   "dayuable_type",   limit: 255,                 null: false
-    t.string   "result",          limit: 255, default: "",    null: false
-    t.datetime "sended_at"
-    t.boolean  "sended",                      default: false, null: false
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.string   "type",            limit: 255
+    t.string   "smsType",         limit: 255
+    t.string   "smsFreeSignName", limit: 255
+    t.string   "smsParam",        limit: 255
+    t.string   "recNum",          limit: 255
+    t.string   "smsTemplateCode", limit: 255
+    t.string   "appkey",          limit: 255
+    t.integer  "dayuable_id",     limit: 4
+    t.string   "dayuable_type",   limit: 255
+    t.string   "result",          limit: 255
+    t.datetime "sended_at"
+    t.boolean  "sended"
   end
 
-  add_index "gabe_dayus", ["appkey"], name: "gabe_dayus_appkey_index", using: :btree
-  add_index "gabe_dayus", ["dayuable_id"], name: "gabe_dayus_dayuable_id_index", using: :btree
-  add_index "gabe_dayus", ["dayuable_type", "dayuable_id"], name: "gabe_dayus_dayuable_type_dayuable_id_index", using: :btree
-  add_index "gabe_dayus", ["dayuable_type"], name: "gabe_dayus_dayuable_type_index", using: :btree
-  add_index "gabe_dayus", ["recNum"], name: "gabe_dayus_recnum_index", using: :btree
-  add_index "gabe_dayus", ["sended"], name: "gabe_dayus_sended_index", using: :btree
-  add_index "gabe_dayus", ["smsFreeSignName"], name: "gabe_dayus_smsfreesignname_index", using: :btree
-  add_index "gabe_dayus", ["smsTemplateCode"], name: "gabe_dayus_smstemplatecode_index", using: :btree
-  add_index "gabe_dayus", ["smsType"], name: "gabe_dayus_smstype_index", using: :btree
+  add_index "gabe_dayus", ["dayuable_id", "dayuable_type"], name: "index_gabe_dayus_on_dayuable_id_and_dayuable_type", using: :btree
+  add_index "gabe_dayus", ["recNum"], name: "index_gabe_dayus_on_recNum", using: :btree
+  add_index "gabe_dayus", ["sended"], name: "index_gabe_dayus_on_sended", using: :btree
+  add_index "gabe_dayus", ["smsFreeSignName"], name: "index_gabe_dayus_on_smsFreeSignName", using: :btree
+  add_index "gabe_dayus", ["smsTemplateCode"], name: "index_gabe_dayus_on_smsTemplateCode", using: :btree
+  add_index "gabe_dayus", ["smsType"], name: "index_gabe_dayus_on_smsType", using: :btree
   add_index "gabe_dayus", ["type"], name: "index_gabe_dayus_on_type", using: :btree
 
-  create_table "get_periods", force: :cascade do |t|
-    t.integer  "card_tpl_id",  limit: 4
-    t.string   "from",         limit: 255
-    t.string   "to",           limit: 255
-    t.integer  "number",       limit: 4
-    t.integer  "person_limit", limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+  create_table "group_managers", force: :cascade do |t|
+    t.integer  "group_id",   limit: 4
+    t.integer  "member_id",  limit: 4
+    t.boolean  "send"
+    t.boolean  "admin"
+    t.boolean  "check"
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
   end
 
-  add_index "get_periods", ["card_tpl_id"], name: "index_get_periods_on_card_tpl_id", using: :btree
+  add_index "group_managers", ["admin"], name: "index_group_managers_on_admin", using: :btree
+  add_index "group_managers", ["check"], name: "index_group_managers_on_check", using: :btree
+  add_index "group_managers", ["group_id", "member_id"], name: "index_group_managers_on_group_id_and_member_id", unique: true, using: :btree
+  add_index "group_managers", ["group_id"], name: "index_group_managers_on_group_id", using: :btree
+  add_index "group_managers", ["member_id"], name: "index_group_managers_on_member_id", using: :btree
+  add_index "group_managers", ["send"], name: "index_group_managers_on_send", using: :btree
 
   create_table "group_members", force: :cascade do |t|
     t.integer  "group_id",   limit: 4
@@ -556,6 +546,17 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   add_index "imports", ["importable_type"], name: "index_imports_on_importable_type", using: :btree
   add_index "imports", ["type"], name: "index_imports_on_type", using: :btree
 
+  create_table "manager_shops", force: :cascade do |t|
+    t.integer  "client_manager_id", limit: 4
+    t.integer  "shop_id",           limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "manager_shops", ["client_manager_id"], name: "index_manager_shops_on_client_manager_id", using: :btree
+  add_index "manager_shops", ["shop_id", "client_manager_id"], name: "index_manager_shops_on_shop_id_and_client_manager_id", unique: true, using: :btree
+  add_index "manager_shops", ["shop_id"], name: "index_manager_shops_on_shop_id", using: :btree
+
   create_table "members", force: :cascade do |t|
     t.string   "email",                   limit: 255, default: "", null: false
     t.string   "encrypted_password",      limit: 255, default: "", null: false
@@ -586,11 +587,6 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   add_index "members", ["reset_password_token"], name: "index_members_on_reset_password_token", unique: true, using: :btree
   add_index "members", ["username"], name: "index_members_on_username", unique: true, using: :btree
   add_index "members", ["wechat_binded"], name: "index_members_on_wechat_binded", using: :btree
-
-  create_table "migrations", id: false, force: :cascade do |t|
-    t.string  "migration", limit: 255, null: false
-    t.integer "batch",     limit: 4,   null: false
-  end
 
   create_table "mobile_files", force: :cascade do |t|
     t.integer  "user_id",           limit: 4
@@ -627,15 +623,6 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   add_index "moneys", ["spendable_id"], name: "index_moneys_on_spendable_id", using: :btree
   add_index "moneys", ["spendable_type"], name: "index_moneys_on_spendable_type", using: :btree
   add_index "moneys", ["type"], name: "index_moneys_on_type", using: :btree
-
-  create_table "password_resets", id: false, force: :cascade do |t|
-    t.string   "email",      limit: 255, null: false
-    t.string   "token",      limit: 255, null: false
-    t.datetime "created_at",             null: false
-  end
-
-  add_index "password_resets", ["email"], name: "password_resets_email_index", using: :btree
-  add_index "password_resets", ["token"], name: "password_resets_token_index", using: :btree
 
   create_table "periods", force: :cascade do |t|
     t.integer  "card_tpl_id",  limit: 4
@@ -678,27 +665,6 @@ ActiveRecord::Schema.define(version: 20160516091258) do
 
   add_index "shops", ["client_id"], name: "index_shops_on_client_id", using: :btree
 
-  create_table "spends", force: :cascade do |t|
-    t.integer  "member_id",        limit: 4
-    t.integer  "client_id",        limit: 4
-    t.integer  "client_member_id", limit: 4
-    t.float    "money",            limit: 24
-    t.integer  "spendable_id",     limit: 4
-    t.string   "spendable_type",   limit: 255
-    t.integer  "by_member_id",     limit: 4
-    t.string   "type",             limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-  end
-
-  add_index "spends", ["by_member_id"], name: "index_spends_on_by_member_id", using: :btree
-  add_index "spends", ["client_id"], name: "index_spends_on_client_id", using: :btree
-  add_index "spends", ["client_member_id"], name: "index_spends_on_client_member_id", using: :btree
-  add_index "spends", ["member_id"], name: "index_spends_on_member_id", using: :btree
-  add_index "spends", ["spendable_id"], name: "index_spends_on_spendable_id", using: :btree
-  add_index "spends", ["spendable_type"], name: "index_spends_on_spendable_type", using: :btree
-  add_index "spends", ["type"], name: "index_spends_on_type", using: :btree
-
   create_table "taggings", force: :cascade do |t|
     t.integer  "tag_id",        limit: 4
     t.integer  "taggable_id",   limit: 4
@@ -718,17 +684,6 @@ ActiveRecord::Schema.define(version: 20160516091258) do
   end
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
-
-  create_table "users", force: :cascade do |t|
-    t.string   "name",           limit: 255, null: false
-    t.string   "email",          limit: 255, null: false
-    t.string   "password",       limit: 255, null: false
-    t.string   "remember_token", limit: 100
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "users", ["email"], name: "users_email_unique", unique: true, using: :btree
 
   create_table "wechat_sessions", force: :cascade do |t|
     t.string   "openid",     limit: 255, null: false
