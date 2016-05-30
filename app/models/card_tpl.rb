@@ -8,7 +8,7 @@ class CardTpl < ActiveRecord::Base
   UseHours = {I18n.t("check_hours.h0")=>"h0", I18n.t("check_hours.h1")=>"h1", I18n.t("check_hours.h2")=>"h2", I18n.t("check_hours.h3")=>"h3", I18n.t("check_hours.h4")=>"h4", I18n.t("check_hours.h5")=>"h5", I18n.t("check_hours.h6")=>"h6", I18n.t("check_hours.h7")=>"h7", I18n.t("check_hours.h8")=>"h8", I18n.t("check_hours.h9")=>"h9", I18n.t("check_hours.h10")=>"h10", I18n.t("check_hours.h11")=>"h11", I18n.t("check_hours.h12")=>"h12", I18n.t("check_hours.h13")=>"h13", I18n.t("check_hours.h14")=>"h14", I18n.t("check_hours.h15")=>"h15", I18n.t("check_hours.h16")=>"h16", I18n.t("check_hours.h17")=>"h17", I18n.t("check_hours.h18")=>"h18", I18n.t("check_hours.h19")=>"h19", I18n.t("check_hours.h20")=>"h20", I18n.t("check_hours.h21")=>"h21", I18n.t("check_hours.h22")=>"h22", I18n.t("check_hours.h23")=>"h23"}
   IndateType = { I18n.t('indate_type.fixed')=>'fixed', I18n.t('indate_type.dynamic')=>'dynamic'}
   Type = { I18n.t('card_tpl.type.CardATpl')=>'CardATpl', I18n.t('card_tpl.type.CardBTpl')=>'CardBTpl'}
-
+  AcquireType = { I18n.t('card_tpl.acquire_type.anonymous')=>'anonymous', I18n.t('card_tpl.acquire_type.login')=>'login'}
   belongs_to :client
   belongs_to :member
 
@@ -33,6 +33,9 @@ class CardTpl < ActiveRecord::Base
   scope :fixed, ->{where(:indate_type=>:fixed)}
   scope :dynamic, ->{where(:indate_type=>:dynamic)}
 
+  scope :anonymous, ->{where(:acquire_type=>:anonymous)}
+  scope :login, ->{where(:acquire_type=>:login)}
+
   scope :datetime_acquirable, ->{where(arel_table[:acquire_from].lt(DateTime.now)).where(arel_table[:acquire_to].gt(DateTime.now))}
   scope :week_acquirable, ->{joins(:setting).where(:card_tpl_settings=>{"acquire_#{DateTime.now.strftime('%A').downcase}"=>1})}
   scope :hour_acquirable, ->{joins(:periods).where(Period.arel_table['from'].lt("#{DateTime.now.hour}:#{DateTime.now.min}")).where(Period.arel_table['to'].gt("#{DateTime.now.hour}:#{DateTime.now.min}"))}
@@ -53,11 +56,14 @@ class CardTpl < ActiveRecord::Base
   accepts_nested_attributes_for :quantities, :allow_destroy => false
 
   validates :shops, :presence=> true
+  validates :groups, :presence=> true
   validates :client_id, :title, :presence=>true
   validates :person_limit, :numericality => {:greater_than => 0}
   validates :total, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
   validates :remain, :numericality => {:only_integer => true, :greater_than_or_equal_to => 0}
   validates :change_remain, :numericality => {:only_integer => true, :greater_than_or_equal_to => Proc.new {|i| 0 - i.remain } }, :allow_blank=>true
+  validates :acquire_type, :inclusion=>{:in=>AcquireType.values}
+  
   validates_datetime :acquire_from, :before=>:acquire_to, :allow_blank=>true
   validates_datetime :acquire_to, :after=>:acquire_from, :allow_blank=>true
 
@@ -69,6 +75,12 @@ class CardTpl < ActiveRecord::Base
 
   has_attached_file :guide_cover, styles: { medium: "300x300>", thumb: "100x100>" }, default_url: "/images/:style/missing.png"
   validates_attachment_content_type :guide_cover, content_type: /\Aimage\/.*\Z/
+
+  after_initialize do |record|
+    record.acquire_weeks = UseWeeks.values
+    record.check_weeks = UseWeeks.values
+    record.check_hours = UseHours.values
+  end 
 
   after_save do |record|
     update_setting
@@ -120,6 +132,8 @@ class CardTpl < ActiveRecord::Base
           :week_not_acquirable
         elsif hour_can_acquire? != true
           :hour_not_acquirable
+        elsif groups_can_acquire? != true
+          :groups_can_acquire
         elsif period_card_can_acquire? != true
           :period_card_limit_overflow
         elsif phone_can_acquire?(phone) != true
@@ -169,6 +183,14 @@ class CardTpl < ActiveRecord::Base
         client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'核销',:msg=>"#{phone}被核销了#{number}张卡卷,操作员#{by_phone}"}
       end
       result
+    end
+  end
+
+  def groups_can_acquire? phone
+    if self.class.anonymous.include? self.id
+      return true
+    else
+      !Member.find_by_phone(phone).where(:id=>groups).blank?
     end
   end
 

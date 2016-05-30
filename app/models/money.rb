@@ -1,17 +1,20 @@
 class Money < ActiveRecord::Base
-	belongs_to :client_member
-	belongs_to :by_member, :class_name=>Member, :foreign_key=>:by_phone
-	belongs_to :client
+  belongs_to :client_member
+  belongs_to :by_member, :class_name=>Member, :foreign_key=>:by_phone
+  belongs_to :client
 
-	scope :charge, ->{where(arel_table[:money].gt(0))}
-	scope :spend, ->{where(arel_table[:money].lt(0))}
-	scope :by_client, ->(client_id){where(:client_id=>client_id)}
+  scope :charge, ->{where(arel_table[:money].gt(0))}
+  scope :spend, ->{where(arel_table[:money].lt(0))}
+  scope :by_client, ->(client_id){where(:client_id=>client_id)}
 
-	delegate :wechatid, to: :client_member, :allow_nil=>true
-	delegate :member, to: :client_member
-	delegate :title, to: :client, :prefix=>true, :allow_nil=>true
+  delegate :wechatid, to: :client_member, :allow_nil=>true
+  delegate :member, to: :client_member
+  delegate :title, to: :client, :prefix=>true, :allow_nil=>true
 
-
+  def self.table_name
+    :moneys
+  end
+  
   def send_message_charge_money
     config = {
       'type'=>__callee__,
@@ -23,9 +26,4 @@ class Money < ActiveRecord::Base
     }
     Dayu.createByDayuable(member, config).run
   end
-
-	private
-	def self.table_name
-		:moneys
-	end
 end

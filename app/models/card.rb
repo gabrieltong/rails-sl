@@ -207,9 +207,8 @@ class Card < ActiveRecord::Base
   end
 
   def fix_card_tpl
-    client_id = added_quantity.client_id
+    self.client_id = added_quantity.client_id
     save
-    p errors
   end
 
   def send_message_will_expire

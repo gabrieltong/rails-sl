@@ -26,20 +26,19 @@ class Quantity < ActiveRecord::Base
   end
 
   def generate_cards_for_b
-    count = 0
     if number > 0
       (number - added_cards.size).times do
         self.added_cards << CardB.new(:card_tpl_id=>card_tpl_id, :code=>nil, :client_id=>client_id)
       end
 
       card_tpl.draw_awards.each do |draw|
-        p (draw.number - added_cards.has_locked.size)
+        logger.info (draw.number - added_cards.has_locked.size)
         self.added_cards.locked_none.not_locked.not_acquired.not_checked.limit(draw.number_need_create).each do |card_try_to_lock|
-          p :card_try_to_lock
-          p card_try_to_lock
+          logger.info :card_try_to_lock
+          logger.info card_try_to_lock
           draw.award_tpl.cards.locked_none.not_locked.not_acquired.not_checked.limit(1).each do |card_to_be_locked|
-            p :card_to_be_locked
-            p card_to_be_locked
+            logger.info :card_to_be_locked
+            logger.info card_to_be_locked
             card_try_to_lock.locked_card = card_to_be_locked
           end
         end
@@ -59,7 +58,7 @@ class Quantity < ActiveRecord::Base
   def generate_cards_for_a
     if number > 0
       (number - added_cards.size).times do
-        card = self.added_cards << CardA.new(:card_tpl_id=>card_tpl_id, :client_id=>client_id)
+        self.added_cards << CardA.new(:card_tpl_id=>card_tpl_id, :client_id=>client_id)
       end
     end
 

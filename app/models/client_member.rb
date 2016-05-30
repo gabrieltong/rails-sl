@@ -34,7 +34,7 @@ class ClientMember < ActiveRecord::Base
   end
 
   def spend_money money, by_phone
-  	result = add_money -money, by_phone
+  	result = add_money (-money), by_phone
     if result === true
       client.create_activity key: 'member.spend_money', owner: Member.find_by_phone(by_phone),recipient: self,  :parameters=>{:phone=>phone, :by_phone=>by_phone, :money=>money,:type=>'消费',:msg=>"#{phone}消费#{money},操作员#{by_phone}"}
     end

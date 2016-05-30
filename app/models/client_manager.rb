@@ -17,7 +17,7 @@ class ClientManager < ActiveRecord::Base
   end
 
   def self.permit_params
-    [:phone, :name, :admin, :checker, :sender]
+    [:phone, :name, :admin, :checker, :sender, :shop_ids=>[]]
   end
 
   def msg_admin_create_config
