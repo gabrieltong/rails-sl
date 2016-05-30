@@ -30,6 +30,9 @@ class CardTpl < ActiveRecord::Base
   scope :a, ->{where(:type=>:CardATpl)}
   scope :b, ->{where(:type=>:CardBTpl)}
 
+  scope :open, ->{where(:public=>true)}
+  scope :unopen, ->{where.not(:public=>true)}
+
   scope :fixed, ->{where(:indate_type=>:fixed)}
   scope :dynamic, ->{where(:indate_type=>:dynamic)}
 
@@ -43,7 +46,7 @@ class CardTpl < ActiveRecord::Base
   scope :week_checkable, ->{joins(:setting).where(:card_tpl_settings=>{"check_#{DateTime.now.strftime('%A').downcase}"=>1})}
   scope :hour_checkable, ->{joins(:setting).where(:card_tpl_settings=>{"check_h#{DateTime.now.hour}"=>1})}
 
-  scope :sendable_by, ->(phone){joins(:shops=>[:managers]).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:sender].eq(1))}
+  scope :sendable_by, ->(phone){joins(:shops=>[:managers]).where.not(:public=>true).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:sender].eq(1))}
   scope :checkable_by, ->(phone){joins(:shops=>[:managers]).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:checker].eq(1))}
 
   serialize :acquire_weeks
