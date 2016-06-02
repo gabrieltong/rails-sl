@@ -1,6 +1,7 @@
 class Shop < ActiveRecord::Base
   belongs_to :client
-  has_many :client_managers
+  has_many :manager_shops
+  has_many :client_managers, :through=>:manager_shops
   has_many :managers, :through=>:client_managers
   has_many :card_tpl_shops
   has_many :card_tpls, -> {uniq}, :through=>:card_tpl_shops
