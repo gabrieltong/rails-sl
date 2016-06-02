@@ -17,6 +17,7 @@ class CardTpl < ActiveRecord::Base
 
   has_many :card_tpl_groups
   has_many :groups, :through=>:card_tpl_groups
+  has_many :members, :through=>:groups, :source=>:members
 
   has_one :setting, :class_name=>CardTplSetting
   has_many :periods
@@ -199,7 +200,7 @@ class CardTpl < ActiveRecord::Base
     if self.class.anonymous.include? self.id
       return true
     else
-      !Member.find_by_phone(phone).where(:id=>groups).blank?
+      self.members.exists?(:phone=>phone)
     end
   end
 
