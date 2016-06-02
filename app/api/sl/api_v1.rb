@@ -153,6 +153,7 @@ module SL
         @member = Member.includes(:managed_clients).where(:clients=>{:id=>params[:client_id]}).find_by_phone(params[:phone])
         if @member and @member.valid_password? params[:password]
           @result = @member
+          @member.remember_me!
         else
           @error = ['no_user']
           @state = 'fail'
