@@ -273,12 +273,13 @@ module SL
     resource :card_tpls do
       params do
         requires :token, allow_blank: false, :type=>String
+        requires :client_id, allow_blank: false, :type=>Integer
       end
       desc '能够发送的卡卷'
       get :sendable_by do
         authenticate!
         render
-        present :result, CardTpl.unopen.sendable_by(current_member.phone), with: SL::Entities::CardTpl
+        present :result, CardTpl.by_client(params[:client_id]).unopen.sendable_by(current_member.phone), with: SL::Entities::CardTpl
       end
 
       params do
@@ -291,20 +292,21 @@ module SL
       get :checkable_by do
         authenticate!
         render
-        present :result, CardTpl.checkable_by(current_member.phone), with: SL::Entities::CardTpl
+        present :result, CardTpl.by_client(params[:client_id]).checkable_by(current_member.phone), with: SL::Entities::CardTpl
       end
 
-      route_param :id do
-        desc '卡卷报表信息'
-        params do
-          requires :token, allow_blank: false, :type=>String
-          requires :date, allow_blank: false, :type=>Date
-          requires :id, allow_blank: false, :type=>Integer
-        end
-        get 'report/:date' do
-          Status.find(params[:id])
-        end
-      end
+      # TODO: 卡卷报表功能
+      # route_param :id do
+      #   desc '卡卷报表信息'
+      #   params do
+      #     requires :token, allow_blank: false, :type=>String
+      #     requires :date, allow_blank: false, :type=>Date
+      #     requires :id, allow_blank: false, :type=>Integer
+      #   end
+      #   get 'report/:date' do
+      #     Status.find(params[:id])
+      #   end
+      # end
     end
 
     resource :images do
@@ -622,6 +624,7 @@ module SL
           requires :code, allow_blank: false, :type=>Integer
           # requires :token, allow_blank: false, :type=>String
         end
+        # TODO: add permission
         get :send_check_capcha do
           # authenticate!
           render
@@ -634,6 +637,8 @@ module SL
           requires :code, allow_blank: false, :type=>Integer
           requires :token, allow_blank: false, :type=>String
         end
+
+        # TODO: add permission
         get :card_info do
           authenticate!
           card = Card.includes(:card_tpl).find_by_code(params[:code].to_s)
