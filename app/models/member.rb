@@ -95,4 +95,9 @@ class Member < ActiveRecord::Base
     name
     rememberable_value
   end
+
+  def api_remember_me!
+    self.api_token ||= self.class.remember_token
+    save(validate: false) if self.changed?
+  end
 end

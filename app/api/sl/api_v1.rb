@@ -61,7 +61,9 @@ module SL
 
     class Member < Grape::Entity
       expose :id
-      expose :remember_token
+      expose :remember_token do |m|
+        m.api_token
+      end
       expose :phone
     end
 
@@ -134,7 +136,7 @@ module SL
       end
 
       def current_member
-        @current_member ||= Member.find_by_remember_token(params[:token])
+        @current_member ||= Member.find_by_api_token(params[:token])
       end
 
       def current_client
@@ -153,7 +155,7 @@ module SL
         @member = Member.includes(:managed_clients).where(:clients=>{:id=>params[:client_id]}).find_by_phone(params[:phone])
         if @member and @member.valid_password? params[:password]
           @result = @member
-          @member.remember_me!
+          @member.api_remember_me!
         else
           @error = ['no_user']
           @state = 'fail'
