@@ -85,6 +85,12 @@ class CardTpl < ActiveRecord::Base
     record.check_hours = UseHours.values
   end 
 
+  before_save do |record|
+    if record.class.login.exists? record.id
+      record.groups = record.client.groups
+    end
+  end
+
   after_save do |record|
     update_setting
   end
@@ -135,7 +141,7 @@ class CardTpl < ActiveRecord::Base
           :week_not_acquirable
         elsif hour_can_acquire? != true
           :hour_not_acquirable
-        elsif groups_can_acquire? != true
+        elsif groups_can_acquire?(phone) != true
           :groups_can_acquire
         elsif period_card_can_acquire? != true
           :period_card_limit_overflow
@@ -189,7 +195,7 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  def groups_can_acquire? phone
+  def groups_can_acquire? phone=''
     if self.class.anonymous.include? self.id
       return true
     else
