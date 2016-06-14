@@ -143,7 +143,7 @@ class CardTpl < ActiveRecord::Base
         elsif hour_can_acquire? != true
           :hour_not_acquirable
         elsif groups_can_acquire?(phone) != true
-          :groups_can_acquire
+          :groups_not_acquirable
         elsif period_card_can_acquire? != true
           :period_card_limit_overflow
         elsif phone_can_acquire?(phone) != true

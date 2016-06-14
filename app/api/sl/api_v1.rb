@@ -275,7 +275,7 @@ module SL
         requires :token, allow_blank: false, :type=>String
         requires :client_id, allow_blank: false, :type=>Integer
       end
-      desc '能够发送的卡卷'
+      desc '能够发送的卡券'
       get :sendable_by do
         authenticate!
         render
@@ -285,7 +285,7 @@ module SL
       params do
         requires :token, allow_blank: false, :type=>String
       end
-      desc '能够核销的卡卷'
+      desc '能够核销的卡券'
       params do
         requires :token, allow_blank: false, :type=>String
       end
@@ -295,9 +295,9 @@ module SL
         present :result, CardTpl.by_client(params[:client_id]).checkable_by(current_member.phone), with: SL::Entities::CardTpl
       end
 
-      # TODO: 卡卷报表功能
+      # TODO: 卡券报表功能
       # route_param :id do
-      #   desc '卡卷报表信息'
+      #   desc '卡券报表信息'
       #   params do
       #     requires :token, allow_blank: false, :type=>String
       #     requires :date, allow_blank: false, :type=>Date
@@ -421,7 +421,7 @@ module SL
     end
 # TODO: 验证用户是否是 client 管理员
     resource :card_tpls do
-      desc '用户拥有的卡卷列表'
+      desc '用户拥有的卡券列表'
       params do
         requires :client_id, allow_blank: false, :type=>Integer
         requires :token, allow_blank: false, :type=>String
@@ -442,7 +442,7 @@ module SL
       end
 
       route_param :id do
-        desc '卡卷能否核销'
+        desc '卡券能否核销'
         params do
           requires :id, allow_blank: false, :type=>Integer
           requires :client_id, allow_blank: false, :type=>Integer
@@ -481,7 +481,7 @@ module SL
           present :result, CardTpl.find(params[:id]).check(params[:phone], current_member.phone, params[:number])
         end
 
-        desc '是否能够发卷'
+        desc '是否能够发券'
         params do
           requires :id, allow_blank: false, :type=>Integer
           requires :phone, allow_blank: false, :type=>Integer
@@ -499,7 +499,7 @@ module SL
           end
         end
 
-        desc '发卷'
+        desc '发券'
         params do
           requires :id, allow_blank: false, :type=>Integer
           requires :phone, allow_blank: false, :type=>Integer
@@ -632,7 +632,7 @@ module SL
           present :result, card.send_check_capcha
         end
 
-        desc '核销前获取卡卷信息'
+        desc '核销前获取卡券信息'
         params do
           requires :code, allow_blank: false, :type=>Integer
           requires :token, allow_blank: false, :type=>String
@@ -655,9 +655,9 @@ module SL
         end
 
         # 卡能否可笑
-        # 卡卷能否核销
+        # 卡券能否核销
         # 用户是否有核销权限
-        desc '卡卷能否核销'
+        desc '卡券能否核销'
         params do
           requires :code, allow_blank: false, :type=>Integer
           requires :token, allow_blank: false, :type=>String
@@ -673,7 +673,7 @@ module SL
           end
         end
 
-        desc '核销卡卷'
+        desc '核销卡券'
         params do
           requires :token, allow_blank: false, :type=>String
           requires :code, allow_blank: false, :type=>Integer

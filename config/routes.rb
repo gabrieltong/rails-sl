@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
 
+  get 'card_tpls/acquire'
+
+  resources :card_tpls, :only=>[] do 
+    member do 
+      get :acquire
+    end
+  end
+
   resources :members do 
     collection do 
       get :info

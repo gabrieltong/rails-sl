@@ -11,6 +11,7 @@
 		<%= Gon::Base.render_data %>
 </head>
 <body ontouchstart>
+<div class="container" id="container">
 	<%= wechat_config_js debug: false, api: %w(hideMenuItems closeWindow) -%>
 	<script type="application/javascript">
 	  wx.ready(function() {
@@ -35,5 +36,6 @@
 	<div class="footer">
 		<a href="">服务商:麦咖啡</a> | <a href="">POWERD BY 红券</a>        
 	</div>
+  </div>
 </body>
 </html>

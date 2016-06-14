@@ -286,7 +286,7 @@
         author: '作者'
         published_at: '发布日期'
         from: '来源'
-        public: '是否公开'
+        public: '仅操作员发放'
         name: '标题'
         member: '作者'
         category: '微信分类'
