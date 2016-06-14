@@ -9,6 +9,7 @@ class CardTpl < ActiveRecord::Base
   IndateType = { I18n.t('indate_type.fixed')=>'fixed', I18n.t('indate_type.dynamic')=>'dynamic'}
   Type = { I18n.t('card_tpl.type.CardATpl')=>'CardATpl', I18n.t('card_tpl.type.CardBTpl')=>'CardBTpl'}
   AcquireType = { I18n.t('card_tpl.acquire_type.anonymous')=>'anonymous', I18n.t('card_tpl.acquire_type.login')=>'login'}
+  
   belongs_to :client
   belongs_to :member
 
@@ -59,7 +60,6 @@ class CardTpl < ActiveRecord::Base
   accepts_nested_attributes_for :groups, :allow_destroy => true
   accepts_nested_attributes_for :quantities, :allow_destroy => false
 
-  validates :shops, :presence=> true
   validates :groups, :presence=> true
   validates :client_id, :title, :presence=>true
   validates :person_limit, :numericality => {:greater_than => 0}
@@ -87,6 +87,7 @@ class CardTpl < ActiveRecord::Base
   end 
 
   before_save do |record|
+    # 如果需要登录， 默认勾选所有会员组
     if record.class.login.exists? record.id
       record.groups = record.client.groups
     end

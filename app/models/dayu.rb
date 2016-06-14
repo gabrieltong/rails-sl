@@ -44,9 +44,15 @@ class Dayu < ActiveRecord::Base
     result = bigfish.send_sms params
     self.result = result
   
-    if JSON.parse(result).values[0]['result']['success'] == true
-      self.sended_at = DateTime.now
-      self.sended = true
+    
+    begin
+      if JSON.parse(result).values[0]['result']['success'] == true
+        self.sended_at = DateTime.now
+        self.sended = true
+      end
+    rescue
+      logger.info "AliDayu: >>>>>>>>>>>>>>>>>>>>>>>"
+      logger.info JSON.parse(result)  
     end
 
     self.save

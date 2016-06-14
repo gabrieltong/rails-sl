@@ -7,4 +7,6 @@ class CardATpl < CardTpl
   validates_datetime :indate_to, :after=>:indate_from, :allow_blank=>true
 
   alias_method :card_as, :cards
+
+  validates :shops, :presence=> true
 end
