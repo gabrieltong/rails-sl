@@ -1,4 +1,15 @@
 'zh-CN':
+  can_acquire_error:
+    no_acquirable_card: '优惠劵已领完'
+    public_type_not_acquirable: '公开类型不符'
+    acquire_type_not_acquirable: '领取权限不符'
+    datetime_not_acquirable: '时间不可领取'
+    week_not_acquirable: '星期不可领取'
+    hour_not_acquirable: '小时不可领取'
+    groups_not_acquirable: '群组不可领取'
+    period_card_limit_overflow: '时间段领取数量超限'
+    phone_limit_overflow: '电话领取数量超限'
+    period_phone_limit_overflow: '时间段用户领取数量超限'
   acquire_type:
     anonymous: '游客卷'
     login: '会员卷'

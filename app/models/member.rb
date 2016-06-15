@@ -30,10 +30,10 @@ class Member < ActiveRecord::Base
   has_many :client_managers, :foreign_key=>:phone, :primary_key=>:phone
   has_many :managed_shops, :through=>:client_managers, :source=>:shops
 
-  # 用户具有发卷权限的卡卷
+  # 用户具有发券权限的卡券
   has_many :sender_card_tpls, ->{where(:client_managers=>{:sender=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
 
-  # 用户具有核销权限的卡卷
+  # 用户具有核销权限的卡券
   has_many :checker_card_tpls, ->{where(:client_managers=>{:checker=>1}).uniq}, :through=>:managed_shops, :source=>:card_tpls
 
   
@@ -45,11 +45,11 @@ class Member < ActiveRecord::Base
   has_many :acquired_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:phone
   # 用户发送的卡密
   has_many :sended_cards, :class_name=>Card, :primary_key=>:phone, :foreign_key=>:sender_phone
-  # 用户得到的卡卷， 通过卡密搜索
+  # 用户得到的卡券， 通过卡密搜索
   has_many :acquired_card_tpls, -> {uniq}, :through=>:acquired_cards, :source=>:card_tpl
-  # 用户已核销的卡卷， 通过卡密搜索
+  # 用户已核销的卡券， 通过卡密搜索
   has_many :checked_card_tpls, -> {uniq}, :through=>:checked_cards, :source=>:card_tpl
-  # 用户可以核销的卡卷
+  # 用户可以核销的卡券
   has_many :active_card_tpls, -> {uniq}, :through=>:active_cards, :source=>:card_tpl
 
   has_many :dayus, :as=>:dayuable
@@ -97,7 +97,14 @@ class Member < ActiveRecord::Base
   end
 
   def api_remember_me!
-    self.api_token ||= self.class.remember_token
+    self.api_token ||= self.class.api_token
     save(validate: false) if self.changed?
   end
+
+  def self.api_token #:nodoc:
+    loop do
+      token = Devise.friendly_token
+      break token unless self.exists?({ api_token: token })
+    end
+  end  
 end

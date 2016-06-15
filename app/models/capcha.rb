@@ -121,7 +121,7 @@ class Capcha < ActiveRecord::Base
         'type'=>__callee__,
         'smsType'=>'normal',
         'smsFreeSignName'=>'红券',
-        'smsParam'=>{code: capcha.code.to_s, product: "红卷" },
+        'smsParam'=>{code: capcha.code.to_s, product: "红券" },
         'recNum'=>phone,
         'smsTemplateCode'=>'SMS_2100912'
       }

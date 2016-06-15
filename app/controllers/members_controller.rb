@@ -27,6 +27,13 @@ class MembersController < ApplicationController
       if Capcha.valid_code(nil, params[:phone], :send_capcha_bind_phone, params[:capcha])
         @wechat_user.phone = params[:phone]
         @wechat_user.save
+        
+        if @wechat_user.member.nil?
+          @member = Member.new(:phone=>params[:phone],:password=>Devise.friendly_token)
+          @member.save
+          @wechat_user.member = @member
+        end
+
         redirect_to bind_success_members_path
       else
         flash[:message] = '绑定失败'

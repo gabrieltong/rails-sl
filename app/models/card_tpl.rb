@@ -133,24 +133,28 @@ class CardTpl < ActiveRecord::Base
       # person_limit
       # period.person_limit
       # card_tpl.state
-      # 判断某手机号能否领优惠卷
-      def can_acquire? phone
+      # 判断某手机号能否领优惠券
+      def can_acquire? phone＝nil, agent=:admin
         if cards.acquirable.empty?
-          :no_acquirable_card
-        elsif datetime_can_acquire? != true
-          :datetime_not_acquirable
-        elsif week_can_acquire? != true
-          :week_not_acquirable
-        elsif hour_can_acquire? != true
-          :hour_not_acquirable
-        elsif groups_can_acquire?(phone) != true
-          :groups_not_acquirable
-        elsif period_card_can_acquire? != true
-          :period_card_limit_overflow
-        elsif phone_can_acquire?(phone) != true
-          :phone_limit_overflow
-        elsif period_phone_can_acquire?(phone)!= true
-          :period_phone_limit_overflow
+          I18n.t('can_acquire_error.no_acquirable_card')
+        elsif public_type_can_acquire?(phone) == false
+          I18n.t('can_acquire_error.public_type_not_acquirable')
+        elsif acquire_type_can_acquire?(agent) == false
+          I18n.t('can_acquire_error.acquire_type_not_acquirable')          
+        elsif datetime_can_acquire? == false
+          I18n.t('can_acquire_error.datetime_not_acquirable')
+        elsif week_can_acquire? == false
+          I18n.t('can_acquire_error.week_not_acquirable')
+        elsif hour_can_acquire? == false
+          I18n.t('can_acquire_error.hour_not_acquirable')
+        elsif groups_can_acquire?(phone) == false
+          I18n.t('can_acquire_error.groups_not_acquirable')
+        elsif period_card_can_acquire? == false
+          I18n.t('can_acquire_error.period_card_limit_overflow')
+        elsif phone_can_acquire?(phone) == false
+          I18n.t('can_acquire_error.phone_limit_overflow')
+        elsif period_phone_can_acquire?(phone)== false
+          I18n.t('can_acquire_error.period_phone_limit_overflow')
         else
           true
         end
@@ -170,7 +174,7 @@ class CardTpl < ActiveRecord::Base
 
 
   before_validation do |record|
-    # 根据change_remain创建Quantity，通过Quantity的数量变化创建卡卷
+    # 根据change_remain创建Quantity，通过Quantity的数量变化创建卡券
     if record.change_remain and record.change_remain.to_i != 0
       quantities.build(:number=>change_remain)
     end
@@ -191,7 +195,7 @@ class CardTpl < ActiveRecord::Base
         if result != number
           raise ActiveRecord::Rollback
         end
-        client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'核销',:msg=>"#{phone}被核销了#{number}张卡卷,操作员#{by_phone}"}
+        client.create_activity key: 'card.check', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'核销',:msg=>"#{phone}被核销了#{number}张卡券,操作员#{by_phone}"}
       end
       result
     end
@@ -201,11 +205,15 @@ class CardTpl < ActiveRecord::Base
     if self.class.anonymous.include? self.id
       return true
     else
-      self.members.exists?(:phone=>phone)
+      return self.members.exists?(:phone=>phone)
     end
   end
 
   def period_phone_can_acquire_count phone
+    if self.class.anonymous.exists? self.id
+      return 1000
+    end
+    
     if period = period_now
       from = DateTime.now.change({ hour: period.from.hour, min: period.from.min, sec: 0 })
       to = DateTime.now.change({ hour: period.to.hour, min: period.to.min, sec: 0 })
@@ -231,12 +239,37 @@ class CardTpl < ActiveRecord::Base
 
   # 验证用户
   def period_phone_can_acquire? phone
-    period_phone_can_acquire_count(phone) > 0 
+    if self.class.anonymous.exists?(id)
+      return true
+    else
+      return period_phone_can_acquire_count(phone) > 0 
+    end
   end
 
   # 验证用户
   def phone_can_acquire? phone
-    cards.acquired_by(phone).size < person_limit
+    if self.class.anonymous.exists?(id)
+      return true
+    else
+      return cards.acquired_by(phone).size < person_limit
+    end
+  end
+
+  # 卡券领取类型
+  def acquire_type_can_acquire? phone
+    if phone.blank?
+      return self.class.anonymous.exists?(id)
+    else
+      true
+    end
+  end
+
+  def public_type_can_acquire? agent
+    if agent.to_sym == :user
+      return self.class.open.exists?(id)
+    elsif agent.to_sym == :admin
+      return self.class.unopen.exists?(id)
+    end
   end
 
   # 验证投放日期日期
@@ -311,7 +344,7 @@ class CardTpl < ActiveRecord::Base
 
           send_message_acquired_cards phone, number
 
-          client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'发卷',:msg=>"#{phone}获得了#{number}张卡卷,操作员#{by_phone}"}
+          client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'发券',:msg=>"#{phone}获得了#{number}张卡券,操作员#{by_phone}"}
         end
         return result
       else
@@ -346,16 +379,16 @@ class CardTpl < ActiveRecord::Base
     Dayu.createByDayuable(self, config).run
   end
 
-  def self.can_acquire? id, phone
+  def self.can_acquire? id, phone, agent
     record = find_by_id(id)
     if record
-      record.can_acquire? phone
+      record.can_acquire? phone, agent
     else
       :no_record
     end
   end
 
-  # 判断卡卷是否能被member投放
+  # 判断卡券是否能被member投放
   def self.can_send_by_phone? id, phone
     record = find_by_id(id)
     if record
@@ -365,7 +398,7 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  # 判断卡卷是否能被member投放
+  # 判断卡券是否能被member投放
   def self.can_check_by_phone? id, phone
     record = find_by_id(id)
     if record
@@ -427,7 +460,7 @@ class CardTpl < ActiveRecord::Base
     where type: [:CardBTpl,:CardATpl]
   end
 
-  # 卡卷是否可核销 , 需要结合卡密核销函数 card.can_check?
+  # 卡券是否可核销 , 需要结合卡密核销函数 card.can_check?
   def _can_check?
     if week_can_check? != true
       return :week_not_checkable

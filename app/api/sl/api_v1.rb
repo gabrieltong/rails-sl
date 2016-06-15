@@ -492,7 +492,7 @@ module SL
           render
           can_send_by_phone = CardTpl.unopen.can_send_by_phone? params[:id], current_member.phone
           if can_send_by_phone === true
-            present :result, CardTpl.unopen.can_acquire?(params[:id], params[:phone])
+            present :result, CardTpl.unopen.can_acquire?(params[:id], params[:phone], :admin)
             present :number, [CardTpl.unopen.find(params[:id]).period_phone_can_acquire_count(params[:phone]), CardTpl.find(params[:id]).cards.acquirable.size].min
           else
             present :result, can_send_by_phone

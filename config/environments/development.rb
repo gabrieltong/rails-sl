@@ -51,7 +51,7 @@ LaPath = '/Users/shangliang/Sites/la-sl-timer/artisan'
 
 Rails.application.config.middleware.use ExceptionNotification::Rack,
   :email => {
-    :email_prefix => "[红卷报错] ",
+    :email_prefix => "[红券报错] ",
     :sender_address => %{"notifier" <notifier@hongq.net>},
     :exception_recipients => %w{334812134@qq.com}
   }

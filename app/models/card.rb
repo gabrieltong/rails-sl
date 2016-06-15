@@ -28,7 +28,8 @@ class Card < ActiveRecord::Base
   scope :locked, ->{where.not(:locked_by_id=>nil)}
   scope :acquired, ->{where.not(:acquired_at=>nil)}
   scope :acquired_by_phone, ->{where.not(:acquired_at=>nil, :phone=>nil)}
-  scope :acquired_by_openid, ->{where.not(:acquired_at=>nil, :openid=>nil)}
+  # scope :acquired_by_openid, ->{where.not(:acquired_at=>nil, :openid=>nil)}
+  scope :acquired_by_anonymous, ->{where(:phone=>nil).where.not(:acquired_at=>nil)}
   scope :checked, ->{where.not(:checked_at=>nil)}
 
   scope :locked_none, ->{where(:locked_id=>nil)}
@@ -72,11 +73,11 @@ class Card < ActiveRecord::Base
 
 # 冗余：locked_id, locked_tpl_id
   def generate_locked_info
-    # 为被绑定的卡卷生成冗余
+    # 为被绑定的卡券生成冗余
     if locked_by_card
       self.locked_by_tpl_id = locked_by_card.card_tpl_id
       if locked_by_card.locked_id.nil?
-        # 为绑定其他卡卷的卡卷生成冗余
+        # 为绑定其他卡券的卡券生成冗余
         locked_by_card.locked_id = id
         locked_by_card.locked_tpl_id = card_tpl_id
         locked_by_card.save
@@ -107,9 +108,9 @@ class Card < ActiveRecord::Base
 
 # 已获得 scope card.acquired
 # 未核销 scope card.not_checked
-# 卡卷实例在有效期内 scope card.active
+# 卡券实例在有效期内 scope card.active
 
-# 卡卷模板未下架 scope card_tpl.active or card_tpl.paused
+# 卡券模板未下架 scope card_tpl.active or card_tpl.paused
 # 当前时间在可核销时间内 hour in use_hours 
 # 当前天(周1，2，3，4，5，6，7）在可核销cwday内 : cwday in use_weeks
 # 使用乐观锁
@@ -147,7 +148,7 @@ class Card < ActiveRecord::Base
     }
   end
 
-# 改卡卷自身是否能核销 ，包含卡卷实例的验证， 包括卡卷模板的验证
+# 改卡券自身是否能核销 ，包含卡券实例的验证， 包括卡券模板的验证
   def self.can_check? code
     card = self.find_by_code(code)
     if card.nil?

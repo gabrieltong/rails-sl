@@ -54,7 +54,7 @@ class Quantity < ActiveRecord::Base
     end
   end
 
-# TODO: 生成卡卷密钥
+# TODO: 生成卡券密钥
   def generate_cards_for_a
     if number > 0
       (number - added_cards.size).times do
