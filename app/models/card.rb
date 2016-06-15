@@ -27,6 +27,8 @@ class Card < ActiveRecord::Base
   scope :has_locked, ->{where.not(:locked_id=>nil)}
   scope :locked, ->{where.not(:locked_by_id=>nil)}
   scope :acquired, ->{where.not(:acquired_at=>nil)}
+  scope :acquired_by_phone, ->{where.not(:acquired_at=>nil, :phone=>nil)}
+  scope :acquired_by_openid, ->{where.not(:acquired_at=>nil, :openid=>nil)}
   scope :checked, ->{where.not(:checked_at=>nil)}
 
   scope :locked_none, ->{where(:locked_id=>nil)}

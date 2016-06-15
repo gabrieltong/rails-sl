@@ -9,7 +9,7 @@ class CardTpl < ActiveRecord::Base
   IndateType = { I18n.t('indate_type.fixed')=>'fixed', I18n.t('indate_type.dynamic')=>'dynamic'}
   Type = { I18n.t('card_tpl.type.CardATpl')=>'CardATpl', I18n.t('card_tpl.type.CardBTpl')=>'CardBTpl'}
   AcquireType = { I18n.t('card_tpl.acquire_type.anonymous')=>'anonymous', I18n.t('card_tpl.acquire_type.login')=>'login'}
-  
+
   belongs_to :client
   belongs_to :member
 
