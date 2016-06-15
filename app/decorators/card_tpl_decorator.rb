@@ -14,6 +14,14 @@ class CardTplDecorator < Draper::Decorator
     	''
     end.html_safe
   end
+
+  def indate_text
+    if object.decorator_class.fixed.exists?(object.id)
+      "#{I18n.t('indate_type.fixed')}(#{indate_from}~#{indate_to})"
+    elsif object.decorator_class.dynamic.exists?(object.id)
+      "#{I18n.t('indate_type.dynamic')}(领取后#{indate_after}天后有效)"
+    end
+  end
   # Define presentation-specific methods here. Helpers are accessed through
   # `helpers` (aka `h`). You can override attributes, for example:
   #

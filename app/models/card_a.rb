@@ -27,9 +27,10 @@ class CardA < Card
         self.to = card_tpl.indate_to
       end
 
+      # 动态有效期类型不需要from to , from to 在领取时才会生效
       if CardTpl.dynamic.exists?(card_tpl_id)
-        self.from = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) + (card_tpl.indate_today ? 0 : 1).days
-        self.to = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) + (card_tpl.indate_today ? 0 : 1).days + (card_tpl.indate_after - 1).days
+        # self.from = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) - 1.days
+        # self.to = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) + 10.years
       end
     end
   end

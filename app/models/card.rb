@@ -16,6 +16,10 @@ class Card < ActiveRecord::Base
 
   delegate 'can_check_by_phone?', :to=>:card_tpl
   delegate :title, :to=>:card_tpl
+  delegate :indate_type, :to=>:card_tpl
+  delegate :indate_after, :to=>:card_tpl
+  delegate :indate_from, :to=>:card_tpl
+  delegate :indate_to, :to=>:card_tpl
 
   scope :by_client, ->(client_id){where(:client_id=>client_id)}
   scope :acquired_by, ->(phone){where(:phone=>phone)}
@@ -46,7 +50,7 @@ class Card < ActiveRecord::Base
   # 相当于 acquired.not_checked.active
   scope :checkable, ->{where(arel_table[:acquired_at].not_eq(nil)).where(arel_table[:checked_at].eq(nil)).where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
 
-  scope :acquirable, ->{where(:acquired_at=>nil, :locked_by_id=>nil).where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
+  scope :acquirable, ->{where(:acquired_at=>nil, :locked_by_id=>nil).where(arel_table[:from].lt(DateTime.now).or(arel_table[:from].eq(nil))).where(arel_table[:to].gt(DateTime.now).or(arel_table[:to].eq(nil)))}
 
   scope :acquired_in_range, ->(from, to){where(arel_table[:acquired_at].gt(from)).where(arel_table[:acquired_at].lt(to))}
   scope :checked_in_range, ->(from, to){where(arel_table[:checked_at].gt(from)).where(arel_table[:checked_at].lt(to))}
