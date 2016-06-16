@@ -2,6 +2,8 @@ class CardA < Card
   validates :code, :uniqueness=>true
   validates :code, :presence=>true
 
+  scope :need_fix_from_to, ->{where(:to=>nil).where.not(:acquired_at=>nil)}
+
   before_validation do |record|
     record.generate_code
     record.generate_from_to
@@ -10,6 +12,10 @@ class CardA < Card
   after_create do |record|
     record.generate_code
   end
+
+  # after_save do |record|
+  #   record.fix_from_to
+  # end
 
   def generate_code
     if code.blank? and card_tpl.is_a? CardATpl
@@ -32,6 +38,21 @@ class CardA < Card
         # self.from = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) - 1.days
         # self.to = DateTime.now.change({ hour: 0, min: 0, sec: 0 }) + 10.years
       end
+    end
+  end
+
+  def self.fix_from_to
+    self.need_fix_from_to.each do |record|
+      record.fix_from_to
+    end
+  end
+  # private
+  def fix_from_to
+    
+    if !self.acquired_at.blank? && self.indate_type.to_sym == :dynamic
+      self.from = acquired_at + (self.indate_today == true ? 1.days : 0.days)
+      self.to = self.from + self.indate_after.days
+      self.save :validate=>false
     end
   end
 end

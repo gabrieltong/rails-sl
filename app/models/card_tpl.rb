@@ -48,8 +48,8 @@ class CardTpl < ActiveRecord::Base
   scope :week_checkable, ->{joins(:setting).where(:card_tpl_settings=>{"check_#{DateTime.now.strftime('%A').downcase}"=>1})}
   scope :hour_checkable, ->{joins(:setting).where(:card_tpl_settings=>{"check_h#{DateTime.now.hour}"=>1})}
 
-  scope :sendable_by, ->(phone){joins(:shops=>[:managers]).where.not(:public=>true).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:sender].eq(1))}
-  scope :checkable_by, ->(phone){joins(:shops=>[:managers]).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:checker].eq(1))}
+  scope :sendable_by, ->(phone){joins(:shops=>[:managers]).where.not(:public=>true).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:sender].eq(1).or(ClientManager.arel_table[:admin].eq(1)))}
+  scope :checkable_by, ->(phone){joins(:shops=>[:managers]).where(Member.arel_table[:phone].eq(phone)).where(ClientManager.arel_table[:checker].eq(1).or(ClientManager.arel_table[:admin].eq(1)))}
 
   serialize :acquire_weeks
   serialize :check_weeks
@@ -84,14 +84,9 @@ class CardTpl < ActiveRecord::Base
     record.acquire_weeks = UseWeeks.values
     record.check_weeks = UseWeeks.values
     record.check_hours = UseHours.values
+    record.public = true
+    record.groups = client.groups if client
   end 
-
-  before_save do |record|
-    # 如果需要登录， 默认勾选所有会员组
-    if record.class.login.exists? record.id
-      record.groups = record.client.groups
-    end
-  end
 
   after_save do |record|
     update_setting
@@ -135,8 +130,7 @@ class CardTpl < ActiveRecord::Base
       # card_tpl.state
       # 判断某手机号能否领优惠券
       def can_acquire? phone=nil, agent=:admin
-        logger.info '>>>>'
-        logger.info phone
+        logger.info "#{__callee__} >>>>"
         if cards.acquirable.empty?
           I18n.t('can_acquire_error.no_acquirable_card')
         elsif public_type_can_acquire?(agent) == false
@@ -204,6 +198,7 @@ class CardTpl < ActiveRecord::Base
   end
 
   def groups_can_acquire? phone=''
+    logger.info 'groups_can_acquire >>>>'
     if self.class.anonymous.include? self.id
       return true
     else
@@ -339,11 +334,13 @@ class CardTpl < ActiveRecord::Base
         result = false
 
         Card.transaction do 
-          result = cards.acquirable.limit(number).update_all(:phone=>phone, :acquired_at=>DateTime.now, :sender_phone=>by_phone)
+          conditions = {:phone=>phone, :acquired_at=>DateTime.now, :sender_phone=>by_phone}
+          result = cards.acquirable.limit(number).update_all(conditions)
           if result != number
             raise ActiveRecord::Rollback
           end
 
+          CardA.where(conditions).fix_from_to
           send_message_acquired_cards phone, number
 
           client.create_activity key: 'card.acquire', owner: Member.find_by_phone(by_phone), recipient: self, :parameters=>{:phone=>phone, :by_phone=>by_phone, :number=>number,:type=>'发券',:msg=>"#{phone}获得了#{number}张卡券,操作员#{by_phone}"}
@@ -450,6 +447,10 @@ class CardTpl < ActiveRecord::Base
     end
 
     self.setting.save
+  end
+
+  def anonymous?
+    self.acquire_type.to_sym == :anonymous
   end
 
   private

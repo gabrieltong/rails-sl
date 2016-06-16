@@ -1,4 +1,9 @@
 'zh-CN':
+  formtastic:
+    hints:
+      card_tpl:
+        acquire_type: "Choose a good title for your post."
+        body: "Write something inspiring here."  
   can_acquire_error:
     no_acquirable_card: '优惠劵已领完'
     public_type_not_acquirable: '公开类型不符'
@@ -383,6 +388,7 @@
         removed_quantity_id: '删除批次'
       card_tpl:
         acquire_type: '领取权限'
+        public_hint: '匿名券必须设置为公开，否则无法领取'
         state: '状态'
         acquire_range: '投放日期'
         client_id: '商户ID'

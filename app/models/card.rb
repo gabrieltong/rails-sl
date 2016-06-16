@@ -20,6 +20,7 @@ class Card < ActiveRecord::Base
   delegate :indate_after, :to=>:card_tpl
   delegate :indate_from, :to=>:card_tpl
   delegate :indate_to, :to=>:card_tpl
+  delegate :indate_today, :to=>:card_tpl
 
   scope :by_client, ->(client_id){where(:client_id=>client_id)}
   scope :acquired_by, ->(phone){where(:phone=>phone)}
