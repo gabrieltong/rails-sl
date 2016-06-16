@@ -490,10 +490,10 @@ module SL
         get :can_acquire do
           authenticate!
           render
-          can_send_by_phone = CardTpl.unopen.can_send_by_phone? params[:id], current_member.phone
+          can_send_by_phone = CardTpl.can_send_by_phone? params[:id], current_member.phone
           if can_send_by_phone === true
-            present :result, CardTpl.unopen.can_acquire?(params[:id], params[:phone], :admin)
-            present :number, [CardTpl.unopen.find(params[:id]).period_phone_can_acquire_count(params[:phone]), CardTpl.find(params[:id]).cards.acquirable.size].min
+            present :result, CardTpl.can_acquire?(params[:id], params[:phone], :admin)
+            present :number, [CardTpl.find(params[:id]).period_phone_can_acquire_count(params[:phone]), CardTpl.find(params[:id]).cards.acquirable.size].min
           else
             present :result, can_send_by_phone
           end
@@ -509,7 +509,7 @@ module SL
         get :acquire do
           authenticate!
           render
-          present :result, CardTpl.unopen.acquire(params[:id], params[:phone], current_member.phone, params[:number], :admin)
+          present :result, CardTpl.acquire(params[:id], params[:phone], current_member.phone, params[:number], :admin)
         end
       end
     end
