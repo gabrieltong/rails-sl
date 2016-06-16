@@ -134,12 +134,14 @@ class CardTpl < ActiveRecord::Base
       # period.person_limit
       # card_tpl.state
       # 判断某手机号能否领优惠券
-      def can_acquire? phone＝nil, agent=:admin
+      def can_acquire? phone=nil, agent=:admin
+        logger.info '>>>>'
+        logger.info phone
         if cards.acquirable.empty?
           I18n.t('can_acquire_error.no_acquirable_card')
-        elsif public_type_can_acquire?(phone) == false
+        elsif public_type_can_acquire?(agent) == false
           I18n.t('can_acquire_error.public_type_not_acquirable')
-        elsif acquire_type_can_acquire?(agent) == false
+        elsif acquire_type_can_acquire?(phone) == false
           I18n.t('can_acquire_error.acquire_type_not_acquirable')          
         elsif datetime_can_acquire? == false
           I18n.t('can_acquire_error.datetime_not_acquirable')
@@ -329,8 +331,8 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  def acquire(phone, by_phone, number=1)
-    can_acquire = can_acquire?(phone)
+  def acquire(phone, by_phone, number=1, agent=:admin)
+    can_acquire = can_acquire?(phone, agent)
     if can_acquire === true
       can_send_by_phone = self.can_send_by_phone?(by_phone)
       if can_send_by_phone === true
@@ -408,10 +410,10 @@ class CardTpl < ActiveRecord::Base
     end
   end
 
-  def self.acquire(id, phone, by_phone, number=1)
+  def self.acquire(id, phone, by_phone, number=1, agent=:admin)
     record = find_by_id(id)
     if record
-      record.acquire(phone, by_phone, number)
+      record.acquire(phone, by_phone, number, agent)
     else
       :no_record
     end

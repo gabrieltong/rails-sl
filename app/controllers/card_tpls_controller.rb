@@ -18,6 +18,7 @@ class CardTplsController < ApplicationController
 
 private
   def can_acquire
+    # @can_acquire = true
     @can_acquire = @card_tpl.can_acquire? @wechat_user.phone, :user
   end
 

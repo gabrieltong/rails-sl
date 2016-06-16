@@ -509,7 +509,7 @@ module SL
         get :acquire do
           authenticate!
           render
-          present :result, CardTpl.unopen.acquire(params[:id], params[:phone], current_member.phone, params[:number])
+          present :result, CardTpl.unopen.acquire(params[:id], params[:phone], current_member.phone, params[:number], :admin)
         end
       end
     end
