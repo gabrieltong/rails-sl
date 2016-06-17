@@ -1,4 +1,5 @@
 class GroupMember < ActiveRecord::Base
+  DEFAULT_PERIOD = 1.year
   belongs_to :group
   belongs_to :client
   belongs_to :member, :primary_key=>:phone, :foreign_key=>:phone

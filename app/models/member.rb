@@ -106,5 +106,20 @@ class Member < ActiveRecord::Base
       token = Devise.friendly_token
       break token unless self.exists?({ api_token: token })
     end
-  end  
+  end
+
+  def self.get_instance_by_phone(phone)
+    p ChinaPhoneValidator.validate?(phone)
+    if ChinaPhoneValidator.validate?(phone)
+      m = Member.find_by_phone(phone)
+      if m.nil?
+        m = Member.new(:phone=>phone)
+        m.password = rand(100000000000)
+        m.save!
+      end
+      m
+    else
+      false
+    end
+  end
 end
