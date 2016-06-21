@@ -151,7 +151,7 @@
       card_a_tpl: '优惠券'
       card_b_tpl: '抽奖券'
       image: '图片'
-      draw_award: '奖项'
+      draw_award: '奖品'
       period: '投放时间段'
       card: '卡密'
       card_a: '优惠劵卡密'
@@ -353,6 +353,7 @@
         desc: '优惠说明'
         intro: '使用须知'
       card_b_tpl:
+        draw_awards: '奖品'
         title: '抽奖券标题'
         desc: '抽奖说明'
         intro: '抽奖须知'
@@ -363,6 +364,7 @@
         number: '每时段投放张数'
         person_limit: '每时段每人限领'
       card:
+        locked_card: '锁定卡券'
         card_tpl: '卡卷'
         acquire_type: '领取权限'
         type: '类型'
@@ -457,7 +459,7 @@
       checked_by: '被%{phone}核销'
       locked_by: '被抽奖券卡密%{card}锁定'
       locked_by_tpl: '被抽奖券%{card_tpl}锁定'
-      has_locked: '中奖卷'
+      locked_other: '中奖卷'
       locked: '占用'
       acquired: '已领'
       checked: '已核'

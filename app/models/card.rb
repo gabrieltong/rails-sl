@@ -26,19 +26,19 @@ class Card < ActiveRecord::Base
   scope :acquired_by, ->(phone){where(:phone=>phone)}
   scope :sended_by, ->(phone){where(:sender_phone=>phone)}
   scope :checked_by, ->(phone){where(:checker_phone=>phone)}
-  scope :locked_by, ->(card_id){where(:locked_by_id=>card_id)}
-  scope :locked_by_tpl, ->(card_tpl_id){where(:locked_by_tpl_id=>card_tpl_id)}
-
-  scope :has_locked, ->{where.not(:locked_id=>nil)}
-  scope :locked, ->{where.not(:locked_by_id=>nil)}
+  
   scope :acquired, ->{where.not(:acquired_at=>nil)}
   scope :acquired_by_phone, ->{where.not(:acquired_at=>nil, :phone=>nil)}
   # scope :acquired_by_openid, ->{where.not(:acquired_at=>nil, :openid=>nil)}
   scope :acquired_by_anonymous, ->{where(:phone=>nil).where.not(:acquired_at=>nil)}
   scope :checked, ->{where.not(:checked_at=>nil)}
 
+  scope :locked_other, ->{where.not(:locked_id=>nil)}
   scope :locked_none, ->{where(:locked_id=>nil)}
+  scope :locked, ->{where.not(:locked_by_id=>nil)}
   scope :not_locked, ->{where(:locked_by_id=>nil)}
+  scope :locked_by_tpl, ->(card_tpl_id){where(:locked_by_tpl_id=>card_tpl_id)}
+  
   scope :not_acquired, ->{where(:acquired_at=>nil)}
   scope :not_checked, ->{where(:checked_at=>nil)}
 
@@ -51,6 +51,7 @@ class Card < ActiveRecord::Base
   # 相当于 acquired.not_checked.active
   scope :checkable, ->{where(arel_table[:acquired_at].not_eq(nil)).where(arel_table[:checked_at].eq(nil)).where(arel_table[:from].lt(DateTime.now)).where(arel_table[:to].gt(DateTime.now))}
 
+  scope :locked_acquirable, ->{where(:acquired_at=>nil).where.not(:locked_by_id=>nil).where(arel_table[:from].lt(DateTime.now).or(arel_table[:from].eq(nil))).where(arel_table[:to].gt(DateTime.now).or(arel_table[:to].eq(nil)))}
   scope :acquirable, ->{where(:acquired_at=>nil, :locked_by_id=>nil).where(arel_table[:from].lt(DateTime.now).or(arel_table[:from].eq(nil))).where(arel_table[:to].gt(DateTime.now).or(arel_table[:to].eq(nil)))}
   scope :expired, ->{where(:acquired_at=>nil, :locked_by_id=>nil).where(arel_table[:to].lt(DateTime.now))}
 
@@ -77,6 +78,37 @@ class Card < ActiveRecord::Base
     'type'
   end
 
+  def locked?
+    !locked_by_id.nil?
+  end
+
+  def locked_other?
+    !locked_id.nil?
+  end
+
+  def acquired?
+    !acquired_at.nil?
+  end
+
+  def checked?
+    !checked_at.nil?
+  end
+
+  def active?
+    (self.from.nil? || self.from <= DateTime.now ) && (self.to.nil? || self.to >= DateTime.now )
+  end
+
+  def expired?
+    self.locked? == false && self.acquired? == false && self.to < DateTime.now
+  end
+
+  def checkable?
+    self.acquired? && !self.checked? && self.active?
+  end
+
+  def acquirable?
+    self.locked? == false && self.acquired? == false && self.active?
+  end
 # 冗余：locked_id, locked_tpl_id
   def generate_locked_info
     # 为被绑定的卡券生成冗余
@@ -92,12 +124,14 @@ class Card < ActiveRecord::Base
   end
 # 为卡密生成正确类型
   def generate_type
-    if card_tpl.is_a? CardATpl
-      self.type = :CardA
-    end
+    if self.type.blank?
+      if card_tpl.is_a? CardATpl
+        self.type = :CardA
+      end
 
-    if card_tpl.is_a? CardBTpl
-      self.type = :CardB
+      if card_tpl.is_a? CardBTpl
+        self.type = :CardB
+      end
     end
   end
 
@@ -198,6 +232,9 @@ class Card < ActiveRecord::Base
     end
   end
 
+  def lock(card)
+    self.locked_card = card
+  end
   # 用户给参与用户发送卡券密码
   def send_message_acquired
 

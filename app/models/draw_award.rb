@@ -5,4 +5,6 @@ class DrawAward < ActiveRecord::Base
 	def number_need_create
 		number - award_tpl.cards.locked_by_tpl(card_tpl).size
 	end
+
+  # validate :
 end

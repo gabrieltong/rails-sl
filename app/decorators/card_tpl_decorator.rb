@@ -16,9 +16,9 @@ class CardTplDecorator < Draper::Decorator
   end
 
   def indate_text
-    if object.decorator_class.fixed.exists?(object.id)
+    if object.fixed?
       "#{I18n.t('indate_type.fixed')}(#{indate_from}~#{indate_to})"
-    elsif object.decorator_class.dynamic.exists?(object.id)
+    elsif object.dynamic?
       "#{I18n.t('indate_type.dynamic')}(领取后#{indate_after}天后有效)"
     end
   end

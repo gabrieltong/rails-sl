@@ -1,8 +1,11 @@
 # encoding: UTF-8
 class CardB < Card
 	delegate 'can_check?', :to=>:locked_card, :allow_nil=>true
-	delegate 'check', :to=>:locked_card, :allow_nil=>true
-	delegate 'code', :to=>:locked_card, :allow_nil=>true
+	delegate :check, :to=>:locked_card, :allow_nil=>true
+	delegate :code, :to=>:locked_card, :allow_nil=>true
+  delegate :phone, :to=>:locked_card, :allow_nil=>true
+  delegate :from, :to=>:locked_card, :allow_nil=>true
+  delegate :to, :to=>:locked_card, :allow_nil=>true
 	
 	validates :code, inclusion: { in: [nil] }
 
