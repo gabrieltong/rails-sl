@@ -16,3 +16,5 @@ vendor
 public/system
 .env
 config/wechat_access_token
+
+sftp-config.json

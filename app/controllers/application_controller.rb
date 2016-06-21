@@ -19,10 +19,10 @@ class ApplicationController < ActionController::Base
   end
 
   def get_wechat_info
-    @wechat_user = WechatUser.find_by_phone(13654265306)
-    @member = @wechat_user.member
-    @client_member = @member.client_members.where(:phone=>@member.phone).first.decorate
-    return
+    # @wechat_user = WechatUser.find_by_phone(13654265306)
+    # @member = @wechat_user.member
+    # @client_member = @member.client_members.where(:phone=>@member.phone).first.decorate
+    # return
 
     wechat_oauth2 do |openid, info|
       logger.info "openid: #{openid}"

@@ -3,13 +3,13 @@
 one:
   client_id: 1
   member_id: 1
-  send: false
+  sender: false
   admin: false
-  check: false
+  checker: false
 
 two:
   client_id: 1
   member_id: 1
-  send: false
+  sender: false
   admin: false
-  check: false
+  checker: false

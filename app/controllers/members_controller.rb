@@ -70,9 +70,9 @@ private
   end
 
   def get_wechat_info
-    @wechat_user =  WechatUser.first
-    @member = @wechat_user.member.decorate
-    return
+    # @wechat_user =  WechatUser.first
+    # @member = @wechat_user.member.decorate
+    # return
 
     wechat_oauth2 'snsapi_userinfo' do |openid, info|
       logger.info "openid: #{openid}"

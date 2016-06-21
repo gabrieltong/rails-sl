@@ -302,6 +302,7 @@ class CardTpl < ActiveRecord::Base
     self.class.week_checkable.exists?self.id
   end
 
+  # 公开券不需要发送人电话， 非公开券需要发送人
   def can_send_by_phone? phone
     if self.open?
       phone.blank?
@@ -348,6 +349,7 @@ class CardTpl < ActiveRecord::Base
         Card.transaction do 
           conditions = {:phone=>phone, :acquired_at=>DateTime.now, :sender_phone=>by_phone}
           result = cards.acquirable.limit(number).update_all(conditions)
+          
           if result != number
             raise ActiveRecord::Rollback
           end
